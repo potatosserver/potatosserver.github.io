@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft 伺服器資訊</title>
+    <title>Minecraft 伺服器狀態</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <style>
@@ -11,251 +11,200 @@
             font-family: 'Press Start 2P', monospace;
             background-color: #111827; /* 深色背景 */
             color: #f9fafb; /* 淺色文字 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             margin: 0;
-            padding: 0;
+            padding: 20px;
+            /* 添加背景圖片 */
+            background-image: url('https://play-lh.googleusercontent.com/bFkE7hv6lnuN3N2UC_d-NnUDRcvtZ_kUpOhZCQ8k930A-oXBNjPEreMUyrnHcQnigYG8=w2560-h1440-rw'); /* 替換成你的圖片網址 */
+            background-size: cover; /* 圖片覆蓋整個 body */
+            background-position: center; /* 圖片置中 */
         }
-        .container {
-            max-width: 800px; /* 限制容器寬度 */
-            margin: 2rem auto; /* 垂直margin設為2rem */
-            padding: 2rem;
-            text-align: center;
-            background-color: #1f2937; /* 稍淺的深色容器背景 */
-            border-radius: 0.75rem; /* 圓角 */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* 陰影效果 */
+
+        #app {
+            max-width: 800px; /* 限制內容寬度 */
+            width: 100%;
+            background-color: rgba(31, 41, 55, 0.8); /* 稍淺的深色容器背景，增加透明度 */
+            padding: 24px;
+            border-radius: 12px; /* 圓角 */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3); /* 更柔和的陰影 */
+            border: 1px solid #374151; /* 邊框 */
         }
+
         h1 {
-            font-size: 2.25rem; /* 標題字體大小 */
-            font-weight: 700; /* 粗體 */
-            margin-bottom: 1.5rem;
-            color: #6ee7b7; /* 青綠色標題 */
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* 文字陰影 */
-        }
-        #server-status {
-            font-size: 1.25rem; /* 狀態字體大小 */
+            font-size: 2em;
             margin-bottom: 1rem;
-            color: #f5f5f5;
+            color: #6ee7b7; /* 綠色標題 */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* 文字陰影 */
         }
-        #player-count {
-            font-size: 1rem;
+
+        #server-status {
             margin-bottom: 1.5rem;
-            color: #cbd5e0;
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: #242424; /* 更深的背景 */
+            border: 1px solid #4a5568;
         }
-        #player-list {
+
+        #server-status p {
+            margin: 0.5rem 0;
+            font-size: 0.8rem;
+        }
+
+        #server-status p strong {
+            color: #f5f5f5; /* 強調文字顏色 */
+        }
+
+        #server-status .online {
+            color: #6ee7b7; /* 線上狀態為綠色 */
+        }
+
+        #server-status .offline {
+            color: #f87171; /* 離線狀態為紅色 */
+        }
+
+        #players {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: #242424; /* 更深的背景 */
+            border: 1px solid #4a5568;
+        }
+
+        #players p {
+            margin: 0.5rem 0;
+            font-size: 0.8rem;
+        }
+
+        #players ul {
             list-style: none;
             padding: 0;
-            margin: 0 auto; /* 水平置中 */
-            max-width: 80%; /* 限制玩家列表寬度 */
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
-        #player-list li {
-            background-color: #374151; /* 更深的背景 для 列表項 */
+
+        #players ul li {
+            background-color: #4a5568; /* 玩家名稱背景 */
             color: #ffffff;
-            padding: 0.5rem;
-            margin-bottom: 0.5rem;
-            border-radius: 0.375rem; /* 圓角 */
-            border: 1px solid #4b5563; /* 邊框 */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* 陰影 */
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
         }
-        #loading-indicator {
-            font-size: 1rem;
-            color: #888;
-            margin-top: 1rem;
+
+        #version-info {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: #242424; /* 更深的背景 */
+            border: 1px solid #4a5568;
         }
-        .online {
-            color: #6ee7b7; /* 線上狀態為青綠色 */
-        }
-        .offline {
-            color: #ef4444; /* 離線狀態為紅色 */
-        }
-        /* Стилі для кнопок */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.375rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            font-family: 'Press Start 2P', monospace;
+
+        #version-info p {
+            margin: 0.5rem 0;
             font-size: 0.8rem;
-            border: none;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-        }
-        .btn-green {
-            background-color: #10b981; /* Зелений колір */
-            color: #ffffff;
-        }
-        .btn-green:hover {
-            background-color: #059669; /* Затемнений зелений при наведенні */
-            transform: translateY(-2px) scale(1.05);
-        }
-        .btn-blue {
-            background-color: #3b82f6; /* Синій колір */
-            color: #ffffff;
-        }
-        .btn-blue:hover {
-            background-color: #2563eb; /* Затемнений синій при наведенні */
-            transform: translateY(-2px) scale(1.05);
         }
 
-        .input-container {
-            margin-bottom: 1rem;
-        }
-
-        .input-container input {
+        .error-message {
+            color: #f87171;
+            margin-top: 1rem;
             padding: 0.75rem;
-            border-radius: 0.375rem;
-            border: 2px solid #4b5563;
-            width: 80%;
-            max-width: 300px;
-            font-family: 'Press Start 2P', monospace;
-            background-color: #374151;
-            color: #ffffff;
+            background-color: #242424;
+            border-radius: 6px;
+            border: 1px solid #4a5568;
+            font-size: 0.8rem;
         }
-
-        .input-container input:focus {
-            outline: none;
-            border-color: #6ee7b7;
-            box-shadow: 0 0 0 3px rgba(110, 231, 183, 0.3);
-        }
-
     </style>
 </head>
 <body class="bg-gray-900 text-gray-50">
-    <div class="container">
-        <h1 class="text-green-400">Minecraft 伺服器資訊</h1>
+    <div id="app" class="rounded-lg shadow-md border border-gray-800">
+        <h1 class="text-2xl font-semibold mb-4 text-green-400">Minecraft 伺服器狀態</h1>
 
-        <div class="input-container">
-            <input
-                type="text"
-                id="server-address-input"
-                placeholder="請輸入伺服器位址 (例如：mc.example.com:25565)"
-                value="andrewcho970531.nglocalhost.com"
-            />
+        <div id="server-status" class="bg-gray-800 rounded-lg p-4 mb-4 border border-gray-700">
+            <p>伺服器位址：<strong id="server-ip">loading...</strong></p>
+            <p>伺服器狀態：<strong id="server-status-text" class="online">loading...</strong></p>
+            <p>延遲：<strong id="server-ping">loading...</strong> ms</p>
         </div>
 
-        <p id="server-status" class="text-white">伺服器狀態：<span class="text-gray-400">載入中...</span></p>
-        <p id="player-count" class="text-gray-300">在線玩家：<span class="text-gray-400">0</span> / <span class="text-gray-400">0</span></p>
-
-        <ul id="player-list" class="text-gray-300">
+        <div id="players" class="bg-gray-800 rounded-lg p-4 mb-4 border border-gray-700">
+            <p>線上人數：<strong id="online-players">0</strong> / <strong id="max-players">0</strong></p>
+            <p>在線玩家：</p>
+            <ul id="player-list">
+                <li>loading...</li>
             </ul>
+        </div>
 
-        <button id="refresh-button" class="btn btn-blue mb-4">
-            <span id="refresh-icon">&#10226;</span> 刷新資訊
-        </button>
+        <div id="version-info" class="bg-gray-800 rounded-lg p-4 mb-4 border border-gray-700">
+            <p>版本：<strong id="server-version">loading...</strong></p>
+        </div>
 
-        <p id="loading-indicator" class="text-gray-400">
-            <span id="loading-spinner" style="display: none;">載入中...</span>
-        </p>
+        <div id="error-message" class="mt-4 text-red-500 bg-gray-800 rounded-md p-4 border border-gray-700 hidden">
+            
+        </div>
     </div>
 
     <script>
-        const serverAddressInput = document.getElementById('server-address-input');
-        const serverStatusDisplay = document.getElementById('server-status');
-        const playerCountDisplay = document.getElementById('player-count');
-        const playerList = document.getElementById('player-list');
-        const refreshButton = document.getElementById('refresh-button');
-        const loadingIndicator = document.getElementById('loading-indicator');
-        const loadingSpinner = document.getElementById('loading-spinner');
-        const refreshIcon = document.getElementById('refresh-icon');
+        const serverAddress = "andrewcho970531.nglocalhost.com"; // 替換成你的伺服器位址
+        const apiUrl = `https://sr-api.sfirew.com/server/${serverAddress}`;
 
-        let serverAddress = serverAddressInput.value;
-        let isFetching = false; // 防止重複fetch
+        const serverIpElement = document.getElementById("server-ip");
+        const serverStatusTextElement = document.getElementById("server-status-text");
+        const serverPingElement = document.getElementById("server-ping");
+        const onlinePlayersElement = document.getElementById("online-players");
+        const maxPlayersElement = document.getElementById("max-players");
+        const playerListElement = document.getElementById("player-list");
+        const serverVersionElement = document.getElementById("server-version");
+        const errorMessageElement = document.getElementById("error-message");
 
-        // 替換為您的伺服器後端 API
-        const API_BASE_URL = 'https://cors-anywhere.herokuapp.com/https://mcapi.xdefcon.com/server';
+        async function fetchServerStatus() {
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
 
-        function updateServerInfo() {
-            if (isFetching) return;
-            isFetching = true;
-            serverAddress = serverAddressInput.value; // 取得輸入框中的伺服器位址
-            serverStatusDisplay.textContent = '伺服器狀態：載入中...';
-            playerCountDisplay.textContent = '在線玩家：載入中...';
-            playerList.innerHTML = ''; // 清空玩家列表
-            loadingSpinner.style.display = 'inline-block';
-            refreshIcon.style.display = 'none';
+                // 只顯示 IP，不顯示 port (如果 port 是預設的 25565)
+                serverIpElement.textContent = data.port === 25565 ? data.ip : `${data.ip}:${data.port}`;
+                serverStatusTextElement.textContent = data.online ? "線上" : "離線";
+                serverStatusTextElement.className = data.online ? "online" : "offline";
+                serverPingElement.textContent = data.ping;
+                onlinePlayersElement.textContent = data.players.online;
+                maxPlayersElement.textContent = data.players.max;
 
-            // 使用fetch API獲取伺服器資訊
-            fetch(`${API_BASE_URL}/${serverAddress}/full`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // 更新UI
-                    if (data.online) {
-                        serverStatusDisplay.textContent = '伺服器狀態：';
-                        const onlineSpan = document.createElement('span');
-                        onlineSpan.textContent = '線上';
-                        onlineSpan.className = 'online';
-                        serverStatusDisplay.appendChild(onlineSpan);
+                if (data.players.sample && data.players.sample.length > 0) {
+                    playerListElement.innerHTML = data.players.sample
+                        .map((player) => `<li>${player.name}</li>`)
+                        .join("");
+                } else {
+                    playerListElement.innerHTML = "<li>無</li>";
+                }
 
-                        playerCountDisplay.textContent = '在線玩家：';
-                        const onlineCountSpan = document.createElement('span');
-                        onlineCountSpan.textContent = data.players.online;
-                        onlineCountSpan.className = 'text-green-400';
-                        playerCountDisplay.appendChild(onlineCountSpan);
+                serverVersionElement.textContent = data.version.name;
 
-                        playerCountDisplay.appendChild(document.createTextNode(' / '));
+                errorMessageElement.classList.add("hidden");
 
-                        const maxPlayersSpan = document.createElement('span');
-                        maxPlayersSpan.textContent = data.players.max;
-                        maxPlayersSpan.className = 'text-gray-400';
-                        playerCountDisplay.appendChild(maxPlayersSpan);
-
-
-                        playerList.innerHTML = ''; // Clear old player list
-                        if (data.players.list && data.players.list.length > 0) {
-                            data.players.list.forEach(playerName => {
-                                const li = document.createElement('li');
-                                li.textContent = playerName;
-                                playerList.appendChild(li);
-                            });
-                        } else {
-                            const li = document.createElement('li');
-                            li.textContent = '沒有玩家在線上';
-                            li.style.fontStyle = 'italic';
-                            playerList.appendChild(li);
-                        }
-                    } else {
-                        serverStatusDisplay.textContent = '伺服器狀態：';
-                        const offlineSpan = document.createElement('span');
-                        offlineSpan.textContent = '離線';
-                        offlineSpan.className = 'offline';
-                        serverStatusDisplay.appendChild(offlineSpan);
-                        playerCountDisplay.textContent = '伺服器離線';
-                        playerList.innerHTML = '';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching server info:', error);
-                    serverStatusDisplay.textContent = '伺服器狀態：';
-                    const errorSpan = document.createElement('span');
-                    errorSpan.textContent = '錯誤';
-                    errorSpan.className = 'text-red-500';
-                    serverStatusDisplay.appendChild(errorSpan);
-                    playerCountDisplay.textContent = '無法取得玩家資訊';
-                    playerList.innerHTML = '';
-                })
-                .finally(() => {
-                    isFetching = false;
-                    loadingSpinner.style.display = 'none';
-                    refreshIcon.style.display = 'inline-block';
-                });
+            } catch (error) {
+                console.error("Failed to fetch server status:", error);
+                errorMessageElement.textContent = `無法取得伺服器狀態：${error.message}`;
+                errorMessageElement.classList.remove("hidden");
+                // 為了防止錯誤，這裡更新為預設值
+                serverIpElement.textContent = "N/A";
+                serverStatusTextElement.textContent = "N/A";
+                serverStatusTextElement.className = "offline";
+                serverPingElement.textContent = "N/A";
+                onlinePlayersElement.textContent = "0";
+                maxPlayersElement.textContent = "0";
+                playerListElement.innerHTML = "<li>N/A</li>";
+                serverVersionElement.textContent = "N/A";
+            }
         }
 
-        // 初次載入時獲取伺服器資訊
-        updateServerInfo();
-
-        // 設定刷新按鈕點擊事件
-        refreshButton.addEventListener('click', updateServerInfo);
-        serverAddressInput.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                updateServerInfo();
-            }
-        });
+        fetchServerStatus();
+        setInterval(fetchServerStatus, 60000); // 每 60 秒更新一次
     </script>
 </body>
 </html>
