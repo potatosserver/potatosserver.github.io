@@ -219,6 +219,11 @@
             word-break: break-all;
             display: inline-block;
             overflow: hidden;
+            transition: background-color 0.3s ease; /* Changed to background-color */
+        }
+
+        #server-ip:hover {
+            background-color: #718096; /* 使用和玩家名稱 hover 時相同的顏色 */
         }
 
         #server-ip-copy-text {
@@ -300,7 +305,7 @@
             </div>
             <div style="flex: 1;">
                 <p>
-                    伺服器位址：<span id="server-ip" style="background-color: #4a5568; color: #ffffff; padding: 0.375rem 0.75rem; border-radius: 6px; display: inline-block;">loading...</span>
+                    伺服器位址：<span id="server-ip" style="background-color: #4a5568; color: #ffffff; padding: 0.375rem 0.75rem; border-radius: 6px; display: inline-block; cursor: pointer; transition: background-color 0.3s ease;">loading...</span>
                 </p>
                 <p>伺服器狀態：<strong id="server-status-text" class="online">loading...</strong></p>
                 <p>延遲：<strong id="server-ping">loading...</strong> ms</p>
@@ -336,6 +341,16 @@
         const serverVersionElement = document.getElementById("server-version");
         const errorMessageElement = document.getElementById("error-message");
         const serverIconElement = document.getElementById("server-icon").querySelector("img");
+
+        serverIpElement.addEventListener('mouseover', () => {
+            serverIpElement.style.backgroundColor = '#718096'; // 使用和玩家名稱 hover 時相同的顏色
+            serverIpElement.style.color = '#ffffff';
+        });
+        serverIpElement.addEventListener('mouseout', () => {
+            serverIpElement.style.backgroundColor = '#4a5568';
+            serverIpElement.style.color = '#ffffff';
+        });
+
 
         async function fetchServerStatus() {
             try {
