@@ -118,7 +118,13 @@
             font-size: 1.2rem;
             word-break: break-word;
             overflow: hidden;
+            cursor: pointer; /* Added cursor style */
         }
+
+        #players ul li:hover {
+            background-color: #718096; /* Added hover effect */
+        }
+
 
         #version-info {
             margin-bottom: 2rem;
@@ -172,6 +178,7 @@
             position: fixed;
             top: 20px;
             right: 20px;
+            transform: translateX(0);
             background-color: #4CAF50;
             color: white;
             padding: 10px 20px;
@@ -181,13 +188,30 @@
             z-index: 1000;
             opacity: 1;
             transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            overflow: hidden;
+            word-break: break-word;
+            min-width: 200px;
+            text-align: left;
+        }
+
+        @media (max-width: 768px) {
+            .copy-message {
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90%;
+                text-align: center;
+            }
         }
 
         .copy-message.fade-out {
             opacity: 0;
-            transform: translateY(-20px);
+            transform: translateX(20px) translateY(-20px);
             overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .copy-message.fade-out {
+                transform: translateX(-50%) translateY(-20px);
+            }
         }
 
         #server-ip {
@@ -221,19 +245,15 @@
             h1 {
                 font-size: 2.5em;
             }
-
-           
         }
 
         @media (max-width: 480px) {
             h1 {
                 font-size: 2em;
             }
-
-           
         }
 
-         /* 移除小螢幕字體縮放 */
+        /* 移除小螢幕字體縮放 */
         #server-status p,
         #server-status strong,
         #server-status .online,
@@ -245,7 +265,7 @@
             font-size: 1.5rem; /* 恢復原始大小 */
         }
         @media (max-width: 768px) {
-             #server-status p,
+            #server-status p,
             #server-status strong,
             #server-status .online,
             #server-status .offline,
@@ -257,7 +277,7 @@
             }
         }
         @media (max-width: 480px) {
-             #server-status p,
+            #server-status p,
             #server-status strong,
             #server-status .online,
             #server-status .offline,
@@ -301,7 +321,6 @@
         </div>
 
         <div id="error-message" class="mt-6 text-red-500 bg-gray-800 rounded-md p-6 border border-gray-700 hidden">
-            
         </div>
     </div>
 
@@ -345,14 +364,27 @@
 
                 if (data.players.sample && data.players.sample.length > 0) {
                     playerListElement.innerHTML = data.players.sample
-                        .map((player) => `<li>${player.name}</li>`)
+                        .map((player) => `<li data-player-name="${player.name}">${player.name}</li>`) // Added data-player-name
                         .join("");
+
+                    // Attach event listener to each player name
+                    const playerNames = playerListElement.querySelectorAll('li');
+                    playerNames.forEach(playerNameElement => {
+                        playerNameElement.addEventListener('click', (event) => {
+                            const playerName = event.target.getAttribute('data-player-name');
+                            navigator.clipboard.writeText(playerName).then(() => {
+                                showCopyMessage(playerName);
+                            }).catch(err => {
+                                console.error('Failed to copy: ', err);
+                            });
+                        });
+                    });
                 } else {
                     playerListElement.innerHTML = "<li>無</li>";
                 }
 
                 serverVersionElement.textContent = data.version.name;
-                
+
                 if (data.icon) {
                     serverIconElement.src = data.icon;
                     serverIconElement.style.display = "block";
