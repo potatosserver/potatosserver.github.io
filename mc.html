@@ -175,6 +175,11 @@
         #server-ip {
             cursor: pointer;
             word-break: break-all; /* 確保 IP 位址過長時斷行 */
+            display: inline-block; /* 確保 strong 元素是 inline-block */
+        }
+
+        #server-ip-copy-text {
+            color: #bbf7d0;
         }
         
         @media (max-width: 768px) {
@@ -185,6 +190,10 @@
             #server-icon {
                 margin-bottom: 1rem; /* 在手機上增加圖示與文字的間距 */
                 margin-right: 0; /* 移除右側間距 */
+            }
+            #server-ip-copy-text {
+                display: block; /* 在手機上讓提示文字佔據一整行 */
+                margin-left: 0; /* 移除左側margin */
             }
         }
     </style>
@@ -198,7 +207,10 @@
                 <img src="/server-icon.png" alt="伺服器圖示">
             </div>
             <div style="flex: 1;">
-                <p>伺服器位址：<strong id="server-ip">loading...</strong><span style="color:#bbf7d0;"> (點擊複製)</span></p>
+                <p>
+                    伺服器位址：<strong id="server-ip">loading...</strong>
+                    <span id="server-ip-copy-text" style="color:#bbf7d0;"> (點擊複製)</span>
+                </p>
                 <p>伺服器狀態：<strong id="server-status-text" class="online">loading...</strong></p>
                 <p>延遲：<strong id="server-ping">loading...</strong> ms</p>
             </div>
