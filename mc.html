@@ -24,61 +24,64 @@
         }
 
         #app {
-            max-width: 800px; /* 限制內容寬度 */
+            max-width: 1200px; /* 限制內容寬度 */
             width: 100%;
             background-color: rgba(31, 41, 55, 0.8); /* 稍淺的深色容器背景，增加透明度 */
-            padding: 24px;
-            border-radius: 12px; /* 圓角 */
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3); /* 更柔和的陰影 */
-            border: 1px solid #374151; /* 邊框 */
+            padding: 32px;
+            border-radius: 16px; /* 圓角 */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3); /* 更柔和的陰影 */
+            border: 2px solid #374151; /* 邊框 */
         }
 
         h1 {
-            font-size: 2em;
-            margin-bottom: 1rem;
+            font-size: 3em;
+            margin-bottom: 1.5rem;
             color: #6ee7b7; /* 綠色標題 */
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* 文字陰影 */
         }
 
         #server-status {
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            border-radius: 8px;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
             background-color: #242424; /* 更深的背景 */
-            border: 1px solid #4a5568;
+            border: 2px solid #4a5568;
             display: flex; /* 使用 Flexbox 佈局 */
             align-items: center; /* 垂直置中 */
-            gap: 1rem; /* 添加間距 */
+            gap: 1.5rem; /* 添加間距 */
         }
 
         #server-status p {
-            margin: 0.5rem 0;
-            font-size: 0.8rem;
+            margin: 0.75rem 0;
+            font-size: 1.5rem;
         }
 
         #server-status strong {
             color: #f5f5f5; /* 強調文字顏色 */
+            font-size: 1.5rem;
         }
 
         #server-status .online {
             color: #6ee7b7; /* 線上狀態為綠色 */
+            font-size: 1.5rem;
         }
 
         #server-status .offline {
             color: #f87171; /* 離線狀態為紅色 */
+            font-size: 1.5rem;
         }
 
         #players {
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            border-radius: 8px;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
             background-color: #242424; /* 更深的背景 */
-            border: 1px solid #4a5568;
+            border: 2px solid #4a5568;
         }
 
         #players p {
-            margin: 0.5rem 0;
-            font-size: 0.8rem;
+            margin: 0.75rem 0;
+            font-size: 1.5rem;
         }
 
         #players ul {
@@ -87,75 +90,75 @@
             margin: 0;
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
+            gap: 0.75rem;
         }
 
         #players ul li {
             background-color: #4a5568; /* 玩家名稱背景 */
             color: #ffffff;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.7rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 1.2rem;
         }
 
         #version-info {
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            border-radius: 8px;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
             background-color: #242424; /* 更深的背景 */
-            border: 1px solid #4a5568;
+            border: 2px solid #4a5568;
         }
 
         #version-info p {
-            margin: 0.5rem 0;
-            font-size: 0.8rem;
+            margin: 0.75rem 0;
+            font-size: 1.5rem;
         }
 
         .error-message {
             color: #f87171;
-            margin-top: 1rem;
-            padding: 0.75rem;
+            margin-top: 1.5rem;
+            padding: 1rem;
             background-color: #242424;
-            border-radius: 6px;
-            border: 1px solid #4a5568;
-            font-size: 0.8rem;
+            border-radius: 8px;
+            border: 2px solid #4a5568;
+            font-size: 1.2rem;
         }
 
         #server-icon {
-            width: 80px; /* 圖示大小 */
-            height: 80px;
-            border-radius: 8px; /* 圓角 */
+            width: 120px; /* 圖示大小 */
+            height: 120px;
+            border-radius: 12px; /* 圓角 */
             background-color: #374151; /* 圖示背景色 */
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-right: 1rem; /* 與文字間的間距 */
+            margin-right: 1.5rem; /* 與文字間的間距 */
             overflow: hidden; /* 確保圖片不會超出邊界 */
         }
 
         #server-icon img {
             max-width: 100%; /* 確保圖片不會超出容器 */
             max-height: 100%;
-            border-radius: 8px;
+            border-radius: 12px;
         }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-50">
-    <div id="app" class="rounded-lg shadow-md border border-gray-800">
-        <h1 class="text-2xl font-semibold mb-4 text-green-400">Minecraft 伺服器狀態</h1>
+    <div id="app" class="rounded-lg shadow-md border border-gray-800" style="max-width: 1400px;">
+        <h1 class="text-3xl font-semibold mb-6 text-green-400">Minecraft 伺服器狀態</h1>
 
-        <div id="server-status" class="bg-gray-800 rounded-lg p-4 mb-4 border border-gray-700">
+        <div id="server-status" class="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
             <div id="server-icon">
                 <img src="/server-icon.png" alt="伺服器圖示">
             </div>
-            <div>
+            <div style="flex: 1;">
                 <p>伺服器位址：<strong id="server-ip">loading...</strong></p>
                 <p>伺服器狀態：<strong id="server-status-text" class="online">loading...</strong></p>
                 <p>延遲：<strong id="server-ping">loading...</strong> ms</p>
             </div>
         </div>
 
-        <div id="players" class="bg-gray-800 rounded-lg p-4 mb-4 border border-gray-700">
+        <div id="players" class="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
             <p>線上人數：<strong id="online-players">0</strong> / <strong id="max-players">0</strong></p>
             <p>在線玩家：</p>
             <ul id="player-list">
@@ -163,11 +166,11 @@
             </ul>
         </div>
 
-        <div id="version-info" class="bg-gray-800 rounded-lg p-4 mb-4 border border-gray-700">
+        <div id="version-info" class="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
             <p>版本：<strong id="server-version">loading...</strong></p>
         </div>
 
-        <div id="error-message" class="mt-4 text-red-500 bg-gray-800 rounded-md p-4 border border-gray-700 hidden">
+        <div id="error-message" class="mt-6 text-red-500 bg-gray-800 rounded-md p-6 border border-gray-700 hidden">
             
         </div>
     </div>
@@ -239,7 +242,7 @@
         }
 
         fetchServerStatus();
-        setInterval(fetchServerStatus, 60000); // 每 60 秒更新一次
+        setInterval(fetchServerStatus, 10000); // 每 10 秒更新一次
     </script>
 </body>
 </html>
