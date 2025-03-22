@@ -9,46 +9,45 @@
     <style>
         body {
             font-family: 'Press Start 2P', monospace;
-            background-color: #111827; /* 深色背景 */
-            color: #f9fafb; /* 淺色文字 */
+            background-color: #111827;
+            color: #f9fafb;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
-            /* 添加背景圖片 */
-            background-image: url('https://play-lh.googleusercontent.com/bFkE7hv6lnuN3N2UC_d-NnUDRcvtZ_kUpOhZCQ8k930A-oXBNjPEreMUyrnHcQnigYG8=w2560-h1440-rw'); /* 替換成你的圖片網址 */
-            background-size: cover; /* 圖片覆蓋整個 body */
-            background-position: center; /* 圖片置中 */
+            background-image: url('https://play-lh.googleusercontent.com/bFkE7hv6lnuN3N2UC_d-NnUDRcvtZ_kUpOhZCQ8k930A-oXBNjPEreMUyrnHcQnigYG8=w2560-h1440-rw');
+            background-size: cover;
+            background-position: center;
         }
 
         #app {
-            max-width: 1200px; /* 限制內容寬度 */
+            max-width: 1200px;
             width: 100%;
-            background-color: rgba(31, 41, 55, 0.8); /* 稍淺的深色容器背景，增加透明度 */
+            background-color: rgba(31, 41, 55, 0.8);
             padding: 32px;
-            border-radius: 16px; /* 圓角 */
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3); /* 更柔和的陰影 */
-            border: 2px solid #374151; /* 邊框 */
+            border-radius: 16px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border: 2px solid #374151;
         }
 
         h1 {
             font-size: 3em;
             margin-bottom: 1.5rem;
-            color: #6ee7b7; /* 綠色標題 */
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* 文字陰影 */
+            color: #6ee7b7;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
         #server-status {
             margin-bottom: 2rem;
             padding: 1.5rem;
             border-radius: 12px;
-            background-color: #242424; /* 更深的背景 */
+            background-color: #242424;
             border: 2px solid #4a5568;
-            display: flex; /* 使用 Flexbox 佈局 */
-            align-items: center; /* 垂直置中 */
-            gap: 1.5rem; /* 添加間距 */
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
         }
 
         #server-status p {
@@ -57,17 +56,17 @@
         }
 
         #server-status strong {
-            color: #f5f5f5; /* 強調文字顏色 */
+            color: #f5f5f5;
             font-size: 1.5rem;
         }
 
         #server-status .online {
-            color: #6ee7b7; /* 線上狀態為綠色 */
+            color: #6ee7b7;
             font-size: 1.5rem;
         }
 
         #server-status .offline {
-            color: #f87171; /* 離線狀態為紅色 */
+            color: #f87171;
             font-size: 1.5rem;
         }
 
@@ -75,7 +74,7 @@
             margin-bottom: 2rem;
             padding: 1.5rem;
             border-radius: 12px;
-            background-color: #242424; /* 更深的背景 */
+            background-color: #242424;
             border: 2px solid #4a5568;
         }
 
@@ -94,7 +93,7 @@
         }
 
         #players ul li {
-            background-color: #4a5568; /* 玩家名稱背景 */
+            background-color: #4a5568;
             color: #ffffff;
             padding: 0.375rem 0.75rem;
             border-radius: 6px;
@@ -105,7 +104,7 @@
             margin-bottom: 2rem;
             padding: 1.5rem;
             border-radius: 12px;
-            background-color: #242424; /* 更深的背景 */
+            background-color: #242424;
             border: 2px solid #4a5568;
         }
 
@@ -125,21 +124,45 @@
         }
 
         #server-icon {
-            width: 120px; /* 圖示大小 */
+            width: 120px;
             height: 120px;
-            border-radius: 12px; /* 圓角 */
-            background-color: #374151; /* 圖示背景色 */
+            border-radius: 12px;
+            background-color: #374151;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-right: 1.5rem; /* 與文字間的間距 */
-            overflow: hidden; /* 確保圖片不會超出邊界 */
+            margin-right: 1.5rem;
+            overflow: hidden;
         }
 
         #server-icon img {
-            max-width: 100%; /* 確保圖片不會超出容器 */
+            max-width: 100%;
             max-height: 100%;
             border-radius: 12px;
+        }
+
+        .copy-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        .copy-message.fade-out {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        #server-ip {
+            cursor: pointer;
         }
     </style>
 </head>
@@ -152,7 +175,7 @@
                 <img src="/server-icon.png" alt="伺服器圖示">
             </div>
             <div style="flex: 1;">
-                <p>伺服器位址：<strong id="server-ip">loading...</strong></p>
+                <p>伺服器位址：<strong id="server-ip">loading...</strong><span style="color:#bbf7d0;"> (點擊複製)</span></p>
                 <p>伺服器狀態：<strong id="server-status-text" class="online">loading...</strong></p>
                 <p>延遲：<strong id="server-ping">loading...</strong> ms</p>
             </div>
@@ -176,7 +199,7 @@
     </div>
 
     <script>
-        const serverAddress = "andrewcho970531.nglocalhost.com"; // 替換成你的伺服器位址
+        const serverAddress = "andrewcho970531.nglocalhost.com";
         const apiUrl = `https://sr-api.sfirew.com/server/${serverAddress}`;
 
         const serverIpElement = document.getElementById("server-ip");
@@ -197,8 +220,16 @@
                 }
                 const data = await response.json();
 
-                // 只顯示 IP，不顯示 port (如果 port 是預設的 25565)
                 serverIpElement.textContent = data.port === 25565 ? data.ip : `${data.ip}:${data.port}`;
+                serverIpElement.addEventListener('click', () => {
+                    const textToCopy = serverIpElement.textContent;
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        showCopyMessage(textToCopy);
+                    }).catch(err => {
+                        console.error('Failed to copy: ', err);
+                    });
+                });
+
                 serverStatusTextElement.textContent = data.online ? "線上" : "離線";
                 serverStatusTextElement.className = data.online ? "online" : "offline";
                 serverPingElement.textContent = data.ping;
@@ -228,7 +259,6 @@
                 console.error("Failed to fetch server status:", error);
                 errorMessageElement.textContent = `無法取得伺服器狀態：${error.message}`;
                 errorMessageElement.classList.remove("hidden");
-                // 為了防止錯誤，這裡更新為預設值
                 serverIpElement.textContent = "N/A";
                 serverStatusTextElement.textContent = "N/A";
                 serverStatusTextElement.className = "offline";
@@ -242,7 +272,26 @@
         }
 
         fetchServerStatus();
-        setInterval(fetchServerStatus, 10000); // 每 10 秒更新一次
+        setInterval(fetchServerStatus, 10000);
+
+        function showCopyMessage(text) {
+            let messageElement = document.querySelector('.copy-message');
+            if (!messageElement) {
+                messageElement = document.createElement('div');
+                messageElement.className = 'copy-message';
+                document.body.appendChild(messageElement);
+            }
+
+            messageElement.textContent = `已複製到剪貼簿：${text}`;
+            messageElement.classList.remove('fade-out');
+
+            setTimeout(() => {
+                messageElement.classList.add('fade-out');
+                setTimeout(()=> {
+                    messageElement.remove();
+                }, 500)
+            }, 3000);
+        }
     </script>
 </body>
 </html>
