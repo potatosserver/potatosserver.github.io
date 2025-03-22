@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minecraft 伺服器狀態</title>
-    <link rel="icon" href="./favicon.ico" type="image/x-icon"> <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <style>
         body {
@@ -24,12 +25,13 @@
 
         #app {
             max-width: 1200px;
-            width: 100%;
+            width: 95%;
             background-color: rgba(31, 41, 55, 0.8);
             padding: 32px;
             border-radius: 16px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
             border: 2px solid #374151;
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
 
         h1 {
@@ -37,6 +39,7 @@
             margin-bottom: 1.5rem;
             color: #6ee7b7;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            word-break: keep-all;
         }
 
         #server-status {
@@ -48,32 +51,37 @@
             display: flex;
             align-items: center;
             gap: 1.5rem;
-            flex-wrap: wrap; /* 確保內容在手機上換行 */
+            flex-wrap: wrap;
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
 
         #server-status p {
             margin: 0.75rem 0;
             font-size: 1.5rem;
-            word-break: break-word; /* 長文字斷行 */
-            min-width: 200px; /* 避免內容過窄 */
+            word-break: break-word;
+            min-width: 200px;
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
 
         #server-status strong {
             color: #f5f5f5;
             font-size: 1.5rem;
-            word-break: break-word; /* 長文字斷行 */
+            word-break: break-word;
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
 
         #server-status .online {
             color: #6ee7b7;
             font-size: 1.5rem;
-            word-break: break-word; /* 長文字斷行 */
+            word-break: break-word;
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
 
         #server-status .offline {
             color: #f87171;
             font-size: 1.5rem;
-            word-break: break-word; /* 長文字斷行 */
+            word-break: break-word;
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
 
         #players {
@@ -82,12 +90,14 @@
             border-radius: 12px;
             background-color: #242424;
             border: 2px solid #4a5568;
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
 
         #players p {
             margin: 0.75rem 0;
             font-size: 1.5rem;
-            word-break: break-word; /* 長文字斷行 */
+            word-break: break-word;
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
 
         #players ul {
@@ -97,6 +107,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 0.75rem;
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
 
         #players ul li {
@@ -105,7 +116,8 @@
             padding: 0.375rem 0.75rem;
             border-radius: 6px;
             font-size: 1.2rem;
-            word-break: break-word; /* 確保玩家名稱不會超出 */
+            word-break: break-word;
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
 
         #version-info {
@@ -114,12 +126,14 @@
             border-radius: 12px;
             background-color: #242424;
             border: 2px solid #4a5568;
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
 
         #version-info p {
             margin: 0.75rem 0;
             font-size: 1.5rem;
-            word-break: break-word; /* 長文字斷行 */
+            word-break: break-word;
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
 
         .error-message {
@@ -130,7 +144,8 @@
             border-radius: 8px;
             border: 2px solid #4a5568;
             font-size: 1.2rem;
-            word-break: break-word; /* 長文字斷行 */
+            word-break: break-word;
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
 
         #server-icon {
@@ -143,13 +158,14 @@
             align-items: center;
             margin-right: 1.5rem;
             overflow: hidden;
-            flex-shrink: 0; /* 防止圖示在小螢幕中被壓縮 */
+            flex-shrink: 0;
         }
 
         #server-icon img {
             max-width: 100%;
             max-height: 100%;
             border-radius: 12px;
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
 
         .copy-message {
@@ -165,41 +181,79 @@
             z-index: 1000;
             opacity: 1;
             transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
 
         .copy-message.fade-out {
             opacity: 0;
             transform: translateY(-20px);
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
 
         #server-ip {
             cursor: pointer;
-            word-break: break-all; /* 確保 IP 位址過長時斷行 */
-            display: inline-block; /* 確保 strong 元素是 inline-block */
+            word-break: break-all;
+            display: inline-block;
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
 
         #server-ip-copy-text {
             color: #bbf7d0;
+            overflow: hidden; /* 確保內容不會超出容器 */
         }
-        
+
         @media (max-width: 768px) {
             #server-status {
-                flex-direction: column; /* 在手機上改為垂直排列 */
-                align-items: flex-start; /* 對齊左側 */
+                flex-direction: column;
+                align-items: flex-start;
             }
+
             #server-icon {
-                margin-bottom: 1rem; /* 在手機上增加圖示與文字的間距 */
-                margin-right: 0; /* 移除右側間距 */
+                margin-bottom: 1rem;
+                margin-right: 0;
             }
+
             #server-ip-copy-text {
-                display: block; /* 在手機上讓提示文字佔據一整行 */
-                margin-left: 0; /* 移除左側margin */
+                display: block;
+                margin-left: 0;
+            }
+
+            h1 {
+                font-size: 2.5em;
+            }
+
+            #server-status p,
+            #server-status strong,
+            #server-status .online,
+            #server-status .offline,
+            #players p,
+            #players ul li,
+            #version-info p,
+            .error-message {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            #server-status p,
+            #server-status strong,
+            #server-status .online,
+            #server-status .offline,
+            #players p,
+            #players ul li,
+            #version-info p,
+            .error-message {
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-50">
-    <div id="app" class="rounded-lg shadow-md border border-gray-800" style="max-width: 1400px;">
+    <div id="app" class="rounded-lg shadow-md border border-gray-800">
         <h1 class="text-3xl font-semibold mb-6 text-green-400">Minecraft 伺服器狀態</h1>
 
         <div id="server-status" class="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
