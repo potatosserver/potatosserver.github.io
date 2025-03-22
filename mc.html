@@ -46,6 +46,9 @@
             border-radius: 8px;
             background-color: #242424; /* 更深的背景 */
             border: 1px solid #4a5568;
+            display: flex; /* 使用 Flexbox 佈局 */
+            align-items: center; /* 垂直置中 */
+            gap: 1rem; /* 添加間距 */
         }
 
         #server-status p {
@@ -53,7 +56,7 @@
             font-size: 0.8rem;
         }
 
-        #server-status p strong {
+        #server-status strong {
             color: #f5f5f5; /* 強調文字顏色 */
         }
 
@@ -117,6 +120,24 @@
             border: 1px solid #4a5568;
             font-size: 0.8rem;
         }
+
+        #server-icon {
+            width: 80px; /* 圖示大小 */
+            height: 80px;
+            border-radius: 8px; /* 圓角 */
+            background-color: #374151; /* 圖示背景色 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 1rem; /* 與文字間的間距 */
+            overflow: hidden; /* 確保圖片不會超出邊界 */
+        }
+
+        #server-icon img {
+            max-width: 100%; /* 確保圖片不會超出容器 */
+            max-height: 100%;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-50">
@@ -124,9 +145,14 @@
         <h1 class="text-2xl font-semibold mb-4 text-green-400">Minecraft 伺服器狀態</h1>
 
         <div id="server-status" class="bg-gray-800 rounded-lg p-4 mb-4 border border-gray-700">
-            <p>伺服器位址：<strong id="server-ip">loading...</strong></p>
-            <p>伺服器狀態：<strong id="server-status-text" class="online">loading...</strong></p>
-            <p>延遲：<strong id="server-ping">loading...</strong> ms</p>
+            <div id="server-icon">
+                <img src="/server-icon.png" alt="伺服器圖示">
+            </div>
+            <div>
+                <p>伺服器位址：<strong id="server-ip">loading...</strong></p>
+                <p>伺服器狀態：<strong id="server-status-text" class="online">loading...</strong></p>
+                <p>延遲：<strong id="server-ping">loading...</strong> ms</p>
+            </div>
         </div>
 
         <div id="players" class="bg-gray-800 rounded-lg p-4 mb-4 border border-gray-700">
@@ -158,6 +184,7 @@
         const playerListElement = document.getElementById("player-list");
         const serverVersionElement = document.getElementById("server-version");
         const errorMessageElement = document.getElementById("error-message");
+        const serverIconElement = document.getElementById("server-icon").querySelector("img");
 
         async function fetchServerStatus() {
             try {
@@ -184,6 +211,13 @@
                 }
 
                 serverVersionElement.textContent = data.version.name;
+                
+                if (data.icon) {
+                    serverIconElement.src = data.icon;
+                    serverIconElement.style.display = "block";
+                } else {
+                    serverIconElement.style.display = "none";
+                }
 
                 errorMessageElement.classList.add("hidden");
 
@@ -200,6 +234,7 @@
                 maxPlayersElement.textContent = "0";
                 playerListElement.innerHTML = "<li>N/A</li>";
                 serverVersionElement.textContent = "N/A";
+                serverIconElement.style.display = "none";
             }
         }
 
