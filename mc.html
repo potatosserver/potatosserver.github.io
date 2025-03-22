@@ -1,180 +1,261 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertCircle } from "lucide-react"
-
-interface ServerStatus {
-    online: boolean;
-    players?: {
-        online: number;
-        max: number;
-        list?: string[];
-    };
-    motd?: {
-        raw: string;
-        html: string;
-    };
-    version?: string;
-    favicon?: string;
-    error?: string; // Add error property
-}
-
-const MinecraftServerStatus = ({ serverAddress }: { serverAddress: string }) => {
-    const [status, setStatus] = useState<ServerStatus | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null); // State for fetch errors
-
-    useEffect(() => {
-        const fetchServerStatus = async () => {
-            setLoading(true);
-            setError(null); // Clear previous errors
-            try {
-                // Use a proxy to avoid CORS issues.  Important for browser-based requests.
-                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(`https://api.mcstatus.io/v2/server/status/${serverAddress}`)}`;
-                const response = await fetch(proxyUrl);
-
-                if (!response.ok) {
-                    // Handle HTTP errors (e.g., 500, 404)
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data: ServerStatus = await response.json();
-                if (data.error) { // Check for error from the mcstatus.io API
-                    setError(data.error);
-                }
-                setStatus(data);
-            } catch (error: any) {
-                // Catch network errors, JSON parsing errors, and the error we threw above
-                setError(error.message);
-                setStatus({ online: false, error: error.message }); // Set status to offline with error
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchServerStatus();
-    }, [serverAddress]);
-
-    const getFavicon = () => {
-        if (status?.favicon) {
-            return status.favicon;
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft 伺服器資訊</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            font-family: 'Press Start 2P', monospace;
+            background-color: #111827; /* 深色背景 */
+            color: #f9fafb; /* 淺色文字 */
+            margin: 0;
+            padding: 0;
         }
-        // Fallback to a default Minecraft icon.
-        return 'https://via.placeholder.com/64x64?text=Minecraft';
-    };
+        .container {
+            max-width: 800px; /* 限制容器寬度 */
+            margin: 2rem auto; /* 垂直margin設為2rem */
+            padding: 2rem;
+            text-align: center;
+            background-color: #1f2937; /* 稍淺的深色容器背景 */
+            border-radius: 0.75rem; /* 圓角 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* 陰影效果 */
+        }
+        h1 {
+            font-size: 2.25rem; /* 標題字體大小 */
+            font-weight: 700; /* 粗體 */
+            margin-bottom: 1.5rem;
+            color: #6ee7b7; /* 青綠色標題 */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* 文字陰影 */
+        }
+        #server-status {
+            font-size: 1.25rem; /* 狀態字體大小 */
+            margin-bottom: 1rem;
+            color: #f5f5f5;
+        }
+        #player-count {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            color: #cbd5e0;
+        }
+        #player-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 auto; /* 水平置中 */
+            max-width: 80%; /* 限制玩家列表寬度 */
+        }
+        #player-list li {
+            background-color: #374151; /* 更深的背景 для 列表項 */
+            color: #ffffff;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.375rem; /* 圓角 */
+            border: 1px solid #4b5563; /* 邊框 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* 陰影 */
+        }
+        #loading-indicator {
+            font-size: 1rem;
+            color: #888;
+            margin-top: 1rem;
+        }
+        .online {
+            color: #6ee7b7; /* 線上狀態為青綠色 */
+        }
+        .offline {
+            color: #ef4444; /* 離線狀態為紅色 */
+        }
+        /* Стилі для кнопок */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .btn-green {
+            background-color: #10b981; /* Зелений колір */
+            color: #ffffff;
+        }
+        .btn-green:hover {
+            background-color: #059669; /* Затемнений зелений при наведенні */
+            transform: translateY(-2px) scale(1.05);
+        }
+        .btn-blue {
+            background-color: #3b82f6; /* Синій колір */
+            color: #ffffff;
+        }
+        .btn-blue:hover {
+            background-color: #2563eb; /* Затемнений синій при наведенні */
+            transform: translateY(-2px) scale(1.05);
+        }
 
-    const motdText = status?.motd?.html
-        ? <div dangerouslySetInnerHTML={{ __html: status.motd.html }} />
-        : status?.motd?.raw || '無法取得伺服器資訊';
+        .input-container {
+            margin-bottom: 1rem;
+        }
 
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black p-4 sm:p-8">
-            <div className="max-w-4xl mx-auto space-y-6">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-                    Minecraft 伺服器狀態
-                </h1>
+        .input-container input {
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            border: 2px solid #4b5563;
+            width: 80%;
+            max-width: 300px;
+            font-family: 'Press Start 2P', monospace;
+            background-color: #374151;
+            color: #ffffff;
+        }
 
-                <Card className="bg-white/5 backdrop-blur-lg border border-white/10 shadow-xl">
-                    <CardHeader>
-                        <CardTitle className="text-2xl font-semibold text-white flex items-center gap-2">
-                            {loading ? (
-                                <Skeleton className="w-8 h-8 rounded-full" />
-                            ) : (
-                                <img
-                                    src={getFavicon()}
-                                    alt="Server Favicon"
-                                    className="w-8 h-8 rounded-full"
-                                />
-                            )}
-                            {loading ? (
-                                <Skeleton className="w-40 h-6" />
-                            ) : status?.online ? (
-                                <span className="text-green-400">線上</span>
-                            ) : (
-                                <span className="text-red-400">離線</span>
-                            )}
-                        </CardTitle>
-                        <CardDescription className="text-gray-300">
-                            伺服器位址: <span className="font-mono text-purple-300">{serverAddress}</span>
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        {loading ? (
-                            <div className="space-y-4">
-                                <Skeleton className="h-8 w-full" />
-                                <Skeleton className="h-6 w-3/4" />
-                                <Skeleton className="h-6 w-1/2" />
-                            </div>
-                        ) : error ? (
-                            <Alert variant="destructive">
-                                <AlertCircle className="h-4 w-4" />
-                                <AlertTitle>連線錯誤</AlertTitle>
-                                <AlertDescription>
-                                    無法連線到伺服器: {error}
-                                </AlertDescription>
-                            </Alert>
-                        ) : status ? (
-                            <>
-                                <div className="text-white">
-                                    <h2 className="text-lg font-semibold">MOTD:</h2>
-                                    <div className="p-4 rounded-lg bg-black/20 border border-white/10">
-                                        {motdText}
-                                    </div>
-                                </div>
-                                {status.online && (
-                                    <>
-                                        <div className="text-white">
-                                            <h2 className="text-lg font-semibold">玩家人數:</h2>
-                                            <p className="text-gray-300">
-                                                {status.players?.online ?? 0} / {status.players?.max ?? '未知'}
-                                            </p>
-                                        </div>
-                                        {status.players?.online && status.players.list && status.players.list.length > 0 && (
-                                            <div className="text-white">
-                                                <h2 className="text-lg font-semibold">線上玩家:</h2>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 p-4 rounded-lg bg-black/20 border border-white/10">
-                                                    {status.players.list.map((player, index) => (
-                                                        <span key={index} className="text-gray-300 truncate">
-                                                            {player}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                        <div className="text-white">
-                                            <h2 className="text-lg font-semibold">版本:</h2>
-                                            <p className="text-gray-300">{status.version || '未知'}</p>
-                                        </div>
-                                    </>
-                                )}
-                            </>
-                        ) : (
-                            <p className="text-gray-400">
-                                無法取得伺服器狀態。請確認伺服器位址是否正確。
-                            </p>
-                        )}
-                        <Button
-                            variant="outline"
-                            className="bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border-purple-500/30"
-                            onClick={() => window.location.reload()}
-                        >
-                            重新整理
-                        </Button>
-                    </CardContent>
-                </Card>
-            </div>
+        .input-container input:focus {
+            outline: none;
+            border-color: #6ee7b7;
+            box-shadow: 0 0 0 3px rgba(110, 231, 183, 0.3);
+        }
+
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-50">
+    <div class="container">
+        <h1 class="text-green-400">Minecraft 伺服器資訊</h1>
+
+        <div class="input-container">
+            <input
+                type="text"
+                id="server-address-input"
+                placeholder="請輸入伺服器位址 (例如：mc.example.com:25565)"
+                value="andrewcho970531.nglocalhost.com"
+            />
         </div>
-    );
-};
 
-const App = () => {
-    // Replace with your actual server address
-    const serverAddress = 'andrewcho970531.ngrok.io';
+        <p id="server-status" class="text-white">伺服器狀態：<span class="text-gray-400">載入中...</span></p>
+        <p id="player-count" class="text-gray-300">在線玩家：<span class="text-gray-400">0</span> / <span class="text-gray-400">0</span></p>
 
-    return (
-        <MinecraftServerStatus serverAddress={serverAddress} />
-    );
-};
+        <ul id="player-list" class="text-gray-300">
+            </ul>
 
-export default App;
+        <button id="refresh-button" class="btn btn-blue mb-4">
+            <span id="refresh-icon">&#10226;</span> 刷新資訊
+        </button>
+
+        <p id="loading-indicator" class="text-gray-400">
+            <span id="loading-spinner" style="display: none;">載入中...</span>
+        </p>
+    </div>
+
+    <script>
+        const serverAddressInput = document.getElementById('server-address-input');
+        const serverStatusDisplay = document.getElementById('server-status');
+        const playerCountDisplay = document.getElementById('player-count');
+        const playerList = document.getElementById('player-list');
+        const refreshButton = document.getElementById('refresh-button');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const refreshIcon = document.getElementById('refresh-icon');
+
+        let serverAddress = serverAddressInput.value;
+        let isFetching = false; // 防止重複fetch
+
+        // 替換為您的伺服器後端 API
+        const API_BASE_URL = 'https://cors-anywhere.herokuapp.com/https://mcapi.xdefcon.com/server';
+
+        function updateServerInfo() {
+            if (isFetching) return;
+            isFetching = true;
+            serverAddress = serverAddressInput.value; // 取得輸入框中的伺服器位址
+            serverStatusDisplay.textContent = '伺服器狀態：載入中...';
+            playerCountDisplay.textContent = '在線玩家：載入中...';
+            playerList.innerHTML = ''; // 清空玩家列表
+            loadingSpinner.style.display = 'inline-block';
+            refreshIcon.style.display = 'none';
+
+            // 使用fetch API獲取伺服器資訊
+            fetch(`${API_BASE_URL}/${serverAddress}/full`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 更新UI
+                    if (data.online) {
+                        serverStatusDisplay.textContent = '伺服器狀態：';
+                        const onlineSpan = document.createElement('span');
+                        onlineSpan.textContent = '線上';
+                        onlineSpan.className = 'online';
+                        serverStatusDisplay.appendChild(onlineSpan);
+
+                        playerCountDisplay.textContent = '在線玩家：';
+                        const onlineCountSpan = document.createElement('span');
+                        onlineCountSpan.textContent = data.players.online;
+                        onlineCountSpan.className = 'text-green-400';
+                        playerCountDisplay.appendChild(onlineCountSpan);
+
+                        playerCountDisplay.appendChild(document.createTextNode(' / '));
+
+                        const maxPlayersSpan = document.createElement('span');
+                        maxPlayersSpan.textContent = data.players.max;
+                        maxPlayersSpan.className = 'text-gray-400';
+                        playerCountDisplay.appendChild(maxPlayersSpan);
+
+
+                        playerList.innerHTML = ''; // Clear old player list
+                        if (data.players.list && data.players.list.length > 0) {
+                            data.players.list.forEach(playerName => {
+                                const li = document.createElement('li');
+                                li.textContent = playerName;
+                                playerList.appendChild(li);
+                            });
+                        } else {
+                            const li = document.createElement('li');
+                            li.textContent = '沒有玩家在線上';
+                            li.style.fontStyle = 'italic';
+                            playerList.appendChild(li);
+                        }
+                    } else {
+                        serverStatusDisplay.textContent = '伺服器狀態：';
+                        const offlineSpan = document.createElement('span');
+                        offlineSpan.textContent = '離線';
+                        offlineSpan.className = 'offline';
+                        serverStatusDisplay.appendChild(offlineSpan);
+                        playerCountDisplay.textContent = '伺服器離線';
+                        playerList.innerHTML = '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching server info:', error);
+                    serverStatusDisplay.textContent = '伺服器狀態：';
+                    const errorSpan = document.createElement('span');
+                    errorSpan.textContent = '錯誤';
+                    errorSpan.className = 'text-red-500';
+                    serverStatusDisplay.appendChild(errorSpan);
+                    playerCountDisplay.textContent = '無法取得玩家資訊';
+                    playerList.innerHTML = '';
+                })
+                .finally(() => {
+                    isFetching = false;
+                    loadingSpinner.style.display = 'none';
+                    refreshIcon.style.display = 'inline-block';
+                });
+        }
+
+        // 初次載入時獲取伺服器資訊
+        updateServerInfo();
+
+        // 設定刷新按鈕點擊事件
+        refreshButton.addEventListener('click', updateServerInfo);
+        serverAddressInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                updateServerInfo();
+            }
+        });
+    </script>
+</body>
+</html>
