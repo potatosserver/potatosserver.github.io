@@ -31,7 +31,7 @@
             border-radius: 16px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
             border: 2px solid #374151;
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         h1 {
@@ -52,7 +52,7 @@
             align-items: center;
             gap: 1.5rem;
             flex-wrap: wrap;
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         #server-status p {
@@ -60,28 +60,28 @@
             font-size: 1.5rem;
             word-break: break-word;
             min-width: 200px;
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         #server-status strong {
             color: #f5f5f5;
             font-size: 1.5rem;
             word-break: break-word;
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         #server-status .online {
             color: #6ee7b7;
             font-size: 1.5rem;
             word-break: break-word;
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         #server-status .offline {
             color: #f87171;
             font-size: 1.5rem;
             word-break: break-word;
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         #players {
@@ -90,14 +90,14 @@
             border-radius: 12px;
             background-color: #242424;
             border: 2px solid #4a5568;
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         #players p {
             margin: 0.75rem 0;
             font-size: 1.5rem;
             word-break: break-word;
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         #players ul {
@@ -107,7 +107,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 0.75rem;
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         #players ul li {
@@ -117,7 +117,7 @@
             border-radius: 6px;
             font-size: 1.2rem;
             word-break: break-word;
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         #version-info {
@@ -126,14 +126,14 @@
             border-radius: 12px;
             background-color: #242424;
             border: 2px solid #4a5568;
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         #version-info p {
             margin: 0.75rem 0;
             font-size: 1.5rem;
             word-break: break-word;
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         .error-message {
@@ -145,7 +145,7 @@
             border: 2px solid #4a5568;
             font-size: 1.2rem;
             word-break: break-word;
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         #server-icon {
@@ -165,7 +165,7 @@
             max-width: 100%;
             max-height: 100%;
             border-radius: 12px;
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         .copy-message {
@@ -181,25 +181,25 @@
             z-index: 1000;
             opacity: 1;
             transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         .copy-message.fade-out {
             opacity: 0;
             transform: translateY(-20px);
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         #server-ip {
             cursor: pointer;
             word-break: break-all;
             display: inline-block;
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         #server-ip-copy-text {
             color: #bbf7d0;
-            overflow: hidden; /* 確保內容不會超出容器 */
+            overflow: hidden;
         }
 
         @media (max-width: 768px) {
@@ -222,7 +222,30 @@
                 font-size: 2.5em;
             }
 
-            #server-status p,
+           
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2em;
+            }
+
+           
+        }
+
+         /* 移除小螢幕字體縮放 */
+        #server-status p,
+        #server-status strong,
+        #server-status .online,
+        #server-status .offline,
+        #players p,
+        #players ul li,
+        #version-info p,
+        .error-message {
+            font-size: 1.5rem; /* 恢復原始大小 */
+        }
+        @media (max-width: 768px) {
+             #server-status p,
             #server-status strong,
             #server-status .online,
             #server-status .offline,
@@ -233,13 +256,8 @@
                 font-size: 1.2rem;
             }
         }
-
         @media (max-width: 480px) {
-            h1 {
-                font-size: 2em;
-            }
-
-            #server-status p,
+             #server-status p,
             #server-status strong,
             #server-status .online,
             #server-status .offline,
