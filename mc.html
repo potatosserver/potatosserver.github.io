@@ -118,11 +118,11 @@
             font-size: 1.2rem;
             word-break: break-word;
             overflow: hidden;
-            cursor: pointer; /* Added cursor style */
+            cursor: pointer;
         }
 
         #players ul li:hover {
-            background-color: #718096; /* Added hover effect */
+            background-color: #718096;
         }
 
 
@@ -262,7 +262,7 @@
         #players ul li,
         #version-info p,
         .error-message {
-            font-size: 1.5rem; /* 恢復原始大小 */
+            font-size: 1.5rem;
         }
         @media (max-width: 768px) {
             #server-status p,
@@ -300,8 +300,7 @@
             </div>
             <div style="flex: 1;">
                 <p>
-                    伺服器位址：<strong id="server-ip">loading...</strong>
-                    <span id="server-ip-copy-text" style="color:#bbf7d0;"> (點擊複製)</span>
+                    伺服器位址：<span id="server-ip" style="background-color: #4a5568; color: #ffffff; padding: 0.375rem 0.75rem; border-radius: 6px; display: inline-block;">loading...</span>
                 </p>
                 <p>伺服器狀態：<strong id="server-status-text" class="online">loading...</strong></p>
                 <p>延遲：<strong id="server-ping">loading...</strong> ms</p>
@@ -364,10 +363,9 @@
 
                 if (data.players.sample && data.players.sample.length > 0) {
                     playerListElement.innerHTML = data.players.sample
-                        .map((player) => `<li data-player-name="${player.name}">${player.name}</li>`) // Added data-player-name
+                        .map((player) => `<li data-player-name="${player.name}">${player.name}</li>`)
                         .join("");
 
-                    // Attach event listener to each player name
                     const playerNames = playerListElement.querySelectorAll('li');
                     playerNames.forEach(playerNameElement => {
                         playerNameElement.addEventListener('click', (event) => {
