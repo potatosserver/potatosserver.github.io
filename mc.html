@@ -119,9 +119,11 @@
             word-break: break-word;
             overflow: hidden;
             cursor: pointer;
+            transition: background-color 0.3s ease; /* Added transition */
         }
 
-        #players ul li:hover {
+        #players ul li:hover,
+        #players ul li:active {  /* Added :active pseudo-class */
             background-color: #718096;
         }
 
@@ -219,11 +221,12 @@
             word-break: break-all;
             display: inline-block;
             overflow: hidden;
-            transition: background-color 0.3s ease; /* Changed to background-color */
+            transition: background-color 0.3s ease;
         }
 
-        #server-ip:hover {
-            background-color: #718096; /* 使用和玩家名稱 hover 時相同的顏色 */
+        #server-ip:hover,
+        #server-ip:active { /* Added :active state */
+            background-color: #718096;
         }
 
         #server-ip-copy-text {
@@ -343,10 +346,19 @@
         const serverIconElement = document.getElementById("server-icon").querySelector("img");
 
         serverIpElement.addEventListener('mouseover', () => {
-            serverIpElement.style.backgroundColor = '#718096'; // 使用和玩家名稱 hover 時相同的顏色
+            serverIpElement.style.backgroundColor = '#718096';
             serverIpElement.style.color = '#ffffff';
         });
         serverIpElement.addEventListener('mouseout', () => {
+            serverIpElement.style.backgroundColor = '#4a5568';
+            serverIpElement.style.color = '#ffffff';
+        });
+        // Added for touch devices
+        serverIpElement.addEventListener('touchstart', () => {
+            serverIpElement.style.backgroundColor = '#718096';
+            serverIpElement.style.color = '#ffffff';
+        });
+        serverIpElement.addEventListener('touchend', () => {
             serverIpElement.style.backgroundColor = '#4a5568';
             serverIpElement.style.color = '#ffffff';
         });
@@ -378,20 +390,13 @@
 
                 if (data.players.sample && data.players.sample.length > 0) {
                     playerListElement.innerHTML = data.players.sample
-                        .map((player) => `<li data-player-name="${player.name}">${player.name}</li>`)
+                        .map((player) => `<li data-player-name="${player.name}" style="cursor: pointer; transition: background-color 0.3s ease;"
+                                                onmouseover="this.style.backgroundColor='#718096'; this.style.color='#ffffff';"
+                                                onmouseout="this.style.backgroundColor='#4a5568'; this.style.color='#ffffff';"
+                                                ontouchstart="this.style.backgroundColor='#718096'; this.style.color='#ffffff';"
+                                                ontouchend="this.style.backgroundColor='#4a5568'; this.style.color='#ffffff';"
+                                                onclick="copyToClipboard(event, '${player.name}')">${player.name}</li>`)
                         .join("");
-
-                    const playerNames = playerListElement.querySelectorAll('li');
-                    playerNames.forEach(playerNameElement => {
-                        playerNameElement.addEventListener('click', (event) => {
-                            const playerName = event.target.getAttribute('data-player-name');
-                            navigator.clipboard.writeText(playerName).then(() => {
-                                showCopyMessage(playerName);
-                            }).catch(err => {
-                                console.error('Failed to copy: ', err);
-                            });
-                        });
-                    });
                 } else {
                     playerListElement.innerHTML = "<li>無</li>";
                 }
@@ -443,6 +448,15 @@
                     messageElement.remove();
                 }, 500)
             }, 3000);
+        }
+
+        function copyToClipboard(event, text) {
+            event.stopPropagation(); // Prevent click from triggering parent
+            navigator.clipboard.writeText(text).then(() => {
+                showCopyMessage(text);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
         }
     </script>
 </body>
