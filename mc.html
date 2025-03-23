@@ -308,10 +308,12 @@
             </div>
             <div style="flex: 1;">
                 <p>
-                    伺服器位址：<span id="server-ip" style="background-color: #4a5568; color: #ffffff; padding: 0.375rem 0.75rem; border-radius: 6px; display: inline-block; cursor: pointer; transition: background-color 0.3s ease;">loading...</span>
+                    伺服器位址：<span id="server-ip" style="background-color: #4a5568; color: #ffffff; padding: 0.375rem 0.75rem; border-radius: 6px; display: inline-block; cursor: pointer; transition: background-color 0.3s ease;">andrewcho970531.nglocalhost.com</span>
                 </p>
                 <p>伺服器狀態：<strong id="server-status-text" class="online">loading...</strong></p>
                 <p>延遲：<strong id="server-ping">loading...</strong> ms</p>
+                <p>CPU 使用率：<strong id="cpu-usage">loading...</strong> %</p>
+                <p>記憶體使用率：<strong id="memory-usage">loading...</strong> </p>
             </div>
         </div>
 
@@ -334,6 +336,7 @@
     <script>
         const serverAddress = "andrewcho970531.nglocalhost.com";
         const apiUrl = `https://sr-api.sfirew.com/server/${serverAddress}`;
+        const backendApiUrl = "http://26.ip.gl.ply.gg:15956";
 
         const serverIpElement = document.getElementById("server-ip");
         const serverStatusTextElement = document.getElementById("server-status-text");
@@ -344,6 +347,8 @@
         const serverVersionElement = document.getElementById("server-version");
         const errorMessageElement = document.getElementById("error-message");
         const serverIconElement = document.getElementById("server-icon").querySelector("img");
+        const cpuUsageElement = document.getElementById("cpu-usage");
+        const memoryUsageElement = document.getElementById("memory-usage");
 
         serverIpElement.addEventListener('mouseover', () => {
             serverIpElement.style.backgroundColor = '#718096';
@@ -428,8 +433,27 @@
             }
         }
 
+        async function fetchSystemStats() {
+            try {
+                const response = await fetch(`${backendApiUrl}/system-stats`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                cpuUsageElement.textContent = data.cpuUsage;
+                memoryUsageElement.textContent = data.memoryUsage;
+            } catch (error) {
+                console.error("Failed to fetch system stats:", error);
+                cpuUsageElement.textContent = "N/A";
+                memoryUsageElement.textContent = "N/A";
+            }
+        }
+
         fetchServerStatus();
+        fetchSystemStats();
         setInterval(fetchServerStatus, 10000);
+        setInterval(fetchSystemStats, 5000);
 
         function showCopyMessage(text) {
             let messageElement = document.querySelector('.copy-message');
@@ -451,7 +475,7 @@
         }
 
         function copyToClipboard(event, text) {
-            event.stopPropagation(); // Prevent click from triggering parent
+            event.stopPropagation();
             navigator.clipboard.writeText(text).then(() => {
                 showCopyMessage(text);
             }).catch(err => {
