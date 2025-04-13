@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft 伺服器狀態</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            font-family: 'Press Start 2P', monospace;
+            background-color: #111827;
+            color: #f9fafb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background-image: url('https://play-lh.googleusercontent.com/bFkE7hv6lnuN3N2UC_d-NnUDRcvtZ_kUpOhZCQ8k930A-oXBNjPEreMUyrnHcQnigYG8=w2560-h1440-rw');
+            background-size: cover;
+            background-position: center;
+        }
+
+        #app {
+            max-width: 1200px;
+            width: 95%;
+            background-color: rgba(31, 41, 55, 0.8);
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border: 2px solid #374151;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 1.5rem;
+            color: #6ee7b7;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            word-break: keep-all;
+        }
+
+        #server-status {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background-color: #242424;
+            border: 2px solid #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            overflow: hidden;
+        }
+
+        #server-status p {
+            margin: 0.75rem 0;
+            font-size: 1.5rem;
+            word-break: break-word;
+            min-width: 200px;
+            overflow: hidden;
+        }
+
+        #server-status strong {
+            color: #f5f5f5;
+            font-size: 1.5rem;
+            word-break: break-word;
+            overflow: hidden;
+        }
+
+        #server-status .online {
+            color: #6ee7b7;
+            font-size: 1.5rem;
+            word-break: break-word;
+            overflow: hidden;
+        }
+
+        #server-status .offline {
+            color: #f87171;
+            font-size: 1.5rem;
+            word-break: break-word;
+            overflow: hidden;
+        }
+
+        #players {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background-color: #242424;
+            border: 2px solid #4a5568;
+            overflow: hidden;
+        }
+
+        #players p {
+            margin: 0.75rem 0;
+            font-size: 1.5rem;
+            word-break: break-word;
+            overflow: hidden;
+        }
+
+        #players ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            overflow: hidden;
+        }
+
+        #players ul li {
+            background-color: #4a5568;
+            color: #ffffff;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 1.2rem;
+            word-break: break-word;
+            overflow: hidden;
+            cursor: pointer;
+            transition: background-color 0.3s ease; /* Added transition */
+        }
+
+        #players ul li:hover,
+        #players ul li:active {  /* Added :active pseudo-class */
+            background-color: #718096;
+        }
+
+
+        #version-info {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background-color: #242424;
+            border: 2px solid #4a5568;
+            overflow: hidden;
+        }
+
+        #version-info p {
+            margin: 0.75rem 0;
+            font-size: 1.5rem;
+            word-break: break-word;
+            overflow: hidden;
+        }
+
+        .error-message {
+            color: #f87171;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #242424;
+            border-radius: 8px;
+            border: 2px solid #4a5568;
+            font-size: 1.2rem;
+            word-break: break-word;
+            overflow: hidden;
+        }
+
+        #server-icon {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            background-color: #374151;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 1.5rem;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        #server-icon img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .copy-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            transform: translateX(0);
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            word-break: break-word;
+            min-width: 200px;
+            text-align: left;
+        }
+
+        @media (max-width: 768px) {
+            .copy-message {
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90%;
+                text-align: center;
+            }
+        }
+
+        .copy-message.fade-out {
+            opacity: 0;
+            transform: translateX(20px) translateY(-20px);
+            overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .copy-message.fade-out {
+                transform: translateX(-50%) translateY(-20px);
+            }
+        }
+
+        #server-ip {
+            cursor: pointer;
+            word-break: break-all;
+            display: inline-block;
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        #server-ip:hover,
+        #server-ip:active { /* Added :active state */
+            background-color: #718096;
+        }
+
+        #server-ip-copy-text {
+            color: #bbf7d0;
+            overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            #server-status {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            #server-icon {
+                margin-bottom: 1rem;
+                margin-right: 0;
+            }
+
+            #server-ip-copy-text {
+                display: block;
+                margin-left: 0;
+            }
+
+            h1 {
+                font-size: 2.5em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2em;
+            }
+        }
+
+        /* 移除小螢幕字體縮放 */
+        #server-status p,
+        #server-status strong,
+        #server-status .online,
+        #server-status .offline,
+        #players p,
+        #players ul li,
+        #version-info p,
+        .error-message {
+            font-size: 1.5rem;
+        }
+        @media (max-width: 768px) {
+            #server-status p,
+            #server-status strong,
+            #server-status .online,
+            #server-status .offline,
+            #players p,
+            #players ul li,
+            #version-info p,
+            .error-message {
+                font-size: 1.2rem;
+            }
+        }
+        @media (max-width: 480px) {
+            #server-status p,
+            #server-status strong,
+            #server-status .online,
+            #server-status .offline,
+            #players p,
+            #players ul li,
+            #version-info p,
+            .error-message {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-50">
+    <div id="app" class="rounded-lg shadow-md border border-gray-800">
+        <h1 class="text-3xl font-semibold mb-6 text-green-400">Minecraft 伺服器狀態</h1>
+
+        <div id="server-status" class="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
+            <div id="server-icon">
+                <img src="/server-icon.png" alt="伺服器圖示">
+            </div>
+            <div style="flex: 1;">
+                <p>
+                    伺服器位址：<span id="server-ip" style="background-color: #4a5568; color: #ffffff; padding: 0.375rem 0.75rem; border-radius: 6px; display: inline-block; cursor: pointer; transition: background-color 0.3s ease;">loading...</span>
+                </p>
+                <p>伺服器狀態：<strong id="server-status-text" class="online">loading...</strong></p>
+                <p>延遲：<strong id="server-ping">loading...</strong> ms</p>
+            </div>
+        </div>
+
+        <div id="players" class="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
+            <p>線上人數：<strong id="online-players">0</strong> / <strong id="max-players">0</strong></p>
+            <p>在線玩家：</p>
+            <ul id="player-list">
+                <li>loading...</li>
+            </ul>
+        </div>
+
+        <div id="version-info" class="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
+            <p>版本：<strong id="server-version">loading...</strong></p>
+        </div>
+
+        <div id="error-message" class="mt-6 text-red-500 bg-gray-800 rounded-md p-6 border border-gray-700 hidden">
+        </div>
+    </div>
+
+    <script>
+        const serverAddress = "nglocalhost.com";
+        const apiUrl = `https://sr-api.sfirew.com/server/${serverAddress}`;
+
+        const serverIpElement = document.getElementById("server-ip");
+        const serverStatusTextElement = document.getElementById("server-status-text");
+        const serverPingElement = document.getElementById("server-ping");
+        const onlinePlayersElement = document.getElementById("online-players");
+        const maxPlayersElement = document.getElementById("max-players");
+        const playerListElement = document.getElementById("player-list");
+        const serverVersionElement = document.getElementById("server-version");
+        const errorMessageElement = document.getElementById("error-message");
+        const serverIconElement = document.getElementById("server-icon").querySelector("img");
+
+        serverIpElement.addEventListener('mouseover', () => {
+            serverIpElement.style.backgroundColor = '#718096';
+            serverIpElement.style.color = '#ffffff';
+        });
+        serverIpElement.addEventListener('mouseout', () => {
+            serverIpElement.style.backgroundColor = '#4a5568';
+            serverIpElement.style.color = '#ffffff';
+        });
+        // Added for touch devices
+        serverIpElement.addEventListener('touchstart', () => {
+            serverIpElement.style.backgroundColor = '#718096';
+            serverIpElement.style.color = '#ffffff';
+        });
+        serverIpElement.addEventListener('touchend', () => {
+            serverIpElement.style.backgroundColor = '#4a5568';
+            serverIpElement.style.color = '#ffffff';
+        });
+
+
+        async function fetchServerStatus() {
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                serverIpElement.textContent = data.port === 25565 ? data.ip : `${data.ip}:${data.port}`;
+                serverIpElement.addEventListener('click', () => {
+                    const textToCopy = serverIpElement.textContent;
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        showCopyMessage(textToCopy);
+                    }).catch(err => {
+                        console.error('Failed to copy: ', err);
+                    });
+                });
+
+                serverStatusTextElement.textContent = data.online ? "線上" : "離線";
+                serverStatusTextElement.className = data.online ? "online" : "offline";
+                serverPingElement.textContent = data.ping;
+                onlinePlayersElement.textContent = data.players.online;
+                maxPlayersElement.textContent = data.players.max;
+
+                if (data.players.sample && data.players.sample.length > 0) {
+                    playerListElement.innerHTML = data.players.sample
+                        .map((player) => `<li data-player-name="${player.name}" style="cursor: pointer; transition: background-color 0.3s ease;"
+                                                onmouseover="this.style.backgroundColor='#718096'; this.style.color='#ffffff';"
+                                                onmouseout="this.style.backgroundColor='#4a5568'; this.style.color='#ffffff';"
+                                                ontouchstart="this.style.backgroundColor='#718096'; this.style.color='#ffffff';"
+                                                ontouchend="this.style.backgroundColor='#4a5568'; this.style.color='#ffffff';"
+                                                onclick="copyToClipboard(event, '${player.name}')">${player.name}</li>`)
+                        .join("");
+                } else {
+                    playerListElement.innerHTML = "<li>無</li>";
+                }
+
+                serverVersionElement.textContent = data.version.name;
+
+                if (data.icon) {
+                    serverIconElement.src = data.icon;
+                    serverIconElement.style.display = "block";
+                } else {
+                    serverIconElement.style.display = "none";
+                }
+
+                errorMessageElement.classList.add("hidden");
+
+            } catch (error) {
+                console.error("Failed to fetch server status:", error);
+                errorMessageElement.textContent = `無法取得伺服器狀態：${error.message}`;
+                errorMessageElement.classList.remove("hidden");
+                serverIpElement.textContent = "N/A";
+                serverStatusTextElement.textContent = "N/A";
+                serverStatusTextElement.className = "offline";
+                serverPingElement.textContent = "N/A";
+                onlinePlayersElement.textContent = "0";
+                maxPlayersElement.textContent = "0";
+                playerListElement.innerHTML = "<li>N/A</li>";
+                serverVersionElement.textContent = "N/A";
+                serverIconElement.style.display = "none";
+            }
+        }
+
+        fetchServerStatus();
+        setInterval(fetchServerStatus, 10000);
+
+        function showCopyMessage(text) {
+            let messageElement = document.querySelector('.copy-message');
+            if (!messageElement) {
+                messageElement = document.createElement('div');
+                messageElement.className = 'copy-message';
+                document.body.appendChild(messageElement);
+            }
+
+            messageElement.textContent = `已複製到剪貼簿：${text}`;
+            messageElement.classList.remove('fade-out');
+
+            setTimeout(() => {
+                messageElement.classList.add('fade-out');
+                setTimeout(()=> {
+                    messageElement.remove();
+                }, 500)
+            }, 3000);
+        }
+
+        function copyToClipboard(event, text) {
+            event.stopPropagation(); // Prevent click from triggering parent
+            navigator.clipboard.writeText(text).then(() => {
+                showCopyMessage(text);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
