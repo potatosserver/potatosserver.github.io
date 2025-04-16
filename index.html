@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>potatosserver - 首頁</title>
+    <meta name="description" content="potatosserver 是一個提供 Minecraft 伺服器、Discord 和 Line 機器人、資料庫等多種服務的平台，並提供絕佳的開發環境。">
+    <meta name="keywords" content="potatosserver, Minecraft, Discord, Line, 機器人, 開發環境, 資料庫">
+    <link rel="canonical" href="https://yourdomain.com/potatosserver">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Your Name or Organization Name">
+    <meta property="og:title" content="potatosserver - 首頁">
+    <meta property="og:description" content="potatosserver 是一個提供 Minecraft 伺服器、Discord 和 Line 機器人、資料庫等多種服務的平台，並提供絕佳的開發環境。">
+    <meta property="og:url" content="https://yourdomain.com/potatosserver">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://potatosserver.github.io/potatosserver.jpg">
+    <meta property="og:site_name" content="potatosserver">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@yourtwitterhandle">
+    <meta name="twitter:creator" content="@yourtwitterhandle">
+    <meta name="twitter:title" content="potatosserver - 首頁">
+    <meta name="twitter:description" content="potatosserver 是一個提供 Minecraft 伺服器、Discord 和 Line 機器人、資料庫等多種服務的平台，並提供絕佳的開發環境。">
+    <meta name="twitter:image" content="https://potatosserver.github.io/potatosserver.jpg">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        color: #333;
+        line-height: 1.7;
+      }
+      header {
+        background-color: #2c3e50;
+        color: white;
+        padding: 1rem 0;
+        text-align: center;
+      }
+      header h1 {
+        margin: 0;
+        font-size: 2.2rem;
+      }
+      nav {
+        background-color: #34495e;
+        color: white;
+        padding: 0.5rem 0;
+        text-align: center;
+      }
+      nav ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+      }
+      nav ul li {
+        margin: 0;
+      }
+      nav ul li a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        padding: 0.5rem 1rem;
+        border-radius: 0.3rem;
+        transition: background-color 0.3s ease;
+        display: block;
+      }
+      nav ul li a:hover {
+        background-color: #e74c3c;
+      }
+      section {
+        padding: 2rem;
+        text-align: center;
+      }
+      section h2 {
+        margin-bottom: 1.5rem;
+        font-size: 2rem;
+        color: #2c3e50;
+      }
+      section p {
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+      }
+      .service-box {
+        background-color: #fff;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      }
+      .service-box:hover {
+        transform: translateY(-0.2rem);
+        box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.15);
+      }
+      .service-box h3 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        font-size: 1.4rem;
+        color: #e74c3c;
+      }
+      .service-box p {
+        margin-bottom: 0;
+        font-size: 1.1rem;
+      }
+      footer {
+        background-color: #2c3e50;
+        color: white;
+        padding: 1rem;
+        text-align: center;
+        font-size: 0.9rem;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1.5rem;
+      }
+      .col-md-4 {
+        flex: 1;
+        min-width: 250px;
+      }
+      @media (max-width: 768px) {
+        nav ul {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+        nav ul li a {
+          padding: 0.5rem;
+        }
+        .col-md-4 {
+          flex-basis: 100%;
+        }
+        section {
+          padding: 1.5rem 1rem;
+        }
+        header h1{
+           font-size: 1.8rem;
+        }
+        section h2{
+            font-size: 1.6rem;
+        }
+      }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>potatosserver</h1>
+        </div>
+    </header>
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="#about">關於我們</a></li>
+                <li><a href="#services">服務項目</a></li>
+                <li><a href="#contact">聯絡我們</a></li>
+                <li><a href="#mcservers">Minecraft 伺服器</a></li>
+            </ul>
+        </div>
+    </nav>
+    <main>
+        <section id="about">
+            <div class="container">
+                <h2>關於我們</h2>
+                <p>
+                    potatosserver 的命名源自於「potatoesserver」，但因為名稱已被註冊，所以改為 potatosserver。
+                    我們提供多元的服務，包含兩台 Minecraft 伺服器、一台 Discord 機器人、一台 Line 機器人，
+                    以及一個資料庫，還有許多其他類型的程式。
+                </p>
+                <p>
+                    最重要的是，potatosserver 提供一個非常棒的開發環境，這也是我們平台的核心價值。
+                    在這個環境中，我們孕育了許多機器人與各種程式，不斷推動創新與發展。
+                </p>
+            </div>
+        </section>
+        <section id="services">
+            <div class="container">
+                <h2>服務項目</h2>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="service-box">
+                            <h3>Minecraft 伺服器</h3>
+                            <p>提供穩定的遊戲伺服器，讓玩家享受優質的遊戲體驗。</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="service-box">
+                            <h3>Discord 機器人</h3>
+                            <p>功能豐富的 Discord 機器人，提供社群管理、互動等多種功能。</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="service-box">
+                            <h3>Line 機器人</h3>
+                            <p>方便實用的 Line 機器人，為您提供即時資訊和服務。</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="service-box">
+                            <h3>資料庫</h3>
+                            <p>提供可靠的資料庫服務，支援各種應用程式的資料儲存需求。</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="service-box">
+                            <h3>開發環境</h3>
+                            <p>提供優質的開發環境，協助開發者打造各種創新的應用程式。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="contact">
+            <div class="container">
+                <h2>聯絡我們</h2>
+                <p>
+                    如果您對 potatosserver 有任何疑問或建議，歡迎隨時與我們聯繫。
+                    您可以透過電子郵件、社群媒體或其他方式找到我們。
+                </p>
+                <p>
+                    我們的團隊將竭誠為您服務，感謝您的支持與關注！
+                </p>
+            </div>
+        </section>
+        <section id="mcservers">
+            <div class="container">
+                <h2>Minecraft 伺服器連結</h2>
+                <p>
+                    點擊以下連結加入我們的 Minecraft 伺服器：
+                </p>
+                <ul>
+                    <li><a href="https://potatosserver.github.io/mc1.html">Minecraft 伺服器 1</a></li>
+                    <li><a href="https://potatosserver.github.io/mc2.html">Minecraft 伺服器 2</a></li>
+                </ul>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="container">
+            &copy; <?php echo date("Y"); ?> potatosserver. All rights reserved.
+        </div>
+    </footer>
+</body>
+</html>
