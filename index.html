@@ -207,6 +207,20 @@
       #mc-servers a:hover {
         color: #217dbb;
       }
+      .mc-server-link {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background-color: #007bff;
+        color: #fff;
+        font-size: 1.1rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+        margin: 0.5rem;
+      }
+      .mc-server-link:hover {
+        background-color: #0056b3;
+      }
     </style>
 </head>
 <body>
@@ -302,17 +316,10 @@
                     <p>
                         點擊以下連結加入我們的 Minecraft 伺服器：
                     </p>
-                    <ul>
-                        <li><a href="https://potatosserver.github.io/mc1.html">Minecraft 伺服器 1</a></li>
-                        <li><a href="https://potatosserver.github.io/mc2.html">Minecraft 伺服器 2</a></li>
-                    </ul>
-                    <p>
-                        完整連結：
-                    </p>
-                    <ul>
-                        <li>https://potatosserver.github.io/mc1.html</li>
-                        <li>https://potatosserver.github.io/mc2.html</li>
-                    </ul>
+                    <div>
+                        <a href="https://potatosserver.github.io/mc1.html" class="mc-server-link">Minecraft 伺服器 1</a>
+                        <a href="https://potatosserver.github.io/mc2.html" class="mc-server-link">Minecraft 伺服器 2</a>
+                    </div>
                 </div>
             </div>
         </section>
