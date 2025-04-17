@@ -160,33 +160,45 @@
 <body>
     <h1>高雄 YouBike 搜尋</h1>
     <div id="centerButtons">
-        <button onclick="searchYouBike('楠梓')">楠梓</button>
-        <button onclick="searchYouBike('左營')">左營</button>
-        <button onclick="searchYouBike('三民')">三民</button>
-        <button onclick="searchYouBike('鼓山')">鼓山</button>
-        <button onclick="searchYouBike('鹽埕')">鹽埕</button>
-        <button onclick="searchYouBike('前金')">前金</button>
-        <button onclick="searchYouBike('新興')">新興</button>
-        <button onclick="searchYouBike('苓雅')">苓雅</button>
-        <button onclick="searchYouBike('前鎮')">前鎮</button>
-        <button onclick="searchYouBike('旗津')">旗津</button>
-        <button onclick="searchYouBike('小港')">小港</button>
-        <button onclick="searchYouBike('鳳山')">鳳山</button>
-        <button onclick="searchYouBike('仁武')">仁武</button>
-        <button onclick="searchYouBike('大社')">大社</button>
-        <button onclick="searchYouBike('岡山')">岡山</button>
-        <button onclick="searchYouBike('路竹')">路竹</button>
-        <button onclick="searchYouBike('燕巢')">燕巢</button>
-        <button onclick="searchYouBike('橋頭')">橋頭</button>
     </div>
     <div id="searchContainer">
-        <input type="text" id="keyword" placeholder="請輸入關鍵字" value="">
+        <input type="text" id="keyword" placeholder="請輸入站點名稱" value="">
         <button onclick="searchYouBike()">搜尋</button>
     </div>
     <div id="results"></div>
-
     <script>
-        const buttons = document.getElementById('centerButtons').querySelectorAll('button');
+        const buttonsDiv = document.getElementById('centerButtons');
+        const buttons = [
+            { name: '楠梓', value: '楠梓' },
+            { name: '左營', value: '左營' },
+            { name: '三民', value: '三民' },
+            { name: '鼓山', value: '鼓山' },
+            { name: '鹽埕', value: '鹽埕' },
+            { name: '前金', value: '前金' },
+            { name: '新興', value: '新興' },
+            { name: '苓雅', value: '苓雅' },
+            { name: '前鎮', value: '前鎮' },
+            { name: '旗津', value: '旗津' },
+            { name: '小港', value: '小港' },
+            { name: '鳳山', value: '鳳山' },
+            { name: '仁武', value: '仁武' },
+            { name: '大社', value: '大社' },
+            { name: '岡山', value: '岡山' },
+            { name: '路竹', value: '路竹' },
+            { name: '燕巢', value: '燕巢' },
+            { name: '橋頭', value: '橋頭' }
+        ];
+
+        function createButton(button) {
+            const btn = document.createElement('button');
+            btn.textContent = button.name;
+            btn.onclick = () => searchYouBike(button.value);
+            return btn;
+        }
+
+        buttons.forEach(button => {
+            buttonsDiv.appendChild(createButton(button));
+        });
 
         function adjustButtonLayout() {
             const screenWidth = window.innerWidth;
@@ -205,26 +217,24 @@
                 buttonsPerRow = 10;
             }
 
+            const buttons = buttonsDiv.querySelectorAll('button');
             buttons.forEach((button, index) => {
                 button.style.width =  'auto';
                 button.style.minWidth = '50px';
                 button.style.margin = '5px 10px';
                 button.style.textAlign = 'center';
             });
-            document.getElementById('centerButtons').style.justifyContent = buttonsPerRow === 1 ? 'center' : 'flex-start';
+            buttonsDiv.style.justifyContent = buttonsPerRow === 1 ? 'center' : 'flex-start';
         }
 
         adjustButtonLayout();
         window.addEventListener('resize', adjustButtonLayout);
 
-
         async function searchYouBike(keyword) {
             if (!keyword) {
                 keyword = document.getElementById('keyword').value;
             }
-
             document.getElementById('keyword').value = keyword;
-
             const url = "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092";
             try {
                 const response = await fetch(url, {
@@ -233,22 +243,18 @@
                     }
                 });
                 const data = await response.json();
-
                 const retVal = data?.data?.data?.retVal || [];
                 if (!retVal.length) {
                     document.getElementById('results').innerHTML = "找不到資料，請檢查 API 回應格式或資料來源。";
                     return;
                 }
-
                 const results = retVal.filter(station =>
-                    station.sarea.toLowerCase().includes(keyword.toLowerCase())
+                    station.sna.toLowerCase().includes(keyword.toLowerCase())
                 );
-
                 if (!results.length) {
-                    document.getElementById('results').innerHTML = `找不到與關鍵字 '${keyword}' 相關的站點。`;
+                    document.getElementById('results').innerHTML = `找不到與站點名稱 '${keyword}' 相關的站點。`;
                     return;
                 }
-
                 const resultsDiv = document.getElementById('results');
                 resultsDiv.innerHTML = "";
                 results.forEach(station => {
@@ -273,3 +279,4 @@
     </script>
 </body>
 </html>
+
