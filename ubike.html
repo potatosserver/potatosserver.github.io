@@ -162,7 +162,7 @@
     <div id="centerButtons">
     </div>
     <div id="searchContainer">
-        <input type="text" id="keyword" placeholder="請輸入站點名稱" value="">
+        <input type="text" id="keyword" placeholder="請輸入站點名稱、區域或地址" value="">
         <button onclick="searchYouBike()">搜尋</button>
     </div>
     <div id="results"></div>
@@ -249,10 +249,12 @@
                     return;
                 }
                 const results = retVal.filter(station =>
-                    station.sna.toLowerCase().includes(keyword.toLowerCase())
+                    station.sna.toLowerCase().includes(keyword.toLowerCase()) ||
+                    station.sarea.toLowerCase().includes(keyword.toLowerCase()) ||
+                    station.ar.toLowerCase().includes(keyword.toLowerCase())
                 );
                 if (!results.length) {
-                    document.getElementById('results').innerHTML = `找不到與站點名稱 '${keyword}' 相關的站點。`;
+                    document.getElementById('results').innerHTML = `找不到與站點名稱、區域或地址 '${keyword}' 相關的站點。`;
                     return;
                 }
                 const resultsDiv = document.getElementById('results');
