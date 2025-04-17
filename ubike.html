@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高雄 YouBike 搜尋</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #007BFF;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #searchContainer {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 500px;
+            width: 100%;
+        }
+        #keyword {
+            padding: 10px;
+            width: calc(100% - 120px);
+            max-width: 400px;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+            margin-right: 0;
+            font-size: 16px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        #keyword:focus {
+            outline: none;
+            border-color: #007BFF;
+            box-shadow: 0 0 5px rgba(0,123,255,0.5);
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            margin-left: 0;
+            width: auto;
+            min-width: 50px;
+            text-align: center;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #results {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .station {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            width: calc(33% - 20px);
+            min-width: 250px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .station:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+        .station h3 {
+            margin: 0 0 10px 0;
+            color: #007BFF;
+            font-size: 1.2em;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .station p {
+            margin: 0 0 5px 0;
+            color: #555;
+            font-size: 1em;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        #centerButtons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            width: 100%;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        #centerButtons button {
+            margin: 5px 10px;
+            flex: 0 1 auto;
+            min-width: 50px;
+            text-align: center;
+        }
+        #centerButtons button:nth-child(5n+1) {
+            clear: left;
+        }
+        @media (max-width: 768px) {
+            .station {
+                width: calc(50% - 20px);
+            }
+            #keyword {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+                border-radius: 5px 5px 0 0;
+            }
+            button {
+                width: 100%;
+                border-radius: 0 0 5px 5px;
+            }
+            #searchContainer {
+                flex-direction: column;
+            }
+            #results {
+                gap: 10px;
+            }
+             .station{
+                margin-bottom: 10px;
+            }
+            #centerButtons button {
+                margin: 5px;
+            }
+            #centerButtons button:nth-child(5n+1) {
+                clear: none;
+            }
+        }
+        @media (max-width: 480px) {
+            .station {
+                width: 100%;
+            }
+            #centerButtons {
+                flex-direction: column;
+            }
+            #centerButtons button {
+                margin: 5px 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>高雄 YouBike 搜尋</h1>
+    <div id="centerButtons">
+        <button onclick="searchYouBike('楠梓')">楠梓</button>
+        <button onclick="searchYouBike('左營')">左營</button>
+        <button onclick="searchYouBike('三民')">三民</button>
+        <button onclick="searchYouBike('鼓山')">鼓山</button>
+        <button onclick="searchYouBike('鹽埕')">鹽埕</button>
+        <button onclick="searchYouBike('前金')">前金</button>
+        <button onclick="searchYouBike('新興')">新興</button>
+        <button onclick="searchYouBike('苓雅')">苓雅</button>
+        <button onclick="searchYouBike('前鎮')">前鎮</button>
+        <button onclick="searchYouBike('旗津')">旗津</button>
+        <button onclick="searchYouBike('小港')">小港</button>
+        <button onclick="searchYouBike('鳳山')">鳳山</button>
+        <button onclick="searchYouBike('仁武')">仁武</button>
+        <button onclick="searchYouBike('大社')">大社</button>
+        <button onclick="searchYouBike('岡山')">岡山</button>
+        <button onclick="searchYouBike('路竹')">路竹</button>
+        <button onclick="searchYouBike('燕巢')">燕巢</button>
+        <button onclick="searchYouBike('橋頭')">橋頭</button>
+    </div>
+    <div id="searchContainer">
+        <input type="text" id="keyword" placeholder="請輸入關鍵字" value="">
+        <button onclick="searchYouBike()">搜尋</button>
+    </div>
+    <div id="results"></div>
+
+    <script>
+        const buttons = document.getElementById('centerButtons').querySelectorAll('button');
+
+        function adjustButtonLayout() {
+            const screenWidth = window.innerWidth;
+            let buttonsPerRow = 5;
+
+            if (screenWidth < 480) {
+                buttonsPerRow = 1;
+            } else if (screenWidth < 768) {
+                buttonsPerRow = 2;
+            } else if (screenWidth < 992) {
+                buttonsPerRow = 4;
+            } else if (screenWidth < 1200) {
+                buttonsPerRow = 5;
+            }
+            else {
+                buttonsPerRow = 10;
+            }
+
+            buttons.forEach((button, index) => {
+                button.style.width =  'auto';
+                button.style.minWidth = '50px';
+                button.style.margin = '5px 10px';
+                button.style.textAlign = 'center';
+            });
+            document.getElementById('centerButtons').style.justifyContent = buttonsPerRow === 1 ? 'center' : 'flex-start';
+        }
+
+        adjustButtonLayout();
+        window.addEventListener('resize', adjustButtonLayout);
+
+
+        async function searchYouBike(keyword) {
+            if (!keyword) {
+                keyword = document.getElementById('keyword').value;
+            }
+
+            document.getElementById('keyword').value = keyword;
+
+            const url = "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092";
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        "User-Agent": "Mozilla/5.0"
+                    }
+                });
+                const data = await response.json();
+
+                const retVal = data?.data?.data?.retVal || [];
+                if (!retVal.length) {
+                    document.getElementById('results').innerHTML = "找不到資料，請檢查 API 回應格式或資料來源。";
+                    return;
+                }
+
+                const results = retVal.filter(station =>
+                    station.sarea.toLowerCase().includes(keyword.toLowerCase())
+                );
+
+                if (!results.length) {
+                    document.getElementById('results').innerHTML = `找不到與關鍵字 '${keyword}' 相關的站點。`;
+                    return;
+                }
+
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = "";
+                results.forEach(station => {
+                    const stationDiv = document.createElement('div');
+                    stationDiv.className = 'station';
+                    const stationWidth = window.innerWidth < 768 ? (window.innerWidth < 480 ? '100%' : '50%') : '20%';
+                    stationDiv.style.width = stationWidth;
+                    stationDiv.innerHTML = `
+                        <h3>${station.sna || '未知'}</h3>
+                        <p>地區: ${station.sarea || '未知'}</p>
+                        <p>地址: ${station.ar || '未知'}</p>
+                        <p>YouBike 2.0: ${station.sbi_detail?.yb2 || '未知'}</p>
+                        <p>YouBike 2.0E: ${station.sbi_detail?.eyb || '未知'}</p>
+                        <p>可停空位數: ${station.bemp || '未知'}</p>
+                    `;
+                    resultsDiv.appendChild(stationDiv);
+                });
+            } catch (error) {
+                document.getElementById('results').innerHTML = `發生錯誤: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
