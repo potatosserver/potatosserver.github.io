@@ -113,6 +113,35 @@
         #centerButtons button:nth-child(5n+1) {
             clear: left;
         }
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            font-size: 1.2em;
+            z-index: 10;
+        }
+        #geolocationError {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: rgba(255, 0, 0, 0.8);
+            color: white;
+            border-radius: 5px;
+            font-size: 1.0em;
+            z-index: 1000;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        #geolocationError.show {
+            opacity: 1;
+        }
         @media (max-width: 768px) {
             .station {
                 width: calc(50% - 20px);
@@ -133,10 +162,10 @@
             #results {
                 gap: 10px;
             }
-             .station{
+            .station{
                 margin-bottom: 10px;
             }
-            #centerButtons button {
+             #centerButtons button {
                 margin: 5px;
             }
             #centerButtons button:nth-child(5n+1) {
@@ -166,6 +195,8 @@
         <button onclick="searchYouBike()">搜尋</button>
     </div>
     <div id="results"></div>
+    <div id="loading">載入中，請稍候...</div>
+    <div id="geolocationError" style="display:none;"></div>
     <script>
         const buttonsDiv = document.getElementById('centerButtons');
         const buttons = [
@@ -230,11 +261,67 @@
         adjustButtonLayout();
         window.addEventListener('resize', adjustButtonLayout);
 
+        let userLocation = null;
+        let initialLoad = true;
+        let locationDenied = false;
+        let geolocationErrorMessage = null;
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        };
+                        if (initialLoad && !locationDenied) {
+                            searchYouBike();
+                            initialLoad = false;
+                        }
+                        document.getElementById('loading').style.display = 'none';
+                    },
+                    (error) => {
+                        console.error("Geolocation error:", error);
+                        document.getElementById('loading').style.display = 'none';
+                        if (error.code === error.PERMISSION_DENIED) {
+                            locationDenied = true;
+                            geolocationErrorMessage = "您已拒絕使用定位服務，將顯示所有站點，請允許定位以顯示距離。";
+                        } else {
+                            geolocationErrorMessage = `Geolocation error: ${error.message}`;
+                        }
+                        displayGeolocationError();
+                        searchYouBike(); //search without location
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 5000
+                    }
+                );
+            } else {
+                document.getElementById('loading').style.display = 'none';
+                alert("您的瀏覽器不支援地理位置功能。");
+                searchYouBike(); //search without location
+            }
+        }
+
+        function displayGeolocationError() {
+            const errorDiv = document.getElementById('geolocationError');
+            errorDiv.textContent = geolocationErrorMessage;
+            errorDiv.classList.add('show');
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        getLocation();
+
         async function searchYouBike(keyword) {
             if (!keyword) {
                 keyword = document.getElementById('keyword').value;
             }
             document.getElementById('keyword').value = keyword;
+            document.getElementById('loading').style.display = 'block';
             const url = "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092";
             try {
                 const response = await fetch(url, {
@@ -246,15 +333,35 @@
                 const retVal = data?.data?.data?.retVal || [];
                 if (!retVal.length) {
                     document.getElementById('results').innerHTML = "找不到資料，請檢查 API 回應格式或資料來源。";
+                    document.getElementById('loading').style.display = 'none';
                     return;
                 }
-                const results = retVal.filter(station =>
-                    station.sna.toLowerCase().includes(keyword.toLowerCase()) ||
-                    station.sarea.toLowerCase().includes(keyword.toLowerCase()) ||
-                    station.ar.toLowerCase().includes(keyword.toLowerCase())
-                );
+
+                let results = retVal;
+
+                if (userLocation) {
+                    results = retVal.map(station => {
+                        const distance = calculateDistance(
+                            userLocation.latitude,
+                            userLocation.longitude,
+                            parseFloat(station.lat),
+                            parseFloat(station.lng)
+                        );
+                        return { ...station, distance };
+                    }).sort((a, b) => a.distance - b.distance);
+                }
+
+                if (keyword) {
+                    results = results.filter(station =>
+                        station.sna.toLowerCase().includes(keyword.toLowerCase()) ||
+                        station.sarea.toLowerCase().includes(keyword.toLowerCase()) ||
+                        station.ar.toLowerCase().includes(keyword.toLowerCase())
+                    );
+                }
+
                 if (!results.length) {
                     document.getElementById('results').innerHTML = `找不到與站點名稱、區域或地址 '${keyword}' 相關的站點。`;
+                    document.getElementById('loading').style.display = 'none';
                     return;
                 }
                 const resultsDiv = document.getElementById('results');
@@ -264,8 +371,13 @@
                     stationDiv.className = 'station';
                     const stationWidth = window.innerWidth < 768 ? (window.innerWidth < 480 ? '100%' : '50%') : '20%';
                     stationDiv.style.width = stationWidth;
+                    let displayDistance = '';
+                    if (userLocation && station.distance) {
+                        displayDistance = `<p>距離: ${station.distance.toFixed(2)} 公里</p>`;
+                    }
                     stationDiv.innerHTML = `
                         <h3>${station.sna || '未知'}</h3>
+                        ${displayDistance}
                         <p>地區: ${station.sarea || '未知'}</p>
                         <p>地址: ${station.ar || '未知'}</p>
                         <p>YouBike 2.0: ${station.sbi_detail?.yb2 || '未知'}</p>
@@ -276,9 +388,24 @@
                 });
             } catch (error) {
                 document.getElementById('results').innerHTML = `發生錯誤: ${error.message}`;
+            } finally {
+                document.getElementById('loading').style.display = 'none';
             }
+        }
+
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2)
+            ;
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const d = R * c;
+            return d;
         }
     </script>
 </body>
 </html>
-
