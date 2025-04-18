@@ -621,17 +621,18 @@
             clearInterval(loadingTextInterval);
             // 取得目前顯示的進度數字
             let currentProgress = parseInt(loadingText.textContent.replace(/\D/g, "")) || 85;
-            let interval = setInterval(() => {
-                if (currentProgress < 100) {
-                    currentProgress++;
-                    loadingText.textContent = "載入中：" + currentProgress + "%";
-                } else {
-                    clearInterval(interval);
-                    loadingText.textContent = "載入完成！";
-                    showMainContent();
-                }
-            }, 50); // 此處每50毫秒增加一次，並顯示過程
-            searchYouBike(); // Perform initial search with user location
+            searchYouBike().then(() => { // Perform initial search with user location
+                let interval = setInterval(() => {
+                    if (currentProgress < 100) {
+                        currentProgress++;
+                        loadingText.textContent = "載入中：" + currentProgress + "%";
+                    } else {
+                        clearInterval(interval);
+                        loadingText.textContent = "載入完成！";
+                        showMainContent();
+                    }
+                }, 50); // 此處每50毫秒增加一次，並顯示過程
+            });
         }
 
         function handleGeolocationError(error) {
