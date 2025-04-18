@@ -330,21 +330,45 @@
                 width: 100%;
             }
         }
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+        #loadingText {
+            font-size: 1.5em;
+            color: #007BFF;
+        }
     </style>
 </head>
 <body>
-    <h1>高雄 YouBike 搜尋</h1>
-    <div id="searchContainer">
-        <input type="text" id="keyword" placeholder="請輸入站點名稱、區域或地址" value="">
-        <button id="searchButton">搜尋</button> </div>
-    <div id="results"></div>
-    <div id="loading">載入中，請稍候...</div>
-    <div class="overlay"></div>
-    <div class="modal" id="permissionModal">
-        <p id="modalText"></p>
-        <button id="modalButton">確定</button>
+    <!-- 新增全屏載入介面 -->
+    <div id="loadingOverlay">
+        <p id="loadingText">載入中</p>
     </div>
-    <button id="toggleDarkMode" title="切換暗色模式">🌙</button>
+    <!-- 將原有內容包入主要內容容器，初始隱藏 -->
+    <div id="mainContent" style="display:none;">
+        <h1>高雄 YouBike 搜尋</h1>
+        <div id="searchContainer">
+            <input type="text" id="keyword" placeholder="請輸入站點名稱、區域或地址" value="">
+            <button id="searchButton">搜尋</button> </div>
+        <div id="results"></div>
+        <div id="loading">載入中，請稍候...</div>
+        <div class="overlay"></div>
+        <div class="modal" id="permissionModal">
+            <p id="modalText"></p>
+            <button id="modalButton">確定</button>
+        </div>
+        <button id="toggleDarkMode" title="切換暗色模式">🌙</button>
+    </div>
     <script>
         let userLocation = null;
         let initialLoad = true;
@@ -385,6 +409,30 @@
             // 即時更新排序並重新渲染結果
             updateResultsOrder();
         }
+
+        let mainContentShown = false;
+        function showMainContent() {
+            if (!mainContentShown) {
+                const overlay = document.getElementById("loadingOverlay");
+                const mainContent = document.getElementById("mainContent");
+                overlay.style.opacity = "0";
+                setTimeout(() => {
+                    overlay.style.display = "none";
+                    mainContent.style.display = "block";
+                }, 500);
+                mainContentShown = true;
+            }
+        }
+
+        // 新增動態更新載入文字效果
+        (function dynamicLoadingText(){
+            const loadingText = document.getElementById("loadingText");
+            let dotCount = 0;
+            setInterval(() => {
+                dotCount = (dotCount + 1) % 4;
+                loadingText.textContent = "載入中" + ".".repeat(dotCount);
+            }, 500);
+        })();
 
         async function searchYouBike(showLoadingIndicator = true) {
             if (showLoadingIndicator) showLoading();
@@ -468,6 +516,8 @@
                     }
                 });
                 updateResultsOrder(); // 直接調整卡片排序，不清空整個容器
+                // 顯示主要內容(僅第一次成功更新時)
+                showMainContent();
             } catch (error) {
                 console.error("Fetch error:", error);
                 resultsDiv.innerHTML = `發生錯誤: ${error.message}`;
@@ -643,3 +693,4 @@
     </script>
 </body>
 </html>
+``` 
