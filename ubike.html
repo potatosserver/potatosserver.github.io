@@ -459,7 +459,7 @@
                          const lat = parseFloat(station.lat);
                          const lng = parseFloat(station.lng);
                          if (!isNaN(lat) && !isNaN(lng)) {
-                             const googleMapsUrl = `https://www.google.com/maps?q=$${lat},${lng}`; // Corrected URL format
+                             const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`; // Corrected URL format
                              window.open(googleMapsUrl, '_blank');
                          } else {
                              showModal('站點座標無效，無法開啟地圖。');
