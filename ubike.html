@@ -82,6 +82,7 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             cursor: pointer;
+            position: relative; /* 新增以定位星星 */
         }
         .station:hover {
             transform: translateY(-5px);
@@ -100,6 +101,28 @@
             font-size: 1em;
             word-wrap: break-word;
             overflow-wrap: break-word;
+        }
+        .station .pin-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px; /* 放大星星 */
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #007BFF;
+            transition: transform 0.2s ease, color 0.2s ease;
+            width: auto; /* 移除固定寬度 */
+            height: auto; /* 移除固定高度 */
+            border-radius: 0; /* 移除圓形按鈕 */
+            display: inline; /* 改為內聯顯示 */
+        }
+        .station .pin-button:hover {
+            transform: scale(1.2); /* 放大效果 */
+            color: #0056b3;
+        }
+        .station .pin-button.pinned {
+            color: #FFD700; /* 釘選後的金色 */
         }
         #loading {
             position: fixed;
@@ -341,6 +364,153 @@
         const maxResults = 100;
         const defaultSearchArea = ""; // This variable seems unused in searchYouBike logic
 
+        const pinnedStations = new Set(JSON.parse(localStorage.getItem('pinnedStations') || '[]'));
+
+        function togglePinStation(stationId, event) {
+            event.stopPropagation(); // 防止點擊星星時觸發地圖跳轉
+            if (pinnedStations.has(stationId)) {
+                pinnedStations.delete(stationId);
+            } else {
+                pinnedStations.add(stationId);
+            }
+            localStorage.setItem('pinnedStations', JSON.stringify([...pinnedStations]));
+
+            // 即時更新星星顯示
+            const pinButton = document.querySelector(`.pin-button[data-id="${stationId}"]`);
+            if (pinButton) {
+                pinButton.classList.toggle('pinned');
+                pinButton.textContent = pinnedStations.has(stationId) ? '★' : '☆';
+            }
+
+            // 即時更新排序並重新渲染結果
+            updateResultsOrder();
+        }
+
+        function updateResultsOrder() {
+            const stations = Array.from(document.querySelectorAll('.station'));
+            stations.sort((a, b) => {
+                const aPinned = pinnedStations.has(a.dataset.id);
+                const bPinned = pinnedStations.has(b.dataset.id);
+                if (aPinned && !bPinned) return -1;
+                if (!aPinned && bPinned) return 1;
+                return parseFloat(a.dataset.distance) - parseFloat(b.dataset.distance);
+            });
+
+            resultsDiv.innerHTML = ''; // 清空結果區域
+            stations.forEach(station => resultsDiv.appendChild(station)); // 重新附加排序後的站點
+        }
+
+        async function searchYouBike(showLoadingIndicator = true) {
+            if (showLoadingIndicator) showLoading();
+            const url = "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092";
+            const keyword = keywordInput.value.trim().toLowerCase();
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        "User-Agent": "Mozilla/5.0"
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                const retVal = data?.data?.data?.retVal;
+
+                if (!Array.isArray(retVal)) {
+                    resultsDiv.innerHTML = "<p>找不到資料，請檢查 API 回應格式或資料來源。</p>";
+                    if (showLoadingIndicator) hideLoading();
+                    return;
+                }
+
+                let results = retVal;
+
+                const currentLocation = userLocation || { latitude: defaultLatitude, longitude: defaultLongitude };
+
+                results = results.map(station => {
+                    const lat = parseFloat(station.lat);
+                    const lng = parseFloat(station.lng);
+                    let distance = Infinity;
+
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        distance = calculateDistance(
+                            currentLocation.latitude,
+                            currentLocation.longitude,
+                            lat,
+                            lng
+                        );
+                    }
+                    return { ...station, distance, pinned: pinnedStations.has(station.sno) };
+                });
+
+                if (keyword) {
+                    results = results.filter(station => {
+                        const stationName = station.sna ? station.sna.toLowerCase() : '';
+                        const stationArea = station.sarea ? station.sarea.toLowerCase() : '';
+                        const stationAddress = station.ar ? station.ar.toLowerCase() : '';
+                        return stationArea.includes(keyword) ||
+                            stationName.includes(keyword) ||
+                            stationAddress.includes(keyword);
+                    });
+                }
+
+                results.sort((a, b) => {
+                    if (a.pinned && !b.pinned) return -1;
+                    if (!a.pinned && b.pinned) return 1;
+                    return a.distance - b.distance;
+                });
+
+                if (!results.length) {
+                    resultsDiv.innerHTML = `找不到與 '${keyword}' 相關的站點。`;
+                    if (showLoadingIndicator) hideLoading();
+                    return;
+                }
+
+                resultsDiv.innerHTML = '';
+                let count = 0;
+                for (const station of results) {
+                    if (count >= maxResults) break;
+                    const stationDiv = document.createElement('div');
+                    stationDiv.className = 'station';
+                    stationDiv.dataset.id = station.sno; // 儲存站點 ID
+                    stationDiv.dataset.distance = station.distance; // 儲存距離
+                    const stationWidth = window.innerWidth < 768 ? (window.innerWidth < 480 ? '100%' : 'calc(50% - 10px)') : 'calc(33% - 14px)';
+                    stationDiv.style.width = stationWidth;
+
+                    const distanceDisplay = station.distance !== undefined && station.distance !== Infinity ? `<p>距離: ${station.distance.toFixed(2)} 公里</p>` : '';
+
+                    const pinButton = `<span class="pin-button ${station.pinned ? 'pinned' : ''}" data-id="${station.sno}" onclick="togglePinStation('${station.sno}', event)">${station.pinned ? '★' : '☆'}</span>`; // 改為直接使用 <span>
+
+                    stationDiv.innerHTML = `
+                        ${pinButton}
+                        <h3>${station.sna || '未知站點'}</h3>
+                        ${distanceDisplay}
+                        <p>地區: ${station.sarea || '未知區域'}</p>
+                        <p>地址: ${station.ar || '未知地址'}</p>
+                        <p>YouBike 2.0: ${station.sbi_detail?.yb2 !== undefined ? station.sbi_detail.yb2 : '未知'}</p>
+                        <p>YouBike 2.0E: ${station.sbi_detail?.eyb !== undefined ? station.sbi_detail.eyb : '未知'}</p>
+                        <p>可停空位數: ${station.bemp !== undefined ? station.bemp : '未知'}</p>
+                    `;
+                    stationDiv.addEventListener('click', () => {
+                        const lat = parseFloat(station.lat);
+                        const lng = parseFloat(station.lng);
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                            const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+                            window.open(googleMapsUrl, '_blank');
+                        } else {
+                            showModal('站點座標無效，無法開啟地圖。');
+                        }
+                    });
+                    resultsDiv.appendChild(stationDiv);
+                    count++;
+                }
+            } catch (error) {
+                console.error("Fetch error:", error);
+                resultsDiv.innerHTML = `發生錯誤: ${error.message}`;
+            } finally {
+                if (showLoadingIndicator) hideLoading();
+            }
+        }
+
         // --- Helper Functions ---
 
         function showLoading() {
@@ -366,114 +536,6 @@
         function hideModal() {
             modal.classList.remove('show');
             overlay.classList.remove('show');
-        }
-
-
-        async function searchYouBike() {
-            showLoading();
-            const url = "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092";
-            const keyword = keywordInput.value.trim().toLowerCase(); // Case-insensitive search
-            try {
-                const response = await fetch(url, {
-                    headers: {
-                        "User-Agent": "Mozilla/5.0"
-                    }
-                });
-                 if (!response.ok) { // Check for HTTP errors
-                     throw new Error(`HTTP error! status: ${response.status}`);
-                 }
-                const data = await response.json();
-                const retVal = data?.data?.data?.retVal; // Use optional chaining
-
-                 if (!Array.isArray(retVal)) { // Check if retVal is an array
-                     resultsDiv.innerHTML = "<p>找不到資料，請檢查 API 回應格式或資料來源。</p>";
-                     hideLoading();
-                     return;
-                 }
-
-
-                let results = retVal;
-
-                // Calculate distance if user location is available, otherwise use default
-                const currentLocation = userLocation || { latitude: defaultLatitude, longitude: defaultLongitude };
-
-                 results = results.map(station => {
-                    const lat = parseFloat(station.lat);
-                    const lng = parseFloat(station.lng);
-                    let distance = Infinity; // Default to infinity if coordinates are invalid
-
-                    if (!isNaN(lat) && !isNaN(lng)) {
-                         distance = calculateDistance(
-                            currentLocation.latitude,
-                            currentLocation.longitude,
-                            lat,
-                            lng
-                        );
-                    }
-                    return { ...station, distance };
-                });
-
-
-                if (keyword) {
-                    results = results.filter(station => {
-                         const stationName = station.sna ? station.sna.toLowerCase() : ''; // Handle potential undefined
-                         const stationArea = station.sarea ? station.sarea.toLowerCase() : '';
-                         const stationAddress = station.ar ? station.ar.toLowerCase() : '';
-                         return stationArea.includes(keyword) ||
-                               stationName.includes(keyword) ||
-                               stationAddress.includes(keyword);
-                    });
-                }
-
-                // Sort by distance after filtering
-                 results.sort((a, b) => a.distance - b.distance);
-
-
-                if (!results.length) {
-                    resultsDiv.innerHTML = `找不到與 '${keyword}' 相關的站點。`;
-                    hideLoading();
-                    return;
-                }
-
-                resultsDiv.innerHTML = ""; // Clear previous results
-                let count = 0;
-                for (const station of results) {
-                    if (count >= maxResults) break;
-                    const stationDiv = document.createElement('div');
-                    stationDiv.className = 'station';
-                    // Responsive width handling (simplified slightly)
-                    const stationWidth = window.innerWidth < 768 ? (window.innerWidth < 480 ? '100%' : 'calc(50% - 10px)') : 'calc(33% - 14px)'; // Adjusted for gap
-                    stationDiv.style.width = stationWidth;
-
-                    const distanceDisplay = station.distance !== undefined && station.distance !== Infinity ? `<p>距離: ${station.distance.toFixed(2)} 公里</p>` : ''; // Show distance only if valid
-
-                    stationDiv.innerHTML = `
-                        <h3>${station.sna || '未知站點'}</h3>
-                        ${distanceDisplay}
-                        <p>地區: ${station.sarea || '未知區域'}</p>
-                        <p>地址: ${station.ar || '未知地址'}</p>
-                        <p>YouBike 2.0: ${station.sbi_detail?.yb2 !== undefined ? station.sbi_detail.yb2 : '未知'}</p> <p>YouBike 2.0E: ${station.sbi_detail?.eyb !== undefined ? station.sbi_detail.eyb : '未知'}</p>
-                        <p>可停空位數: ${station.bemp !== undefined ? station.bemp : '未知'}</p>
-                    `;
-                    stationDiv.addEventListener('click', () => { // Use addEventListener
-                         const lat = parseFloat(station.lat);
-                         const lng = parseFloat(station.lng);
-                         if (!isNaN(lat) && !isNaN(lng)) {
-                             const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`; // Corrected URL format
-                             window.open(googleMapsUrl, '_blank');
-                         } else {
-                             showModal('站點座標無效，無法開啟地圖。');
-                         }
-                    });
-                    resultsDiv.appendChild(stationDiv);
-                    count++;
-                }
-            } catch (error) {
-                console.error("Fetch error:", error);
-                resultsDiv.innerHTML = `發生錯誤: ${error.message}`;
-            } finally {
-                hideLoading();
-            }
         }
 
         function calculateDistance(lat1, lon1, lat2, lon2) {
