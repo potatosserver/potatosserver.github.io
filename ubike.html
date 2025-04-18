@@ -386,101 +386,56 @@
             updateResultsOrder();
         }
 
-        function updateResultsOrder() {
-            const stations = Array.from(document.querySelectorAll('.station'));
-            stations.sort((a, b) => {
-                const aPinned = pinnedStations.has(a.dataset.id);
-                const bPinned = pinnedStations.has(b.dataset.id);
-                if (aPinned && !bPinned) return -1;
-                if (!aPinned && bPinned) return 1;
-                return parseFloat(a.dataset.distance) - parseFloat(b.dataset.distance);
-            });
-
-            resultsDiv.innerHTML = ''; // 清空結果區域
-            stations.forEach(station => resultsDiv.appendChild(station)); // 重新附加排序後的站點
-        }
-
         async function searchYouBike(showLoadingIndicator = true) {
             if (showLoadingIndicator) showLoading();
             const url = "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092";
             const keyword = keywordInput.value.trim().toLowerCase();
             try {
                 const response = await fetch(url, {
-                    headers: {
-                        "User-Agent": "Mozilla/5.0"
-                    }
+                    headers: { "User-Agent": "Mozilla/5.0" }
                 });
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
                 const retVal = data?.data?.data?.retVal;
-
                 if (!Array.isArray(retVal)) {
                     resultsDiv.innerHTML = "<p>找不到資料，請檢查 API 回應格式或資料來源。</p>";
                     if (showLoadingIndicator) hideLoading();
                     return;
                 }
-
                 let results = retVal;
-
                 const currentLocation = userLocation || { latitude: defaultLatitude, longitude: defaultLongitude };
-
                 results = results.map(station => {
-                    const lat = parseFloat(station.lat);
-                    const lng = parseFloat(station.lng);
+                    const lat = parseFloat(station.lat), lng = parseFloat(station.lng);
                     let distance = Infinity;
-
                     if (!isNaN(lat) && !isNaN(lng)) {
-                        distance = calculateDistance(
-                            currentLocation.latitude,
-                            currentLocation.longitude,
-                            lat,
-                            lng
-                        );
+                        distance = calculateDistance(currentLocation.latitude, currentLocation.longitude, lat, lng);
                     }
                     return { ...station, distance, pinned: pinnedStations.has(station.sno) };
                 });
-
                 if (keyword) {
                     results = results.filter(station => {
                         const stationName = station.sna ? station.sna.toLowerCase() : '';
                         const stationArea = station.sarea ? station.sarea.toLowerCase() : '';
                         const stationAddress = station.ar ? station.ar.toLowerCase() : '';
-                        return stationArea.includes(keyword) ||
-                            stationName.includes(keyword) ||
-                            stationAddress.includes(keyword);
+                        return stationArea.includes(keyword) || stationName.includes(keyword) || stationAddress.includes(keyword);
                     });
                 }
-
-                results.sort((a, b) => {
+                results.sort((a, b) => {  // sort results as before
                     if (a.pinned && !b.pinned) return -1;
                     if (!a.pinned && b.pinned) return 1;
                     return a.distance - b.distance;
                 });
-
                 if (!results.length) {
                     resultsDiv.innerHTML = `找不到與 '${keyword}' 相關的站點。`;
                     if (showLoadingIndicator) hideLoading();
                     return;
                 }
-
-                resultsDiv.innerHTML = '';
-                let count = 0;
-                for (const station of results) {
-                    if (count >= maxResults) break;
-                    const stationDiv = document.createElement('div');
-                    stationDiv.className = 'station';
-                    stationDiv.dataset.id = station.sno; // 儲存站點 ID
-                    stationDiv.dataset.distance = station.distance; // 儲存距離
-                    const stationWidth = window.innerWidth < 768 ? (window.innerWidth < 480 ? '100%' : 'calc(50% - 10px)') : 'calc(33% - 14px)';
-                    stationDiv.style.width = stationWidth;
-
-                    const distanceDisplay = station.distance !== undefined && station.distance !== Infinity ? `<p>距離: ${station.distance.toFixed(2)} 公里</p>` : '';
-
-                    const pinButton = `<span class="pin-button ${station.pinned ? 'pinned' : ''}" data-id="${station.sno}" onclick="togglePinStation('${station.sno}', event)">${station.pinned ? '★' : '☆'}</span>`; // 改為直接使用 <span>
-
-                    stationDiv.innerHTML = `
+                // 更新或新增卡片，不清空 resultsDiv
+                results.forEach(station => {
+                    const existingCard = document.querySelector(`.station[data-id="${station.sno}"]`);
+                    const distanceDisplay = station.distance !== undefined && station.distance !== Infinity ? `<p>距離: ${station.distance.toFixed(2)} 公里</p>` : "";
+                    const pinButton = `<span class="pin-button ${station.pinned ? 'pinned' : ''}" data-id="${station.sno}" onclick="togglePinStation('${station.sno}', event)">${station.pinned ? '★' : '☆'}</span>`;
+                    const cardContent = `
                         ${pinButton}
                         <h3>${station.sna || '未知站點'}</h3>
                         ${distanceDisplay}
@@ -490,25 +445,50 @@
                         <p>YouBike 2.0E: ${station.sbi_detail?.eyb !== undefined ? station.sbi_detail.eyb : '未知'}</p>
                         <p>可停空位數: ${station.bemp !== undefined ? station.bemp : '未知'}</p>
                     `;
-                    stationDiv.addEventListener('click', () => {
-                        const lat = parseFloat(station.lat);
-                        const lng = parseFloat(station.lng);
-                        if (!isNaN(lat) && !isNaN(lng)) {
-                            const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
-                            window.open(googleMapsUrl, '_blank');
-                        } else {
-                            showModal('站點座標無效，無法開啟地圖。');
-                        }
-                    });
-                    resultsDiv.appendChild(stationDiv);
-                    count++;
-                }
+                    if (existingCard) {
+                        existingCard.dataset.distance = station.distance;
+                        existingCard.innerHTML = cardContent;
+                    } else {
+                        const card = document.createElement('div');
+                        card.className = 'station';
+                        card.dataset.id = station.sno;
+                        card.dataset.distance = station.distance;
+                        card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
+                        card.innerHTML = cardContent;
+                        card.addEventListener("click", () => {
+                            const lat = parseFloat(station.lat), lng = parseFloat(station.lng);
+                            if (!isNaN(lat) && !isNaN(lng)) {
+                                const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+                                window.open(googleMapsUrl, "_blank");
+                            } else {
+                                showModal("站點座標無效，無法開啟地圖。");
+                            }
+                        });
+                        resultsDiv.appendChild(card);
+                    }
+                });
+                updateResultsOrder(); // 直接調整卡片排序，不清空整個容器
             } catch (error) {
                 console.error("Fetch error:", error);
                 resultsDiv.innerHTML = `發生錯誤: ${error.message}`;
             } finally {
                 if (showLoadingIndicator) hideLoading();
             }
+        }
+
+        function updateResultsOrder() {
+            const cards = Array.from(document.querySelectorAll(".station"));
+            cards.sort((a, b) => {
+                const aPinned = pinnedStations.has(a.dataset.id);
+                const bPinned = pinnedStations.has(b.dataset.id);
+                if (aPinned && !bPinned) return -1;
+                if (!aPinned && bPinned) return 1;
+                return parseFloat(a.dataset.distance) - parseFloat(b.dataset.distance);
+            });
+            // 直接依序重新附加卡片
+            cards.forEach(card => {
+                resultsDiv.appendChild(card);
+            });
         }
 
         // --- Helper Functions ---
