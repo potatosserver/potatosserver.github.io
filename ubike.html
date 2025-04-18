@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高雄 YouBike 搜尋</title>
+    <title>高雄 YouBike 站點搜尋</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -506,13 +506,13 @@
         function handleGeolocationError(error) {
             console.error("Geolocation error:", error);
             locationDenied = true;
-            let errorMessage = "無法取得您的位置資訊。站點將以預設地點 (高雄市政府) 為中心顯示距離。";
+            let errorMessage = "無法取得您的位置資訊。站點將以預設地點 (捷運美麗島站) 為中心顯示距離。";
             if (error.code === error.PERMISSION_DENIED) {
-                errorMessage = "您已拒絕使用定位服務。站點將以預設地點 (高雄市政府) 為中心顯示距離。";
+                errorMessage = "您已拒絕使用定位服務。站點將以預設地點 (捷運美麗島站) 為中心顯示距離。";
             } else if (error.code === error.POSITION_UNAVAILABLE) {
-                 errorMessage = "位置資訊無法取得。站點將以預設地點 (高雄市政府) 為中心顯示距離。";
+                 errorMessage = "位置資訊無法取得。站點將以預設地點 (捷運美麗島站) 為中心顯示距離。";
             } else if (error.code === error.TIMEOUT) {
-                 errorMessage = "定位要求逾時。站點將以預設地點 (高雄市政府) 為中心顯示距離。";
+                 errorMessage = "定位要求逾時。站點將以預設地點 (捷運美麗島站) 為中心顯示距離。";
             }
             showModal(errorMessage);
             userLocation = { latitude: defaultLatitude, longitude: defaultLongitude }; // Use default location
