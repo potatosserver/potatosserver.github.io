@@ -267,6 +267,12 @@
             background: #ffffff; /* 移除漸變，改為單一背景色 */
             color: #000000; /* 全黑文字 */
         }
+        body.dark-mode #loadingOverlay {
+            background-color: rgba(51, 51, 51, 0.9); // 暗色模式下調整全屏載入背景色
+        }
+        body.dark-mode #loadingText {
+            color: #ffffff; // 暗色模式下載入文字改為白色
+        }
 
         #toggleDarkMode {
             position: fixed;
@@ -343,16 +349,25 @@
             z-index: 10000;
             transition: opacity 0.5s ease;
         }
+        #loadingContent {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
         #loadingText {
             font-size: 1.5em;
             color: #007BFF;
+            text-align: center;
         }
     </style>
 </head>
 <body>
     <!-- 新增全屏載入介面 -->
     <div id="loadingOverlay">
-        <p id="loadingText">載入中</p>
+        <div id="loadingContent">
+            <p id="loadingText">載入中</p>
+        </div>
     </div>
     <!-- 將原有內容包入主要內容容器，初始隱藏 -->
     <div id="mainContent" style="display:none;">
@@ -424,14 +439,26 @@
             }
         }
 
-        // 新增動態更新載入文字效果
-        (function dynamicLoadingText(){
+        // 修改 simulateLoadingPercentage，使進度達85後隨機選取一個數字並凍結不動
+        (function simulateLoadingPercentage(){
             const loadingText = document.getElementById("loadingText");
-            let dotCount = 0;
-            setInterval(() => {
-                dotCount = (dotCount + 1) % 4;
-                loadingText.textContent = "載入中" + ".".repeat(dotCount);
-            }, 500);
+            let progress = 0;
+            let lockedProgress = null;
+            loadingTextInterval = setInterval(() => {
+                if(!mainContentShown) {
+                    if (progress < 85) {
+                        progress++;
+                        loadingText.textContent = "載入中：" + progress + "%";
+                    } else {
+                        if(lockedProgress === null){
+                            lockedProgress = 85 + Math.floor(Math.random() * 11); // 選取85~95中的一個數字
+                        }
+                        loadingText.textContent = "載入中：" + lockedProgress + "%";
+                    }
+                } else {
+                    clearInterval(loadingTextInterval);
+                }
+            }, 50);
         })();
 
         async function searchYouBike(showLoadingIndicator = true) {
@@ -584,14 +611,26 @@
 
         // --- Geolocation Handling ---
 
+        // 修改 handleGeolocationSuccess，定位成功後從當前數字逐步加到100
         function handleGeolocationSuccess(position) {
             userLocation = {
                 latitude: position.coords.latitude,
                 longitude: position.coords.longitude
             };
-            console.log("Geolocation successful:", userLocation);
-             // Optional: Show a temporary message that location was obtained
-             // showModal("已取得您的位置資訊，站點將依距離排序。");
+            const loadingText = document.getElementById("loadingText");
+            clearInterval(loadingTextInterval);
+            // 取得目前顯示的進度數字
+            let currentProgress = parseInt(loadingText.textContent.replace(/\D/g, "")) || 85;
+            let interval = setInterval(() => {
+                if (currentProgress < 100) {
+                    currentProgress++;
+                    loadingText.textContent = "載入中：" + currentProgress + "%";
+                } else {
+                    clearInterval(interval);
+                    loadingText.textContent = "載入完成！";
+                    showMainContent();
+                }
+            }, 50); // 此處每50毫秒增加一次，並顯示過程
             searchYouBike(); // Perform initial search with user location
         }
 
@@ -630,7 +669,7 @@
         function getLocation() {
             if (navigator.geolocation) {
                 // 初次獲取定位
-                navigator.geolocation.getCurrentPosition(handleGeoUpdateSuccess, handleGeoUpdateError, {
+                navigator.geolocation.getCurrentPosition(handleGeolocationSuccess, handleGeolocationError, {
                     enableHighAccuracy: true,
                     timeout: 10000,
                     maximumAge: 0
@@ -693,4 +732,3 @@
     </script>
 </body>
 </html>
-``` 
