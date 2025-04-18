@@ -582,26 +582,44 @@
              hideLoading(); // Hide loading if geolocation is not supported
         }
 
-        function getLocation() {
-             showLoading(); // Show loading while attempting to get location
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    handleGeolocationSuccess,
-                    handleGeolocationError,
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 10000, // 10 seconds
-                        maximumAge: 0 // Don't use cached position
-                    }
-                );
-            } else {
-                showModal("您的瀏覽器不支援地理位置功能。站點將以預設地點 (捷運美麗島站) 為中心顯示。");
-                userLocation = { latitude: defaultLatitude, longitude: defaultLongitude }; // Use default location
-                searchYouBike(); // Perform initial search with default location
-                 hideLoading(); // Hide loading if geolocation is not supported
-            }
+        // 新增更新定位成功與失敗的回呼
+        function handleGeoUpdateSuccess(position) {
+            userLocation = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+            };
+            console.log("Geo update:", userLocation);
+            searchYouBike(false); // 更新距離，不顯示載入中
+        }
+        function handleGeoUpdateError(error) {
+            console.error("Geo update error:", error);
+            // 失敗時不跳出提示，只記錄錯誤
         }
 
+        // 修改 getLocation 函式：初次獲取定位後，每10秒更新一次定位
+        function getLocation() {
+            if (navigator.geolocation) {
+                // 初次獲取定位
+                navigator.geolocation.getCurrentPosition(handleGeoUpdateSuccess, handleGeoUpdateError, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                });
+                // 每10秒更新定位
+                setInterval(() => {
+                    navigator.geolocation.getCurrentPosition(handleGeoUpdateSuccess, handleGeoUpdateError, {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    });
+                }, 10000);
+            } else {
+                showModal("您的瀏覽器不支援地理位置功能。站點將以預設地點 (捷運美麗島站) 為中心顯示。");
+                userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+                searchYouBike();
+                hideLoading();
+            }
+        }
 
         const toggleDarkModeButton = document.getElementById('toggleDarkMode');
         toggleDarkModeButton.addEventListener('click', () => {
