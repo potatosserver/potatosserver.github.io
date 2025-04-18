@@ -10,6 +10,7 @@
             font-family: 'Noto Sans TC', Arial, sans-serif;
             margin: 20px;
             background-color: #f4f4f4;
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
         h1 {
             color: #007BFF;
@@ -127,6 +128,13 @@
             border-radius: 5px;
             font-size: 1.2em;
             z-index: 10;
+            display: none; /* 確保初始狀態為隱藏 */
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        #loading.show {
+            display: block; /* 顯示時設為 block */
+            opacity: 1;
         }
         #geolocationError {
             position: fixed;
@@ -208,6 +216,76 @@
             background-color: #0056b3;
         }
 
+        body.dark-mode {
+            background-color: #121212;
+            color: #ffffff;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        body.dark-mode h1 {
+            color: #90caf9;
+        }
+        body.dark-mode #keyword {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            border-color: #90caf9;
+        }
+        body.dark-mode #keyword:focus {
+            box-shadow: 0 0 5px rgba(144, 202, 249, 0.5);
+        }
+        body.dark-mode button {
+            background-color: #90caf9;
+            color: #121212;
+        }
+        body.dark-mode button:hover {
+            background-color: #64b5f6;
+        }
+        body.dark-mode .station {
+            background-color: #1e1e1e;
+            border-color: #333333;
+            color: #ffffff;
+        }
+        body.dark-mode .station h3 {
+            color: #90caf9;
+        }
+        body.dark-mode .modal {
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
+        body.dark-mode .overlay {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        #toggleDarkMode {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #007BFF, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+        #toggleDarkMode:hover {
+            background: linear-gradient(135deg, #0056b3, #003f7f);
+            transform: scale(1.1);
+        }
+        body.dark-mode #toggleDarkMode {
+            background: linear-gradient(135deg, #90caf9, #64b5f6);
+            color: #121212;
+        }
+        body.dark-mode #toggleDarkMode:hover {
+            background: linear-gradient(135deg, #64b5f6, #42a5f5);
+        }
+
         @media (max-width: 768px) {
             .station {
                 width: calc(50% - 20px);
@@ -271,6 +349,7 @@
         <p id="modalText"></p>
         <button id="modalButton">確定</button>
     </div>
+    <button id="toggleDarkMode" title="切換暗色模式">🌙</button>
     <script>
         const buttonsDiv = document.getElementById('centerButtons');
         const buttons = [
@@ -422,8 +501,24 @@
 
         getLocation();
 
+        function showLoading() {
+            const loadingDiv = document.getElementById('loading');
+            loadingDiv.style.display = 'block'; // 確保顯示
+            setTimeout(() => {
+                loadingDiv.classList.add('show'); // 加入過渡效果
+            }, 10); // 確保過渡效果生效
+        }
+
+        function hideLoading() {
+            const loadingDiv = document.getElementById('loading');
+            loadingDiv.classList.remove('show'); // 移除過渡效果
+            setTimeout(() => {
+                loadingDiv.style.display = 'none'; // 確保過渡完成後隱藏
+            }, 500); // 與 CSS 過渡時間一致
+        }
+
         async function searchYouBike() {
-            document.getElementById('loading').style.display = 'block';
+            showLoading();
             const url = "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092";
             const keyword = document.getElementById('keyword').value.trim();
             try {
@@ -512,7 +607,7 @@
             } catch (error) {
                 document.getElementById('results').innerHTML = `發生錯誤: ${error.message}`;
             } finally {
-                document.getElementById('loading').style.display = 'none';
+                hideLoading();
             }
         }
 
@@ -528,6 +623,21 @@
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             const d = R * c;
             return d;
+        }
+
+        const toggleDarkModeButton = document.getElementById('toggleDarkMode');
+        toggleDarkModeButton.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+            toggleDarkModeButton.textContent = isDarkMode ? '☀️' : '🌙';
+        });
+
+        // 初始化暗色模式
+        const savedDarkMode = localStorage.getItem('darkMode');
+        if (savedDarkMode === 'enabled') {
+            document.body.classList.add('dark-mode');
+            toggleDarkModeButton.textContent = '☀️';
         }
     </script>
 </body>
