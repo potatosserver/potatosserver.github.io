@@ -35,6 +35,7 @@
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
             word-wrap: break-word;
             overflow-wrap: break-word;
+            display: block;
         }
         #keyword:focus {
             outline: none;
@@ -55,6 +56,7 @@
             width: auto;
             min-width: 50px;
             text-align: center;
+            display: block;
         }
         button:hover {
             background-color: #0056b3;
@@ -77,6 +79,7 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             word-wrap: break-word;
             overflow-wrap: break-word;
+            cursor: pointer;
         }
         .station:hover {
             transform: translateY(-5px);
@@ -103,6 +106,7 @@
             width: 100%;
             flex-wrap: wrap;
             gap: 10px;
+            display: none;
         }
         #centerButtons button {
             margin: 5px 10px;
@@ -126,10 +130,10 @@
         }
         #geolocationError {
             position: fixed;
-            top: 20px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
+            transform: translate(-50%, -50%);
+            padding: 20px;
             background-color: rgba(255, 0, 0, 0.8);
             color: white;
             border-radius: 5px;
@@ -142,6 +146,68 @@
         #geolocationError.show {
             opacity: 1;
         }
+        #geolocationPermission {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: rgba(0, 255, 0, 0.8);
+            color: white;
+            border-radius: 5px;
+            font-size: 1.0em;
+            z-index: 1000;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        #geolocationPermission.show {
+            opacity: 1;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+        .overlay.show {
+            display: block;
+        }
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            text-align: center;
+            display: none;
+        }
+        .modal.show {
+            display: block;
+        }
+        .modal button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .modal button:hover {
+            background-color: #0056b3;
+        }
+
         @media (max-width: 768px) {
             .station {
                 width: calc(50% - 20px);
@@ -151,10 +217,12 @@
                 margin-right: 0;
                 margin-bottom: 10px;
                 border-radius: 5px 5px 0 0;
+                display: block;
             }
             button {
                 width: 100%;
                 border-radius: 0 0 5px 5px;
+                display: block;
             }
             #searchContainer {
                 flex-direction: column;
@@ -197,27 +265,33 @@
     <div id="results"></div>
     <div id="loading">載入中，請稍候...</div>
     <div id="geolocationError" style="display:none;"></div>
+    <div id="geolocationPermission" style="display:none;"></div>
+    <div class="overlay"></div>
+    <div class="modal" id="permissionModal">
+        <p id="modalText"></p>
+        <button id="modalButton">確定</button>
+    </div>
     <script>
         const buttonsDiv = document.getElementById('centerButtons');
         const buttons = [
-            { name: '楠梓', value: '楠梓' },
-            { name: '左營', value: '左營' },
-            { name: '三民', value: '三民' },
-            { name: '鼓山', value: '鼓山' },
-            { name: '鹽埕', value: '鹽埕' },
-            { name: '前金', value: '前金' },
-            { name: '新興', value: '新興' },
-            { name: '苓雅', value: '苓雅' },
-            { name: '前鎮', value: '前鎮' },
-            { name: '旗津', value: '旗津' },
-            { name: '小港', value: '小港' },
-            { name: '鳳山', value: '鳳山' },
-            { name: '仁武', value: '仁武' },
-            { name: '大社', value: '大社' },
-            { name: '岡山', value: '岡山' },
-            { name: '路竹', value: '路竹' },
-            { name: '燕巢', value: '燕巢' },
-            { name: '橋頭', value: '橋頭' }
+            { name: '楠梓', value: '楠梓區' },
+            { name: '左營', value: '左營區' },
+            { name: '三民', value: '三民區' },
+            { name: '鼓山', value: '鼓山區' },
+            { name: '鹽埕', value: '鹽埕區' },
+            { name: '前金', value: '前金區' },
+            { name: '新興', value: '新興區' },
+            { name: '苓雅', value: '苓雅區' },
+            { name: '前鎮', value: '前鎮區' },
+            { name: '旗津', value: '旗津區' },
+            { name: '小港', value: '小港區' },
+            { name: '鳳山', value: '鳳山區' },
+            { name: '仁武', value: '仁武區' },
+            { name: '大社', value: '大社區' },
+            { name: '岡山', value: '岡山區' },
+            { name: '路竹', value: '路竹區' },
+            { name: '燕巢', value: '燕巢區' },
+            { name: '橋頭', value: '橋頭區' }
         ];
 
         function createButton(button) {
@@ -265,6 +339,14 @@
         let initialLoad = true;
         let locationDenied = false;
         let geolocationErrorMessage = null;
+        const defaultLatitude = 22.6315725;
+        const defaultLongitude = 120.3025079;
+        const overlay = document.querySelector('.overlay');
+        const permissionModal = document.getElementById('permissionModal');
+        const modalText = document.getElementById('modalText');
+        const modalButton = document.getElementById('modalButton');
+        const maxResults = 100;
+        const defaultSearchArea = "";
 
         function getLocation() {
             if (navigator.geolocation) {
@@ -275,7 +357,7 @@
                             longitude: position.coords.longitude
                         };
                         if (initialLoad && !locationDenied) {
-                            searchYouBike();
+                            searchYouBike(defaultSearchArea);
                             initialLoad = false;
                         }
                         document.getElementById('loading').style.display = 'none';
@@ -285,12 +367,14 @@
                         document.getElementById('loading').style.display = 'none';
                         if (error.code === error.PERMISSION_DENIED) {
                             locationDenied = true;
-                            geolocationErrorMessage = "您已拒絕使用定位服務，將顯示所有站點，請允許定位以顯示距離。";
+                            geolocationErrorMessage = "您已拒絕使用定位服務，將以預設地點為中心顯示距離。";
+                            userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+                            displayGeolocationError();
                         } else {
                             geolocationErrorMessage = `Geolocation error: ${error.message}`;
+                            displayGeolocationError();
                         }
-                        displayGeolocationError();
-                        searchYouBike(); //search without location
+                        searchYouBike(defaultSearchArea);
                     },
                     {
                         enableHighAccuracy: true,
@@ -300,29 +384,48 @@
                 );
             } else {
                 document.getElementById('loading').style.display = 'none';
-                alert("您的瀏覽器不支援地理位置功能。");
-                searchYouBike(); //search without location
+                alert("您的瀏覽器不支援地理位置功能。將以預設地點為中心顯示。");
+                userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+                searchYouBike(defaultSearchArea);
             }
         }
 
         function displayGeolocationError() {
-            const errorDiv = document.getElementById('geolocationError');
-            errorDiv.textContent = geolocationErrorMessage;
-            errorDiv.classList.add('show');
+            modalText.textContent = geolocationErrorMessage;
+            permissionModal.classList.add('show');
+            overlay.classList.add('show');
+            modalButton.onclick = () => {
+                permissionModal.classList.remove('show');
+                overlay.classList.remove('show');
+            };
             setTimeout(() => {
-                errorDiv.classList.remove('show');
+                permissionModal.classList.remove('show');
+                overlay.classList.remove('show');
+            }, 5000);
+        }
+
+        function displayGeolocationPermission(showOverlay) {
+            modalText.textContent = "已取得您的位置資訊，開始顯示YouBike站點資訊。";
+            permissionModal.classList.add('show');
+            if (showOverlay) {
+                overlay.classList.add('show');
+            }
+            modalButton.onclick = () => {
+                permissionModal.classList.remove('show');
+                overlay.classList.remove('show');
+            };
+            setTimeout(() => {
+                permissionModal.classList.remove('show');
+                overlay.classList.remove('show');
             }, 5000);
         }
 
         getLocation();
 
-        async function searchYouBike(keyword) {
-            if (!keyword) {
-                keyword = document.getElementById('keyword').value;
-            }
-            document.getElementById('keyword').value = keyword;
+        async function searchYouBike() {
             document.getElementById('loading').style.display = 'block';
             const url = "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092";
+            const keyword = document.getElementById('keyword').value.trim();
             try {
                 const response = await fetch(url, {
                     headers: {
@@ -350,23 +453,37 @@
                         return { ...station, distance };
                     }).sort((a, b) => a.distance - b.distance);
                 }
+                else {
+                    results = retVal.map(station => {
+                        const distance = calculateDistance(
+                            defaultLatitude,
+                            defaultLongitude,
+                            parseFloat(station.lat),
+                            parseFloat(station.lng)
+                        );
+                        return { ...station, distance };
+                    }).sort((a, b) => a.distance - b.distance);
+                }
 
                 if (keyword) {
                     results = results.filter(station =>
-                        station.sna.toLowerCase().includes(keyword.toLowerCase()) ||
-                        station.sarea.toLowerCase().includes(keyword.toLowerCase()) ||
-                        station.ar.toLowerCase().includes(keyword.toLowerCase())
+                        station.sarea.includes(keyword) ||
+                        station.sna.includes(keyword) ||
+                        station.ar.includes(keyword)
                     );
                 }
 
+
                 if (!results.length) {
-                    document.getElementById('results').innerHTML = `找不到與站點名稱、區域或地址 '${keyword}' 相關的站點。`;
+                    document.getElementById('results').innerHTML = `找不到與 '${keyword}' 相關的站點。`;
                     document.getElementById('loading').style.display = 'none';
                     return;
                 }
                 const resultsDiv = document.getElementById('results');
                 resultsDiv.innerHTML = "";
-                results.forEach(station => {
+                let count = 0;
+                for (const station of results) {
+                    if (count >= maxResults) break;
                     const stationDiv = document.createElement('div');
                     stationDiv.className = 'station';
                     const stationWidth = window.innerWidth < 768 ? (window.innerWidth < 480 ? '100%' : '50%') : '20%';
@@ -375,17 +492,23 @@
                     if (userLocation && station.distance) {
                         displayDistance = `<p>距離: ${station.distance.toFixed(2)} 公里</p>`;
                     }
+                    const distanceDisplay = `<p>距離: ${station.distance.toFixed(2)} 公里</p>`;
                     stationDiv.innerHTML = `
                         <h3>${station.sna || '未知'}</h3>
-                        ${displayDistance}
+                        ${distanceDisplay}
                         <p>地區: ${station.sarea || '未知'}</p>
                         <p>地址: ${station.ar || '未知'}</p>
                         <p>YouBike 2.0: ${station.sbi_detail?.yb2 || '未知'}</p>
                         <p>YouBike 2.0E: ${station.sbi_detail?.eyb || '未知'}</p>
                         <p>可停空位數: ${station.bemp || '未知'}</p>
                     `;
+                    stationDiv.onclick = () => {
+                        const googleMapsUrl = `https://www.google.com/maps?q=${station.lat},${station.lng}`;
+                        window.open(googleMapsUrl, '_blank');
+                    };
                     resultsDiv.appendChild(stationDiv);
-                });
+                    count++;
+                }
             } catch (error) {
                 document.getElementById('results').innerHTML = `發生錯誤: ${error.message}`;
             } finally {
