@@ -9,7 +9,7 @@
         body {
             font-family: 'Noto Sans TC', Arial, sans-serif;
             margin: 20px;
-            background: #f4f4f4; /* 移除漸變，改為單一背景色 */
+            background: #f4f4f4;
             transition: background 0.5s ease, color 0.5s ease;
         }
         h1 {
@@ -67,7 +67,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
-            justify-content: center; /* Added to center cards */
+            justify-content: center;
         }
         .station {
             background-color: white;
@@ -82,7 +82,7 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             cursor: pointer;
-            position: relative; /* 新增以定位星星 */
+            position: relative;
         }
         .station:hover {
             transform: translateY(-5px);
@@ -106,23 +106,23 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            font-size: 24px; /* 放大星星 */
+            font-size: 24px;
             background: none;
             border: none;
             cursor: pointer;
             color: #007BFF;
             transition: transform 0.2s ease, color 0.2s ease;
-            width: auto; /* 移除固定寬度 */
-            height: auto; /* 移除固定高度 */
-            border-radius: 0; /* 移除圓形按鈕 */
-            display: inline; /* 改為內聯顯示 */
+            width: auto;
+            height: auto;
+            border-radius: 0;
+            display: inline;
         }
         .station .pin-button:hover {
-            transform: scale(1.2); /* 放大效果 */
+            transform: scale(1.2);
             color: #0056b3;
         }
         .station .pin-button.pinned {
-            color: #FFD700; /* 釘選後的金色 */
+            color: #FFD700;
         }
         #loading {
             position: fixed;
@@ -130,53 +130,17 @@
             left: 50%;
             transform: translate(-50%, -50%);
             padding: 20px;
-            background: rgba(255, 255, 255, 0.8); /* 移除漸變，改為單一背景色 */
+            background: rgba(255, 255, 255, 0.8);
             border-radius: 5px;
             font-size: 1.2em;
             z-index: 10;
-            display: none; /* 確保初始狀態為隱藏 */
+            display: none;
             opacity: 0;
             transition: opacity 0.5s ease;
         }
-         #loading.show { /* Added show class for transition */
+        #loading.show {
             opacity: 1;
             display: block;
-        }
-        #geolocationError {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px;
-            background-color: rgba(255, 0, 0, 0.8);
-            color: white;
-            border-radius: 5px;
-            font-size: 1.0em;
-            z-index: 1000;
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
-        #geolocationError.show {
-            opacity: 1;
-        }
-        #geolocationPermission {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px;
-            background-color: rgba(0, 255, 0, 0.8);
-            color: white;
-            border-radius: 5px;
-            font-size: 1.0em;
-            z-index: 1000;
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
-        #geolocationPermission.show {
-            opacity: 1;
         }
         .overlay {
             position: fixed;
@@ -223,16 +187,16 @@
         }
 
         body.dark-mode {
-            background: #333; /* 修改背景顏色 */
-            color: #ffffff; /* 修改內文文字為純白 */
+            background: #333;
+            color: #ffffff;
             transition: background 0.5s ease, color 0.5s ease;
         }
         body.dark-mode h1 {
-            color: #90CAF9; /* 修改標題顏色 */
+            color: #90CAF9;
         }
         body.dark-mode #keyword {
             background-color: #1e1e1e;
-            color: #ffffff; /* 修改輸入框文字為全白色 */
+            color: #ffffff;
             border-color: #90caf9;
         }
         body.dark-mode #keyword:focus {
@@ -246,32 +210,32 @@
             background-color: #64b5f6;
         }
         body.dark-mode .station {
-            background-color: #444; /* 修改站點背景顏色，增加與主背景的對比 */
-            border-color: #555; /* 修改邊框顏色 */
-            color: #ffffff; /* 修改站點文字為純白 */
+            background-color: #444;
+            border-color: #555;
+            color: #ffffff;
         }
         body.dark-mode .station h3 {
-            color: #90CAF9; /* 修改站點標題顏色 */
+            color: #90CAF9;
         }
         body.dark-mode .station p {
-            color: #cccccc; /* 修改詳細資料文字顏色為較亮的灰色 */
+            color: #cccccc;
         }
         body.dark-mode .modal {
-            background-color: #333; /* 修改模態框背景顏色 */
-            color: #ffffff; /* 修改模態框文字為純白 */
+            background-color: #333;
+            color: #ffffff;
         }
         body.dark-mode .overlay {
             background-color: rgba(0, 0, 0, 0.8);
         }
         body.dark-mode #loading {
-            background: #ffffff; /* 移除漸變，改為單一背景色 */
-            color: #000000; /* 全黑文字 */
+            background: #ffffff;
+            color: #000000;
         }
         body.dark-mode #loadingOverlay {
-            background-color: rgba(51, 51, 51, 0.9); // 暗色模式下調整全屏載入背景色
+            background-color: rgba(51, 51, 51, 0.9);
         }
         body.dark-mode #loadingText {
-            color: #ffffff; // 暗色模式下載入文字改為白色
+            color: #ffffff;
         }
 
         #toggleDarkMode {
@@ -363,13 +327,11 @@
     </style>
 </head>
 <body>
-    <!-- 新增全屏載入介面 -->
     <div id="loadingOverlay">
         <div id="loadingContent">
             <p id="loadingText">載入中</p>
         </div>
     </div>
-    <!-- 將原有內容包入主要內容容器，初始隱藏 -->
     <div id="mainContent" style="display:none;">
         <h1>高雄 YouBike 搜尋</h1>
         <div id="searchContainer">
@@ -392,21 +354,21 @@
         const defaultLatitude = 22.6315725;
         const defaultLongitude = 120.3025079;
         const overlay = document.querySelector('.overlay');
-        const modal = document.querySelector('.modal'); // Changed to select by class
+        const modal = document.querySelector('.modal');
         const modalText = document.getElementById('modalText');
         const modalButton = document.getElementById('modalButton');
-        const resultsDiv = document.getElementById('results'); // Added ID for results div
-        const loadingDiv = document.getElementById('loading'); // Added ID for loading div
-        const keywordInput = document.getElementById('keyword'); // Added ID for keyword input
-        const searchButton = document.getElementById('searchButton'); // Added ID for search button
+        const resultsDiv = document.getElementById('results');
+        const loadingDiv = document.getElementById('loading');
+        const keywordInput = document.getElementById('keyword');
+        const searchButton = document.getElementById('searchButton');
 
         const maxResults = 100;
-        const defaultSearchArea = ""; // This variable seems unused in searchYouBike logic
+        const defaultSearchArea = "";
 
         const pinnedStations = new Set(JSON.parse(localStorage.getItem('pinnedStations') || '[]'));
 
         function togglePinStation(stationId, event) {
-            event.stopPropagation(); // 防止點擊星星時觸發地圖跳轉
+            event.stopPropagation();
             if (pinnedStations.has(stationId)) {
                 pinnedStations.delete(stationId);
             } else {
@@ -414,14 +376,12 @@
             }
             localStorage.setItem('pinnedStations', JSON.stringify([...pinnedStations]));
 
-            // 即時更新星星顯示
             const pinButton = document.querySelector(`.pin-button[data-id="${stationId}"]`);
             if (pinButton) {
                 pinButton.classList.toggle('pinned');
                 pinButton.textContent = pinnedStations.has(stationId) ? '★' : '☆';
             }
 
-            // 即時更新排序並重新渲染結果
             updateResultsOrder();
         }
 
@@ -439,7 +399,6 @@
             }
         }
 
-        // 修改 simulateLoadingPercentage，使進度達85後隨機選取一個數字並凍結不動
         (function simulateLoadingPercentage(){
             const loadingText = document.getElementById("loadingText");
             let progress = 0;
@@ -451,7 +410,7 @@
                         loadingText.textContent = "載入中：" + progress + "%";
                     } else {
                         if(lockedProgress === null){
-                            lockedProgress = 85 + Math.floor(Math.random() * 11); // 選取85~95中的一個數字
+                            lockedProgress = 85 + Math.floor(Math.random() * 11);
                         }
                         loadingText.textContent = "載入中：" + lockedProgress + "%";
                     }
@@ -463,87 +422,108 @@
 
         async function searchYouBike(showLoadingIndicator = true) {
             if (showLoadingIndicator) showLoading();
-            const url = "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092";
             const keyword = keywordInput.value.trim().toLowerCase();
             try {
-                const response = await fetch(url, {
+                const kcgUrl = "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092";
+                const kcgResponse = await fetch(kcgUrl, {
                     headers: { "User-Agent": "Mozilla/5.0" }
                 });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const data = await response.json();
-                const retVal = data?.data?.data?.retVal;
-                if (!Array.isArray(retVal)) {
+                if (!kcgResponse.ok) throw new Error(`HTTP error! status: ${kcgResponse.status}`);
+                const kcgData = await kcgResponse.json();
+                const kcgRetVal = kcgData?.data?.data?.retVal;
+                if (!Array.isArray(kcgRetVal)) {
                     resultsDiv.innerHTML = "<p>找不到資料，請檢查 API 回應格式或資料來源。</p>";
                     if (showLoadingIndicator) hideLoading();
                     return;
                 }
-                let results = retVal;
-                const currentLocation = userLocation || { latitude: defaultLatitude, longitude: defaultLongitude };
-                results = results.map(station => {
-                    const lat = parseFloat(station.lat), lng = parseFloat(station.lng);
-                    let distance = Infinity;
-                    if (!isNaN(lat) && !isNaN(lng)) {
-                        distance = calculateDistance(currentLocation.latitude, currentLocation.longitude, lat, lng);
-                    }
-                    return { ...station, distance, pinned: pinnedStations.has(station.sno) };
-                });
+
+                let kcgResults = kcgRetVal;
+
                 if (keyword) {
-                    results = results.filter(station => {
+                    kcgResults = kcgResults.filter(station => {
                         const stationName = station.sna ? station.sna.toLowerCase() : '';
                         const stationArea = station.sarea ? station.sarea.toLowerCase() : '';
                         const stationAddress = station.ar ? station.ar.toLowerCase() : '';
                         return stationArea.includes(keyword) || stationName.includes(keyword) || stationAddress.includes(keyword);
                     });
                 }
-                results.sort((a, b) => {  // sort results as before
-                    if (a.pinned && !b.pinned) return -1;
-                    if (!a.pinned && b.pinned) return 1;
-                    return a.distance - b.distance;
+
+                const stationIds = kcgResults.map(station => station.sno);
+
+                const vehData = await queryVehicleData(stationIds);
+
+                const organizedOutput = kcgResults.map(site => {
+                    const info = {
+                        id: site.sno,
+                        name: site.sna,
+                        coords: [site.lat, site.lng],
+                        district: site.sarea,
+                        address: site.ar
+                    };
+                    const vehicle = vehData[info.id] || {};
+                    return { station_info: info, vehicle_info: vehicle };
                 });
-                if (!results.length) {
-                    resultsDiv.innerHTML = `找不到與 '${keyword}' 相關的站點。`;
-                    if (showLoadingIndicator) hideLoading();
-                    return;
-                }
-                // 更新或新增卡片，不清空 resultsDiv
-                results.forEach(station => {
-                    const existingCard = document.querySelector(`.station[data-id="${station.sno}"]`);
-                    const distanceDisplay = station.distance !== undefined && station.distance !== Infinity ? `<p>距離: ${station.distance.toFixed(2)} 公里</p>` : "";
-                    const pinButton = `<span class="pin-button ${station.pinned ? 'pinned' : ''}" data-id="${station.sno}" onclick="togglePinStation('${station.sno}', event)">${station.pinned ? '★' : '☆'}</span>`;
+
+                organizedOutput.sort((a, b) => {
+                    const aPinned = pinnedStations.has(a.station_info.id);
+                    const bPinned = pinnedStations.has(b.station_info.id);
+                    if (aPinned && !bPinned) return -1;
+                    if (!aPinned && bPinned) return 1;
+                    const distanceA = calculateDistance(
+                        userLocation ? userLocation.latitude : defaultLatitude,
+                        userLocation ? userLocation.longitude : defaultLongitude,
+                        a.station_info.coords[0],
+                        a.station_info.coords[1]
+                    );
+                    const distanceB = calculateDistance(
+                        userLocation ? userLocation.latitude : defaultLatitude,
+                        userLocation ? userLocation.longitude : defaultLongitude,
+                        b.station_info.coords[0],
+                        b.station_info.coords[1]
+                    );
+                    return distanceA - distanceB;
+                });
+
+                resultsDiv.innerHTML = '';
+                organizedOutput.forEach(item => {
+                    const station = item.station_info;
+                    const vehicle = item.vehicle_info;
+                    const pinButton = `<span class="pin-button ${pinnedStations.has(station.id) ? 'pinned' : ''}" data-id="${station.id}" onclick="togglePinStation('${station.id}', event)">${pinnedStations.has(station.id) ? '★' : '☆'}</span>`;
+                    const distance = calculateDistance(
+                        userLocation ? userLocation.latitude : defaultLatitude,
+                        userLocation ? userLocation.longitude : defaultLongitude,
+                        station.coords[0],
+                        station.coords[1]
+                    );
                     const cardContent = `
                         ${pinButton}
-                        <h3>${station.sna || '未知站點'}</h3>
-                        ${distanceDisplay}
-                        <p>地區: ${station.sarea || '未知區域'}</p>
-                        <p>地址: ${station.ar || '未知地址'}</p>
-                        <p>YouBike 2.0: ${station.sbi_detail?.yb2 !== undefined ? station.sbi_detail.yb2 : '未知'}</p>
-                        <p>YouBike 2.0E: ${station.sbi_detail?.eyb !== undefined ? station.sbi_detail.eyb : '未知'}</p>
-                        <p>可停空位數: ${station.bemp !== undefined ? station.bemp : '未知'}</p>
+                        <h3>${station.name || '未知站點'}</h3>
+                        <p>距離: ${distance.toFixed(2)} 公里</p>
+                        <p>地區: ${station.district || '未知區域'}</p>
+                        <p>地址: ${station.address || '未知地址'}</p>
+                        <p>YouBike 2.0: ${vehicle?.available_2_0 !== undefined ? vehicle.available_2_0 : '未知'}</p>
+                        <p>YouBike 2.0E: ${vehicle?.available_e !== undefined ? vehicle.available_e : '未知'}</p>
+                        <p>可停空位數: ${vehicle?.empty_spaces !== undefined ? vehicle.empty_spaces : '未知'}</p>
                     `;
-                    if (existingCard) {
-                        existingCard.dataset.distance = station.distance;
-                        existingCard.innerHTML = cardContent;
-                    } else {
-                        const card = document.createElement('div');
-                        card.className = 'station';
-                        card.dataset.id = station.sno;
-                        card.dataset.distance = station.distance;
-                        card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
-                        card.innerHTML = cardContent;
-                        card.addEventListener("click", () => {
-                            const lat = parseFloat(station.lat), lng = parseFloat(station.lng);
-                            if (!isNaN(lat) && !isNaN(lng)) {
-                                const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
-                                window.open(googleMapsUrl, "_blank");
-                            } else {
-                                showModal("站點座標無效，無法開啟地圖。");
-                            }
-                        });
-                        resultsDiv.appendChild(card);
-                    }
+
+                    const card = document.createElement('div');
+                    card.className = 'station';
+                    card.dataset.id = station.id;
+                    card.dataset.lat = station.coords[0];
+                    card.dataset.lng = station.coords[1];
+                    card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
+                    card.innerHTML = cardContent;
+                    card.addEventListener("click", () => {
+                        const lat = parseFloat(station.coords[0]), lng = parseFloat(station.coords[1]);
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                            const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+                            window.open(googleMapsUrl, "_blank");
+                        } else {
+                            showModal("站點座標無效，無法開啟地圖。");
+                        }
+                    });
+                    resultsDiv.appendChild(card);
                 });
-                updateResultsOrder(); // 直接調整卡片排序，不清空整個容器
-                // 顯示主要內容(僅第一次成功更新時)
                 showMainContent();
             } catch (error) {
                 console.error("Fetch error:", error);
@@ -553,6 +533,46 @@
             }
         }
 
+        async function queryVehicleData(stationIds) {
+            const headers = {
+                'Accept': '*/*',
+                'Content-Type': 'application/json',
+                'Origin': 'https://www.youbike.com.tw',
+                'Referer': 'https://www.youbike.com.tw/'
+            };
+            const batchSize = 50;
+            const allVehicleData = {};
+
+            for (let i = 0; i < stationIds.length; i += batchSize) {
+                const stationIdBatch = stationIds.slice(i, i + batchSize);
+                const body = JSON.stringify({ station_no: stationIdBatch });
+
+                try {
+                    const response = await fetch('https://apis.youbike.com.tw/tw2/parkingInfo', {
+                        method: 'POST',
+                        headers,
+                        body
+                    });
+                    const result = await response.json();
+                    if (result.retCode === 1 && result.retVal && result.retVal.data) {
+                        const dataArray = result.retVal.data;
+                        dataArray.forEach(item => {
+                            allVehicleData[item.station_no] = {
+                                available_2_0: item.available_spaces_detail ? item.available_spaces_detail.yb2 : 0,
+                                available_e: item.available_spaces_detail ? item.available_spaces_detail.eyb : 0,
+                                empty_spaces: item.empty_spaces || 0
+                            };
+                        });
+                    } else {
+                        console.error("API 請求失敗:", result.retMsg);
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+            return allVehicleData;
+        }
+
         function updateResultsOrder() {
             const cards = Array.from(document.querySelectorAll(".station"));
             cards.sort((a, b) => {
@@ -560,122 +580,87 @@
                 const bPinned = pinnedStations.has(b.dataset.id);
                 if (aPinned && !bPinned) return -1;
                 if (!aPinned && bPinned) return 1;
-                return parseFloat(a.dataset.distance) - parseFloat(b.dataset.distance);
+                const distanceA = calculateDistance(
+                    userLocation ? userLocation.latitude : defaultLatitude,
+                    userLocation ? userLocation.longitude : defaultLongitude,
+                    parseFloat(a.dataset.lat),
+                    parseFloat(a.dataset.lng)
+                );
+                const distanceB = calculateDistance(
+                    userLocation ? userLocation.latitude : defaultLatitude,
+                    userLocation ? userLocation.longitude : defaultLongitude,
+                    parseFloat(b.dataset.lat),
+                    parseFloat(b.dataset.lng)
+                );
+                return distanceA - distanceB;
             });
-            // 直接依序重新附加卡片
             cards.forEach(card => {
                 resultsDiv.appendChild(card);
             });
         }
 
-        // --- Helper Functions ---
-
         function showLoading() {
-            loadingDiv.style.display = 'block'; // Ensure display is block before transition
-            setTimeout(() => {
-                loadingDiv.classList.add('show'); // Add class for opacity transition
-            }, 10); // Small delay to allow display: block to take effect
+            loadingDiv.classList.add('show');
         }
 
         function hideLoading() {
-            loadingDiv.classList.remove('show'); // Remove class for opacity transition
-            setTimeout(() => {
-                loadingDiv.style.display = 'none'; // Hide completely after transition
-            }, 500); // Matches CSS transition duration
+            loadingDiv.classList.remove('show');
         }
 
-         function showModal(message) {
+        function showModal(message) {
             modalText.textContent = message;
-            modal.classList.add('show');
             overlay.classList.add('show');
+            modal.classList.add('show');
         }
 
         function hideModal() {
-            modal.classList.remove('show');
             overlay.classList.remove('show');
+            modal.classList.remove('show');
         }
 
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Radius of the earth in km
+            const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a =
-                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2)
-            ;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            const d = R * c; // Distance in km
-            return d;
+            return R * c;
         }
 
-        // --- Geolocation Handling ---
-
-        // 修改 handleGeolocationSuccess，定位成功後從當前數字逐步加到100
         function handleGeolocationSuccess(position) {
             userLocation = {
                 latitude: position.coords.latitude,
                 longitude: position.coords.longitude
             };
-            const loadingText = document.getElementById("loadingText");
-            clearInterval(loadingTextInterval);
-            // 取得目前顯示的進度數字
-            let currentProgress = parseInt(loadingText.textContent.replace(/\D/g, "")) || 85;
-            searchYouBike().then(() => { // Perform initial search with user location
-                let interval = setInterval(() => {
-                    if (currentProgress < 100) {
-                        currentProgress++;
-                        loadingText.textContent = "載入中：" + currentProgress + "%";
-                    } else {
-                        clearInterval(interval);
-                        loadingText.textContent = "載入完成！";
-                        showMainContent();
-                    }
-                }, 50); // 此處每50毫秒增加一次，並顯示過程
-            });
+            searchYouBike();
         }
 
         function handleGeolocationError(error) {
             console.error("Geolocation error:", error);
             locationDenied = true;
-            let errorMessage = "無法取得您的位置資訊。站點將以預設地點 (捷運美麗島站) 為中心顯示距離。";
-            if (error.code === error.PERMISSION_DENIED) {
-                errorMessage = "您已拒絕使用定位服務。站點將以預設地點 (捷運美麗島站) 為中心顯示距離。";
-            } else if (error.code === error.POSITION_UNAVAILABLE) {
-                 errorMessage = "位置資訊無法取得。站點將以預設地點 (捷運美麗島站) 為中心顯示距離。";
-            } else if (error.code === error.TIMEOUT) {
-                 errorMessage = "定位要求逾時。站點將以預設地點 (捷運美麗島站) 為中心顯示距離。";
-            }
-            showModal(errorMessage);
-            userLocation = { latitude: defaultLatitude, longitude: defaultLongitude }; // Use default location
-            searchYouBike(); // Perform initial search with default location
-             hideLoading(); // Hide loading if geolocation is not supported
+            userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+            searchYouBike();
         }
 
-        // 新增更新定位成功與失敗的回呼
         function handleGeoUpdateSuccess(position) {
             userLocation = {
                 latitude: position.coords.latitude,
                 longitude: position.coords.longitude
             };
-            console.log("Geo update:", userLocation);
-            searchYouBike(false); // 更新距離，不顯示載入中
         }
         function handleGeoUpdateError(error) {
-            console.error("Geo update error:", error);
-            // 失敗時不跳出提示，只記錄錯誤
+            console.error("Geolocation update error:", error);
         }
 
-        // 修改 getLocation 函式：初次獲取定位後，每10秒更新一次定位
         function getLocation() {
             if (navigator.geolocation) {
-                // 初次獲取定位
                 navigator.geolocation.getCurrentPosition(handleGeolocationSuccess, handleGeolocationError, {
                     enableHighAccuracy: true,
                     timeout: 10000,
                     maximumAge: 0
                 });
-                // 每10秒更新定位
                 setInterval(() => {
                     navigator.geolocation.getCurrentPosition(handleGeoUpdateSuccess, handleGeoUpdateError, {
                         enableHighAccuracy: true,
@@ -694,36 +679,14 @@
         const toggleDarkModeButton = document.getElementById('toggleDarkMode');
         toggleDarkModeButton.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-            toggleDarkModeButton.textContent = isDarkMode ? '☀️' : '🌙';
         });
 
-        // 初始化暗色模式
-        const savedDarkMode = localStorage.getItem('darkMode');
-        if (savedDarkMode === 'enabled') {
-            document.body.classList.add('dark-mode');
-            toggleDarkModeButton.textContent = '☀️';
-        } else {
-             // Also check system preference if no saved preference
-             if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                 document.body.classList.add('dark-mode');
-                 toggleDarkModeButton.textContent = '☀️';
-             } else {
-                 toggleDarkModeButton.textContent = '🌙';
-             }
-        }
+        modalButton.addEventListener('click', hideModal);
 
-        // --- Initialization ---
-        modalButton.addEventListener('click', hideModal); // Add event listener for modal button
-
-        // Get user location and perform initial search
         getLocation();
 
-        // Add event listener for the search button
         searchButton.addEventListener('click', searchYouBike);
 
-        // Add event listener for the keyword input (Enter key)
         keywordInput.addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
                 searchYouBike();
