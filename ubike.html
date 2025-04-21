@@ -460,30 +460,71 @@
                     return distA - distB;
                 });
                 let limit = keyword ? 50 : 20;
-                let usedStations = kcgResults.slice(0, limit);
-                // 處理無搜尋結果的狀況
-                if (usedStations.length === 0) {
-                    resultsDiv.innerHTML = "<p>無搜尋結果，請嘗試其他關鍵字。</p>";
-                    hideLoading();
-                    return;
+                let usedStations;
+                if (!keyword) {
+                    // 首頁狀態：顯示釘選車站在前，其次依定位排序其他車站
+                    const pinnedFromLocal = kcgResults.filter(station => pinnedStations.has(String(station.sno)));
+                    const unpinned = kcgResults.filter(station => !pinnedStations.has(String(station.sno)));
+                    pinnedFromLocal.sort((a, b) => {
+                        const distA = calculateDistance(
+                            userLocation ? userLocation.latitude : defaultLatitude,
+                            userLocation ? userLocation.longitude : defaultLongitude,
+                            a.lat, a.lng
+                        );
+                        const distB = calculateDistance(
+                            userLocation ? userLocation.latitude : defaultLatitude,
+                            userLocation ? userLocation.longitude : defaultLongitude,
+                            b.lat, b.lng
+                        );
+                        return distA - distB;
+                    });
+                    unpinned.sort((a, b) => {
+                        const distA = calculateDistance(
+                            userLocation ? userLocation.latitude : defaultLatitude,
+                            userLocation ? userLocation.longitude : defaultLongitude,
+                            a.lat, a.lng
+                        );
+                        const distB = calculateDistance(
+                            userLocation ? userLocation.latitude : defaultLatitude,
+                            userLocation ? userLocation.longitude : defaultLongitude,
+                            b.lat, b.lng
+                        );
+                        return distA - distB;
+                    });
+                    usedStations = [...pinnedFromLocal, ...unpinned].slice(0, limit);
+                } else {
+                    usedStations = kcgResults.slice(0, limit);
+                    // 當有關鍵字時維持原本邏輯：先釘選再非釘選排序
+                    const pinnedList = usedStations.filter(station => pinnedStations.has(String(station.sno)));
+                    const nonPinnedList = usedStations.filter(station => !pinnedStations.has(String(station.sno)));
+                    pinnedList.sort((a, b) => {
+                        const distA = calculateDistance(
+                            userLocation ? userLocation.latitude : defaultLatitude,
+                            userLocation ? userLocation.longitude : defaultLongitude,
+                            a.lat, a.lng
+                        );
+                        const distB = calculateDistance(
+                            userLocation ? userLocation.latitude : defaultLatitude,
+                            userLocation ? userLocation.longitude : defaultLongitude,
+                            b.lat, b.lng
+                        );
+                        return distA - distB;
+                    });
+                    nonPinnedList.sort((a, b) => {
+                        const distA = calculateDistance(
+                            userLocation ? userLocation.latitude : defaultLatitude,
+                            userLocation ? userLocation.longitude : defaultLongitude,
+                            a.lat, a.lng
+                        );
+                        const distB = calculateDistance(
+                            userLocation ? userLocation.latitude : defaultLatitude,
+                            userLocation ? userLocation.longitude : defaultLongitude,
+                            b.lat, b.lng
+                        );
+                        return distA - distB;
+                    });
+                    usedStations = [...pinnedList, ...nonPinnedList];
                 }
-                usedStations.sort((a, b) => {
-                    const aPinned = pinnedStations.has(String(a.sno));
-                    const bPinned = pinnedStations.has(String(b.sno));
-                    if (aPinned && !bPinned) return -1;
-                    if (!aPinned && bPinned) return 1;
-                    const distanceA = calculateDistance(
-                        userLocation ? userLocation.latitude : defaultLatitude,
-                        userLocation ? userLocation.longitude : defaultLongitude,
-                        a.lat, a.lng
-                    );
-                    const distanceB = calculateDistance(
-                        userLocation ? userLocation.latitude : defaultLatitude,
-                        userLocation ? userLocation.longitude : defaultLongitude,
-                        b.lat, b.lng
-                    );
-                    return distanceA - distanceB;
-                });
                 const stationIds = usedStations.map(station => String(station.sno));
                 const vehData = await queryVehicleData(stationIds);
                 
