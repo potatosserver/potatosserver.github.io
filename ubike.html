@@ -324,6 +324,46 @@
             color: #007BFF;
             text-align: center;
         }
+        /* 新增滑動開關樣式 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #007BFF;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
     </style>
 </head>
 <body>
@@ -336,7 +376,16 @@
         <h1>高雄 YouBike 搜尋</h1>
         <div id="searchContainer">
             <input type="text" id="keyword" placeholder="請輸入站點名稱、區域或地址" value="">
-            <button id="searchButton">搜尋</button> </div>
+            <button id="searchButton">搜尋</button> 
+        </div>
+        <!-- 修改定位開關為滑動開關 -->
+        <div id="locationSwitchContainer" style="text-align: center; margin: 10px 0;">
+            <label class="switch">
+                <input type="checkbox" id="toggleUseLocation">
+                <span class="slider"></span>
+            </label>
+            <span style="margin-left:10px;">使用定位</span>
+        </div>
         <div id="results"></div>
         <div id="loading">載入中，請稍候...</div>
         <div class="overlay"></div>
@@ -366,6 +415,22 @@
         const defaultSearchArea = "";
 
         const pinnedStations = new Set(JSON.parse(localStorage.getItem('pinnedStations') || '[]'));
+        // 讀取並設定使用定位的狀態，預設為 true
+        const useLocationSetting = localStorage.getItem("useLocation");
+        const useLocation = useLocationSetting === null ? true : useLocationSetting === "true";
+        document.getElementById('toggleUseLocation').checked = useLocation;
+
+        document.getElementById('toggleUseLocation').addEventListener('change', function(){
+            localStorage.setItem("useLocation", this.checked);
+            if(this.checked) {
+                // 啟用定位
+                getLocation();
+            } else {
+                // 停用定位，使用預設座標
+                userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+                searchYouBike();
+            }
+        });
 
         function togglePinStation(stationId, event) {
             event.stopPropagation();
@@ -730,6 +795,10 @@
         }
 
         function getLocation() {
+            // 檢查定位開關是否開啟，若未開啟則直接返回
+            if (!document.getElementById('toggleUseLocation').checked) {
+                return;
+            }
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(handleGeolocationSuccess, handleGeolocationError, {
                     enableHighAccuracy: true,
@@ -737,11 +806,14 @@
                     maximumAge: 0
                 });
                 setInterval(() => {
-                    navigator.geolocation.getCurrentPosition(handleGeoUpdateSuccess, handleGeoUpdateError, {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0
-                    });
+                    // 每次發送前再檢查開關狀態
+                    if (document.getElementById('toggleUseLocation').checked) {
+                        navigator.geolocation.getCurrentPosition(handleGeoUpdateSuccess, handleGeoUpdateError, {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0
+                        });
+                    }
                 }, 10000);
             } else {
                 showModal("您的瀏覽器不支援地理位置功能。站點將以預設地點 (捷運美麗島站) 為中心顯示。");
@@ -765,7 +837,12 @@
 
         modalButton.addEventListener('click', hideModal);
 
-        getLocation();
+        if(useLocation) {
+            getLocation();
+        } else {
+            userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+            searchYouBike();
+        }
 
         searchButton.addEventListener('click', searchYouBike);
 
