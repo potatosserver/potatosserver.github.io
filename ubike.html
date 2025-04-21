@@ -461,6 +461,12 @@
                 });
                 let limit = keyword ? 50 : 20;
                 let usedStations = kcgResults.slice(0, limit);
+                // 處理無搜尋結果的狀況
+                if (usedStations.length === 0) {
+                    resultsDiv.innerHTML = "<p>無搜尋結果，請嘗試其他關鍵字。</p>";
+                    hideLoading();
+                    return;
+                }
                 usedStations.sort((a, b) => {
                     const aPinned = pinnedStations.has(String(a.sno));
                     const bPinned = pinnedStations.has(String(b.sno));
