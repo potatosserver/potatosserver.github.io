@@ -460,8 +460,9 @@
                     );
                     return distA - distB;
                 });
-                // 修改：取前50筆後，依照 pinned 狀態與距離重新排序，形成實際卡牌顯示順序
-                let usedStations = kcgResults.slice(0, 50);
+                // 修改：若無關鍵字則僅列出20，否則取前50筆
+                let limit = keyword ? 50 : 20;
+                let usedStations = kcgResults.slice(0, limit);
                 usedStations.sort((a, b) => {
                     const aPinned = pinnedStations.has(String(a.sno));
                     const bPinned = pinnedStations.has(String(b.sno));
@@ -685,7 +686,7 @@
                         timeout: 10000,
                         maximumAge: 0
                     });
-                }, 30000); // 更新間隔改為 30 秒
+                }, 10000); // 更新間隔改為 10 秒
             } else {
                 showModal("您的瀏覽器不支援地理位置功能。站點將以預設地點 (捷運美麗島站) 為中心顯示。");
                 userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
@@ -710,7 +711,8 @@
                 searchYouBike();
             }
         });
-
+        // 新增：每5分鐘自動重新爬蟲資料
+        setInterval(searchYouBike, 300000);
     </script>
 </body>
 </html>
