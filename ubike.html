@@ -438,7 +438,6 @@
                 }
 
                 let kcgResults = kcgRetVal;
-
                 if (keyword) {
                     kcgResults = kcgResults.filter(station => {
                         const stationName = station.sna ? station.sna.toLowerCase() : '';
@@ -447,41 +446,54 @@
                         return stationArea.includes(keyword) || stationName.includes(keyword) || stationAddress.includes(keyword);
                     });
                 }
-
-                const stationIds = kcgResults.map(station => station.sno);
-
-                const vehData = await queryVehicleData(stationIds);
-
-                const organizedOutput = kcgResults.map(site => {
-                    const info = {
-                        id: site.sno,
-                        name: site.sna,
-                        coords: [site.lat, site.lng],
-                        district: site.sarea,
-                        address: site.ar
-                    };
-                    const vehicle = vehData[info.id] || {};
-                    return { station_info: info, vehicle_info: vehicle };
+                // 依照距離排序站點 (以使用者目前位置或預設座標計算)
+                kcgResults = kcgResults.sort((a, b) => {
+                    const distA = calculateDistance(
+                        userLocation ? userLocation.latitude : defaultLatitude,
+                        userLocation ? userLocation.longitude : defaultLongitude,
+                        a.lat, a.lng
+                    );
+                    const distB = calculateDistance(
+                        userLocation ? userLocation.latitude : defaultLatitude,
+                        userLocation ? userLocation.longitude : defaultLongitude,
+                        b.lat, b.lng
+                    );
+                    return distA - distB;
                 });
-
-                organizedOutput.sort((a, b) => {
-                    const aPinned = pinnedStations.has(a.station_info.id);
-                    const bPinned = pinnedStations.has(b.station_info.id);
+                // 修改：取前50筆後，依照 pinned 狀態與距離重新排序，形成實際卡牌顯示順序
+                let usedStations = kcgResults.slice(0, 50);
+                usedStations.sort((a, b) => {
+                    const aPinned = pinnedStations.has(String(a.sno));
+                    const bPinned = pinnedStations.has(String(b.sno));
                     if (aPinned && !bPinned) return -1;
                     if (!aPinned && bPinned) return 1;
                     const distanceA = calculateDistance(
                         userLocation ? userLocation.latitude : defaultLatitude,
                         userLocation ? userLocation.longitude : defaultLongitude,
-                        a.station_info.coords[0],
-                        a.station_info.coords[1]
+                        a.lat, a.lng
                     );
                     const distanceB = calculateDistance(
                         userLocation ? userLocation.latitude : defaultLatitude,
                         userLocation ? userLocation.longitude : defaultLongitude,
-                        b.station_info.coords[0],
-                        b.station_info.coords[1]
+                        b.lat, b.lng
                     );
                     return distanceA - distanceB;
+                });
+                // 依照實際卡牌順序，取出 id（轉字串）傳入第二個 API
+                const stationIds = usedStations.map(station => String(station.sno));
+                const vehData = await queryVehicleData(stationIds);
+                
+                // 使用用排序後的 usedStations 組成卡牌，不再額外排序
+                const organizedOutput = usedStations.map(site => {
+                    const info = {
+                        id: String(site.sno),
+                        name: site.sna,
+                        coords: [site.lat, site.lng],
+                        district: site.sarea,
+                        address: site.ar
+                    };
+                    const vehicle = Object.entries(vehData).find(([key]) => key === info.id)?.[1] || {};
+                    return { station_info: info, vehicle_info: vehicle };
                 });
 
                 resultsDiv.innerHTML = '';
@@ -498,6 +510,7 @@
                     const cardContent = `
                         ${pinButton}
                         <h3>${station.name || '未知站點'}</h3>
+                        <p>ID: ${station.id}</p>
                         <p>距離: ${distance.toFixed(2)} 公里</p>
                         <p>地區: ${station.district || '未知區域'}</p>
                         <p>地址: ${station.address || '未知地址'}</p>
@@ -534,14 +547,19 @@
         }
 
         async function queryVehicleData(stationIds) {
+            // 限制傳送最多 60 筆 id
+            if (stationIds.length > 60) {
+                stationIds = stationIds.slice(0, 60);
+            }
+            // 每次傳送 20 個站點id
+            const batchSize = 20;
+            const allVehicleData = {};
             const headers = {
                 'Accept': '*/*',
                 'Content-Type': 'application/json',
                 'Origin': 'https://www.youbike.com.tw',
                 'Referer': 'https://www.youbike.com.tw/'
             };
-            const batchSize = 50;
-            const allVehicleData = {};
 
             for (let i = 0; i < stationIds.length; i += batchSize) {
                 const stationIdBatch = stationIds.slice(i, i + batchSize);
@@ -667,7 +685,7 @@
                         timeout: 10000,
                         maximumAge: 0
                     });
-                }, 10000);
+                }, 30000); // 更新間隔改為 30 秒
             } else {
                 showModal("您的瀏覽器不支援地理位置功能。站點將以預設地點 (捷運美麗島站) 為中心顯示。");
                 userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
