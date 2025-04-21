@@ -446,7 +446,6 @@
                         return stationArea.includes(keyword) || stationName.includes(keyword) || stationAddress.includes(keyword);
                     });
                 }
-                // 依照距離排序站點 (以使用者目前位置或預設座標計算)
                 kcgResults = kcgResults.sort((a, b) => {
                     const distA = calculateDistance(
                         userLocation ? userLocation.latitude : defaultLatitude,
@@ -460,7 +459,6 @@
                     );
                     return distA - distB;
                 });
-                // 修改：若無關鍵字則僅列出20，否則取前50筆
                 let limit = keyword ? 50 : 20;
                 let usedStations = kcgResults.slice(0, limit);
                 usedStations.sort((a, b) => {
@@ -480,11 +478,9 @@
                     );
                     return distanceA - distanceB;
                 });
-                // 依照實際卡牌順序，取出 id（轉字串）傳入第二個 API
                 const stationIds = usedStations.map(station => String(station.sno));
                 const vehData = await queryVehicleData(stationIds);
                 
-                // 使用用排序後的 usedStations 組成卡牌，不再額外排序
                 const organizedOutput = usedStations.map(site => {
                     const info = {
                         id: String(site.sno),
@@ -548,11 +544,9 @@
         }
 
         async function queryVehicleData(stationIds) {
-            // 限制傳送最多 60 筆 id
             if (stationIds.length > 60) {
                 stationIds = stationIds.slice(0, 60);
             }
-            // 每次傳送 20 個站點id
             const batchSize = 20;
             const allVehicleData = {};
             const headers = {
@@ -686,7 +680,7 @@
                         timeout: 10000,
                         maximumAge: 0
                     });
-                }, 10000); // 更新間隔改為 10 秒
+                }, 10000);
             } else {
                 showModal("您的瀏覽器不支援地理位置功能。站點將以預設地點 (捷運美麗島站) 為中心顯示。");
                 userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
@@ -698,7 +692,11 @@
         const toggleDarkModeButton = document.getElementById('toggleDarkMode');
         toggleDarkModeButton.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
+            localStorage.setItem("dark_mode", document.body.classList.contains("dark-mode"));
         });
+        if (localStorage.getItem("dark_mode") === "true") {
+            document.body.classList.add("dark-mode");
+        }
 
         modalButton.addEventListener('click', hideModal);
 
@@ -711,7 +709,6 @@
                 searchYouBike();
             }
         });
-        // 新增：每5分鐘自動重新爬蟲資料
         setInterval(searchYouBike, 60000);
     </script>
 </body>
