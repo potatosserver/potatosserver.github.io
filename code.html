@@ -1,206 +1,323 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>過氧化氫酶產氧速率研究</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px; /* Default height */
+            width: 100%;
+        }
+        @media (min-width: 640px) {
+            .chart-container {
+                height: 500px;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 font-inter text-gray-800 p-4 sm:p-6 lg:p-8 flex flex-col items-center">
 
-// Data for each experiment
-const experimentData = {
-  experiment1: {
-    name: '不同植物探討氧氣產生效率',
-    description: '此圖表顯示在 1 分鐘內，不同植物（香蕉、芭樂、馬鈴薯）的產氣量。實驗結果清晰地指出，馬鈴薯在所有測試植物中表現出最佳的產氧速率，其在一分鐘內的產氣量達到49.3毫升，遠高於芭樂的21.0毫升和香蕉的19毫升。這主要是因為馬鈴薯的塊莖組織富含活性更高、含量更豐富的過氧化氫酶。作為一種高代謝、需較強抗氧化保護的儲存器官，馬鈴薯具備更強的過氧化氫清除能力，能更有效地分解雙氧水並釋放氧氣。因此，酶的種類與其在特定生物組織中的活性和豐度是影響過氧化氫分解效率的關鍵因素。',
-    unit: '毫升',
-    data: [
-      { time: 10, Banana: 0, Guava: 0, Potato: 0 },
-      { time: 20, Banana: 3.5, Guava: 3.8, Potato: 8.2 },
-      { time: 30, Banana: 7, Guava: 7.5, Potato: 16.4 },
-      { time: 40, Banana: 10.5, Guava: 12, Potato: 24.6 },
-      { time: 50, Banana: 14, Guava: 16.5, Potato: 36.9 },
-      { time: 60, Banana: 19, Guava: 21, Potato: 49.3 },
-    ],
-    lines: [
-      { key: 'Banana', stroke: '#8884d8', name: '香蕉', activeDot: { r: 8 } },
-      { key: 'Guava', stroke: '#82ca9d', name: '芭樂', activeDot: { r: 8 } },
-      { key: 'Potato', stroke: '#ffc658', name: '馬鈴薯', activeDot: { r: 8 } },
-    ],
-    yAxisLabel: '產氣量 (毫升)',
-    xAxisLabel: '時間 (秒)',
-  },
-  experiment2: {
-    name: '不同雙氧水濃度探討氧氣產生效率',
-    description: '此圖表顯示在 1 分鐘內，不同雙氧水濃度（2.50%、5.00%、7.50%）的產氣量。實驗結果明確顯示，雙氧水（過氧化氫）的濃度越高，其分解速率越快，產生的氧氣量也越多。具體而言，7.50%濃度的雙氧水在一分鐘內產氣量達到45.7毫升，顯著高於5.00%的38.3毫升和2.50%的24.7毫升。這符合化學反應動力學的基本原理：在酶量和環境條件固定的情況下，增加反應物（過氧化氫）的濃度，會增加單位時間內反應物分子與酶活性位點碰撞的機會，從而加速反應速率。因此，反應物濃度與產氧速率呈現正相關關係。',
-    unit: '毫升',
-    data: [
-      { time: 10, '2.50%': 0, '5.00%': 0, '7.50%': 0 },
-      { time: 20, '2.50%': 4.1, '5.00%': 6.4, '7.50%': 7.6 },
-      { time: 30, '2.50%': 8.2, '5.00%': 12.8, '7.50%': 15.2 },
-      { time: 40, '2.50%': 12.3, '5.00%': 19.2, '7.50%': 22.8 },
-      { time: 50, '2.50%': 18.5, '5.00%': 28.7, '7.50%': 34.2 },
-      { time: 60, '2.50%': 24.7, '5.00%': 38.3, '7.50%': 45.7 },
-    ],
-    lines: [
-      { key: '2.50%', stroke: '#a8dadc', name: '2.50%', activeDot: { r: 8 } },
-      { key: '5.00%', stroke: '#457b9d', name: '5.00%', activeDot: { r: 8 } },
-      { key: '7.50%', stroke: '#1d3557', name: '7.50%', activeDot: { r: 8 } },
-    ],
-    yAxisLabel: '產氣量 (毫升)',
-    xAxisLabel: '時間 (秒)',
-  },
-  experiment3: {
-    name: '不同表面積探討氧氣產生效率',
-    description: '此圖表顯示在 1 分鐘內，相同體積（8.00立方公分）但不同表面積（24.0cm²、48.0cm²、96.0cm²）的馬鈴薯產氣量。實驗結果明確證實，過氧化氫酶（在此實驗中為馬鈴薯塊）與雙氧水溶液的接觸面積越大，產氧速率越快。當馬鈴薯被切割成96.0cm²的較大表面積時，其在一分鐘內產氣量達到26.3毫升，顯著優於48.0cm²的14.7毫升和24.0cm²的5.5毫升。這在非勻相催化反應中是常見的現象，因為固態催化劑（過氧化氫酶所在的馬鈴薯組織）的活性位點主要分佈在表面。更大的表面積意味著有更多的活性位點暴露出來，能夠與反應物分子進行有效碰撞並加速反應，從而提高了過氧化氫的分解效率。',
-    unit: '毫升',
-    data: [
-      { time: 10, '24.0cm²': 0, '48.0cm²': 0, '96.0cm²': 0 },
-      { time: 20, '24.0cm²': 0.9, '48.0cm²': 2.4, '96.0cm²': 4.3 },
-      { time: 30, '24.0cm²': 1.8, '48.0cm²': 4.9, '96.0cm²': 8.7 },
-      { time: 40, '24.0cm²': 2.7, '48.0cm²': 7.4, '96.0cm²': 13.1 },
-      { time: 50, '24.0cm²': 4.1, '48.0cm²': 11.0, '96.0cm²': 19.7 },
-      { time: 60, '24.0cm²': 5.5, '48.0cm²': 14.7, '96.0cm²': 26.3 },
-    ],
-    lines: [
-      { key: '24.0cm²', stroke: '#e63946', name: '24.0 cm²', activeDot: { r: 8 } },
-      { key: '48.0cm²', stroke: '#f4a261', name: '48.0 cm²', activeDot: { r: 8 } },
-      { key: '96.0cm²', stroke: '#2a9d8f', name: '96.0 cm²', activeDot: { r: 8 } },
-    ],
-    yAxisLabel: '產氣量 (毫升)',
-    xAxisLabel: '時間 (秒)',
-  },
-};
-
-const App = () => {
-  const [currentExperiment, setCurrentExperiment] = useState('experiment1');
-  const [showDescription, setShowDescription] = useState(true);
-  const data = experimentData[currentExperiment];
-
-  // Function to handle switching between experiments
-  const handleExperimentChange = (experimentKey) => {
-    setCurrentExperiment(experimentKey);
-  };
-
-  // Custom Tooltip component to display data points
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="p-4 bg-white border border-gray-300 rounded-lg shadow-lg">
-          <p className="font-bold text-gray-800">{`時間: ${label} 秒`}</p>
-          {payload.map((entry, index) => (
-            <p key={`item-${index}`} style={{ color: entry.stroke }}>
-              {`${entry.name}: ${entry.value} ${data.unit}`}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
-
-  // Helper for responsive layout, using ref to monitor container size
-  const chartContainerRef = useRef(null);
-  const [chartWidth, setChartWidth] = useState(600);
-  const [chartHeight, setChartHeight] = useState(400);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (chartContainerRef.current) {
-        setChartWidth(chartContainerRef.current.offsetWidth);
-        setChartHeight(chartContainerRef.current.offsetHeight > 400 ? chartContainerRef.current.offsetHeight : 400);
-      }
-    };
-
-    handleResize(); // Set initial size
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 font-inter text-gray-800 p-4 sm:p-6 lg:p-8 flex flex-col items-center">
-      <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8 lg:p-10 w-full max-w-4xl">
-        {/* Header */}
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-center text-indigo-700 mb-6">
-          過氧化氫酶產氧速率研究
+    <div class="bg-white rounded-xl shadow-lg p-6 sm:p-8 lg:p-10 w-full max-w-4xl">
+        <!-- Header -->
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-indigo-700 mb-6">
+            過氧化氫酶產氧速率研究
         </h1>
-        <p className="text-center text-gray-600 mb-8">
-          本研究深入探討了植物中的過氧化氫酶在不同條件下催化過氧化氫分解並產生氧氣的效率。我們分析了不同植物種類、過氧化氫濃度以及反應物表面積對產氧速率的影響。這些實驗結果有助於我們理解生物催化劑在環境友好型化學反應中的潛力，並為未來利用天然酶替代傳統催化劑提供了寶貴的參考。
+        <p class="text-center text-gray-600 mb-8">
+            本研究深入探討了植物中的過氧化氫酶在不同條件下催化過氧化氫分解並產生氧氣的效率。我們分析了不同植物種類、過氧化氫濃度以及反應物表面積對產氧速率的影響。這些實驗結果有助於我們理解生物催化劑在環境友好型化學反應中的潛力，並為未來利用天然酶替代傳統催化劑提供了寶貴的參考。
         </p>
 
-        {/* Navigation Tabs */}
-        <nav className="mb-8 flex flex-wrap justify-center gap-3">
-          {Object.keys(experimentData).map((key) => (
-            <button
-              key={key}
-              onClick={() => handleExperimentChange(key)}
-              className={`py-2 px-4 rounded-lg font-medium transition-all duration-300 ease-in-out
-                ${currentExperiment === key
-                  ? 'bg-indigo-600 text-white shadow-md transform scale-105'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-800'
-                }`}
-            >
-              {experimentData[key].name}
-            </button>
-          ))}
+        <!-- Navigation Tabs -->
+        <nav id="navigation-tabs" class="mb-8 flex flex-wrap justify-center gap-3">
+            <!-- Buttons will be populated by JavaScript -->
         </nav>
 
-        {/* Experiment Details */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-          <h2 className="text-2xl font-bold text-blue-800 mb-3 flex items-center">
-            {data.name}
-            <button
-              onClick={() => setShowDescription(!showDescription)}
-              className="ml-3 text-blue-600 hover:text-blue-800 focus:outline-none"
-              title={showDescription ? '隱藏描述' : '顯示描述'}
-            >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                {showDescription ? (
-                  <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
-                ) : (
-                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                )}
-              </svg>
-            </button>
-          </h2>
-          {showDescription && (
-            <p className="text-blue-700 leading-relaxed">
-              {data.description}
+        <!-- Experiment Details -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+            <h2 id="experiment-name" class="text-2xl font-bold text-blue-800 mb-3 flex items-center">
+                <!-- Experiment name will be updated by JavaScript -->
+                <button id="toggle-description" class="ml-3 text-blue-600 hover:text-blue-800 focus:outline-none" title="隱藏描述">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </h2>
+            <p id="experiment-description" class="text-blue-700 leading-relaxed">
+                <!-- Experiment description will be updated by JavaScript -->
             </p>
-          )}
         </div>
 
-        {/* Chart Container */}
-        <div ref={chartContainerRef} className="w-full h-96 mb-8 flex items-center justify-center rounded-lg shadow-inner bg-gray-50">
-          <ResponsiveContainer width="95%" height="95%">
-            <LineChart
-              data={data.data}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-              <XAxis dataKey="time" label={{ value: data.xAxisLabel, position: 'bottom', offset: 0, fill: '#4a4a4a' }} tick={{ fill: '#666' }} />
-              <YAxis label={{ value: data.yAxisLabel, angle: -90, position: 'insideLeft', fill: '#4a4a4a' }} tick={{ fill: '#666' }} />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend wrapperStyle={{ paddingTop: '20px' }} />
-              {data.lines.map((line, index) => (
-                <Line
-                  key={index}
-                  type="monotone"
-                  dataKey={line.key}
-                  stroke={line.stroke}
-                  activeDot={line.activeDot}
-                  name={line.name}
-                  strokeWidth={3}
-                  dot={{ r: 4 }}
-                />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
+        <!-- Chart Container -->
+        <div class="w-full h-96 sm:h-auto mb-8 flex items-center justify-center rounded-lg shadow-inner bg-gray-50">
+            <div class="chart-container">
+                <canvas id="experimentChart"></canvas>
+            </div>
         </div>
-
-      </div>
-
-      {/* Footer */}
-      <footer className="mt-8 text-center text-gray-500 text-sm">
-        <p>© 2025 過氧化氫酶研究. 版權所有.</p>
-        [cite_start]<p>參考資料： [cite: 1]</p>
-      </footer>
     </div>
-  );
-};
 
-export default App;
+    <!-- Footer -->
+    <footer class="mt-8 text-center text-gray-500 text-sm">
+        <p>© 2025 過氧化氫酶研究. 版權所有.</p>
+        <p>參考資料： [cite: 1]</p>
+    </footer>
+
+    <script>
+        // Data for each experiment
+        const experimentData = {
+            experiment1: {
+                name: '不同植物探討氧氣產生效率',
+                description: '此圖表顯示在 1 分鐘內，不同植物（香蕉、芭樂、馬鈴薯）的產氣量。實驗結果清晰地指出，馬鈴薯在所有測試植物中表現出最佳的產氧速率，其在一分鐘內的產氣量達到49.3毫升，遠高於芭樂的21.0毫升和香蕉的19毫升。這主要是因為馬鈴薯的塊莖組織富含活性更高、含量更豐富的過氧化氫酶。作為一種高代謝、需較強抗氧化保護的儲存器官，馬鈴薯具備更強的過氧化氫清除能力，能更有效地分解雙氧水並釋放氧氣。因此，酶的種類與其在特定生物組織中的活性和豐度是影響過氧化氫分解效率的關鍵因素。',
+                unit: '毫升',
+                data: [
+                    { time: 10, Banana: 0, Guava: 0, Potato: 0 },
+                    { time: 20, Banana: 3.5, Guava: 3.8, Potato: 8.2 },
+                    { time: 30, Banana: 7, Guava: 7.5, Potato: 16.4 },
+                    { time: 40, Banana: 10.5, Guava: 12, Potato: 24.6 },
+                    { time: 50, Banana: 14, Guava: 16.5, Potato: 36.9 },
+                    { time: 60, Banana: 19, Guava: 21, Potato: 49.3 },
+                ],
+                lines: [
+                    { key: 'Banana', stroke: '#8884d8', name: '香蕉' },
+                    { key: 'Guava', stroke: '#82ca9d', name: '芭樂' },
+                    { key: 'Potato', stroke: '#ffc658', name: '馬鈴薯' },
+                ],
+                yAxisLabel: '產氣量 (毫升)',
+                xAxisLabel: '時間 (秒)',
+            },
+            experiment2: {
+                name: '不同雙氧水濃度探討氧氣產生效率',
+                description: '此圖表顯示在 1 分鐘內，不同雙氧水濃度（2.50%、5.00%、7.50%）的產氣量。實驗結果明確顯示，雙氧水（過氧化氫）的濃度越高，其分解速率越快，產生的氧氣量也越多。具體而言，7.50%濃度的雙氧水在一分鐘內產氣量達到45.7毫升，顯著高於5.00%的38.3毫升和2.50%的24.7毫升。這符合化學反應動力學的基本原理：在酶量和環境條件固定的情況下，增加反應物（過氧化氫）的濃度，會增加單位時間內反應物分子與酶活性位點碰撞的機會，從而加速反應速率。因此，反應物濃度與產氧速率呈現正相關關係。',
+                unit: '毫升',
+                data: [
+                    { time: 10, '2.50%': 0, '5.00%': 0, '7.50%': 0 },
+                    { time: 20, '2.50%': 4.1, '5.00%': 6.4, '7.50%': 7.6 },
+                    { time: 30, '2.50%': 8.2, '5.00%': 12.8, '7.50%': 15.2 },
+                    { time: 40, '2.50%': 12.3, '5.00%': 19.2, '7.50%': 22.8 },
+                    { time: 50, '2.50%': 18.5, '5.00%': 28.7, '7.50%': 34.2 },
+                    { time: 60, '2.50%': 24.7, '5.00%': 38.3, '7.50%': 45.7 },
+                ],
+                lines: [
+                    { key: '2.50%', stroke: '#a8dadc', name: '2.50%' },
+                    { key: '5.00%', stroke: '#457b9d', name: '5.00%' },
+                    { key: '7.50%', stroke: '#1d3557', name: '7.50%' },
+                ],
+                yAxisLabel: '產氣量 (毫升)',
+                xAxisLabel: '時間 (秒)',
+            },
+            experiment3: {
+                name: '不同表面積探討氧氣產生效率',
+                description: '此圖表顯示在 1 分鐘內，相同體積（8.00立方公分）但不同表面積（24.0cm²、48.0cm²、96.0cm²）的馬鈴薯產氣量。實驗結果明確證實，過氧化氫酶（在此實驗中為馬鈴薯塊）與雙氧水溶液的接觸面積越大，產氧速率越快。當馬鈴薯被切割成96.0cm²的較大表面積時，其在一分鐘內產氣量達到26.3毫升，顯著優於48.0cm²的14.7毫升和24.0cm²的5.5毫升。這在非勻相催化反應中是常見的現象，因為固態催化劑（過氧化氫酶所在的馬鈴薯組織）的活性位點主要分佈在表面。更大的表面積意味著有更多的活性位點暴露出來，能夠與反應物分子進行有效碰撞並加速反應，從而提高了過氧化氫的分解效率。',
+                unit: '毫升',
+                data: [
+                    { time: 10, '24.0cm²': 0, '48.0cm²': 0, '96.0cm²': 0 },
+                    { time: 20, '24.0cm²': 0.9, '48.0cm²': 2.4, '96.0cm²': 4.3 },
+                    { time: 30, '24.0cm²': 1.8, '48.0cm²': 4.9, '96.0cm²': 8.7 },
+                    { time: 40, '24.0cm²': 2.7, '48.0cm²': 7.4, '96.0cm²': 13.1 },
+                    { time: 50, '24.0cm²': 4.1, '48.0cm²': 11.0, '96.0cm²': 19.7 },
+                    { time: 60, '24.0cm²': 5.5, '48.0cm²': 14.7, '96.0cm²': 26.3 },
+                ],
+                lines: [
+                    { key: '24.0cm²', stroke: '#e63946', name: '24.0 cm²' },
+                    { key: '48.0cm²', stroke: '#f4a261', name: '48.0 cm²' },
+                    { key: '96.0cm²', stroke: '#2a9d8f', name: '96.0 cm²' },
+                ],
+                yAxisLabel: '產氣量 (毫升)',
+                xAxisLabel: '時間 (秒)',
+            },
+        };
+
+        let currentChart = null; // To hold the Chart.js instance
+        let showDescription = true; // State for description visibility
+
+        /**
+         * Renders the chart and updates experiment details based on the selected experiment.
+         * @param {string} experimentKey - The key of the experiment to display.
+         */
+        function renderExperiment(experimentKey) {
+            const data = experimentData[experimentKey];
+            document.getElementById('experiment-name').innerHTML = `
+                ${data.name}
+                <button id="toggle-description" class="ml-3 text-blue-600 hover:text-blue-800 focus:outline-none" title="${showDescription ? '隱藏描述' : '顯示描述'}">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        ${showDescription ?
+                            '<path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />' :
+                            '<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />'
+                        }
+                    </svg>
+                </button>
+            `;
+            document.getElementById('experiment-description').textContent = data.description;
+            document.getElementById('experiment-description').style.display = showDescription ? 'block' : 'none';
+
+            // Re-attach event listener for the toggle button as its HTML is re-rendered
+            document.getElementById('toggle-description').onclick = toggleDescription;
+
+
+            // Prepare data for Chart.js
+            const labels = data.data.map(item => item.time + ' 秒'); // X-axis labels
+            const datasets = data.lines.map(line => ({
+                label: line.name,
+                data: data.data.map(item => item[line.key]),
+                borderColor: line.stroke,
+                backgroundColor: line.stroke + '30', // Add some transparency
+                fill: false,
+                tension: 0.3, // Curve tension
+                pointRadius: 4,
+                pointHoverRadius: 8,
+            }));
+
+            // Destroy previous chart instance if it exists
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            // Create new chart
+            const ctx = document.getElementById('experimentChart').getContext('2d');
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets,
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                padding: 20,
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y + ' ' + data.unit;
+                                    }
+                                    return label;
+                                }
+                            },
+                            padding: 12,
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            borderColor: '#ccc',
+                            borderWidth: 1,
+                            titleColor: '#333',
+                            bodyColor: '#555',
+                            titleFont: { size: 14, weight: 'bold' },
+                            bodyFont: { size: 13 },
+                            cornerRadius: 8,
+                            boxPadding: 5,
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: data.xAxisLabel,
+                                color: '#4a4a4a',
+                                font: {
+                                    size: 16,
+                                    weight: 'bold',
+                                }
+                            },
+                            ticks: {
+                                color: '#666'
+                            },
+                            grid: {
+                                color: '#e0e0e0',
+                                drawBorder: false,
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: data.yAxisLabel,
+                                color: '#4a4a4a',
+                                font: {
+                                    size: 16,
+                                    weight: 'bold',
+                                }
+                            },
+                            ticks: {
+                                color: '#666'
+                            },
+                            grid: {
+                                color: '#e0e0e0',
+                                drawBorder: false,
+                            },
+                            beginAtZero: true,
+                        }
+                    }
+                }
+            });
+
+            // Update button styles
+            const buttons = document.querySelectorAll('#navigation-tabs button');
+            buttons.forEach(button => {
+                if (button.dataset.experimentKey === experimentKey) {
+                    button.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'transform', 'scale-105');
+                    button.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300', 'hover:text-gray-800');
+                } else {
+                    button.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'transform', 'scale-105');
+                    button.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300', 'hover:text-gray-800');
+                }
+            });
+        }
+
+        /**
+         * Toggles the visibility of the experiment description.
+         */
+        function toggleDescription() {
+            showDescription = !showDescription;
+            const descriptionElement = document.getElementById('experiment-description');
+            descriptionElement.style.display = showDescription ? 'block' : 'none';
+
+            // Update the SVG icon and title on the toggle button
+            const toggleButton = document.getElementById('toggle-description');
+            toggleButton.title = showDescription ? '隱藏描述' : '顯示描述';
+            toggleButton.innerHTML = `
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    ${showDescription ?
+                        '<path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />' :
+                        '<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />'
+                    }
+                </svg>
+            `;
+        }
+
+
+        // Initialize the app when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            const navigationTabs = document.getElementById('navigation-tabs');
+
+            // Populate navigation buttons
+            Object.keys(experimentData).forEach(key => {
+                const button = document.createElement('button');
+                button.textContent = experimentData[key].name;
+                button.dataset.experimentKey = key; // Store the key for easy access
+                button.className = `py-2 px-4 rounded-lg font-medium transition-all duration-300 ease-in-out bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-800`;
+                button.onclick = () => renderExperiment(key);
+                navigationTabs.appendChild(button);
+            });
+
+            // Render the first experiment by default
+            renderExperiment('experiment1');
+        });
+    </script>
+</body>
+</html>
