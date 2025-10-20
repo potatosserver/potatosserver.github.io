@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>常春藤單字提取工具 (QR掃描版)</title>
+    
+    <!-- Google Fonts & Material Symbols -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+    <style>
+        :root {
+            --md-sys-color-primary: #006a66;
+            --md-sys-color-on-primary: #ffffff;
+            --md-sys-color-primary-container-active: #91f3ee;
+            --md-sys-color-on-primary-container: #00201e;
+            --md-sys-color-surface-container: #e8e8e8;
+            --md-sys-color-surface-container-high: #e0e2e1;
+            --md-sys-color-surface: #f8faf7;
+            --md-sys-color-on-surface: #191c1c;
+            --md-sys-color-on-surface-variant: #3f4948;
+            --md-sys-color-outline: #b4b4b4;
+            --md-sys-color-background: #f5f7f5;
+            --md-sys-color-error: #b3261e;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.5;
+            color: var(--md-sys-color-on-surface);
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+            background-color: var(--md-sys-color-background);
+        }
+        .page { display: none; opacity: 0; transition: opacity 0.3s ease-in-out; }
+        .page.active { display: block; opacity: 1; }
+        h1 {
+            color: var(--md-sys-color-primary); font-weight: 700;
+            padding-bottom: 8px; border-bottom: 1px solid var(--md-sys-color-outline);
+        }
+        h2 {
+            color: var(--md-sys-color-on-surface-variant); font-size: 1.2em;
+            font-weight: 500; margin-top: 40px; display: none;
+        }
+        #controls {
+            background-color: var(--md-sys-color-surface-container);
+            padding: 24px; border-radius: 16px; margin: 32px 0;
+        }
+        #controls label { font-weight: 500; margin-bottom: 8px; display: block; }
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        input[type="url"] {
+            width: 100%; padding: 14px 50px 14px 16px; border: 1px solid var(--md-sys-color-outline);
+            border-radius: 8px; font-size: 16px; margin-bottom: 16px; box-sizing: border-box;
+            background-color: var(--md-sys-color-surface);
+        }
+        input[type="url"]:focus {
+            outline: 2px solid var(--md-sys-color-primary);
+            border-color: var(--md-sys-color-primary);
+        }
+        #qr-scanner-btn {
+            position: absolute; right: 10px; top: 11px;
+            width: 36px; height: 36px;
+        }
+        button { cursor: pointer; transition: background-color 0.3s, box-shadow 0.3s; border: none; }
+        button#extract-btn {
+            display: flex; align-items: center; justify-content: center; width: 100%;
+            padding: 14px; background-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary);
+            border-radius: 28px; font-size: 16px; font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        button#extract-btn:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        button#extract-btn:disabled { background-color: #9dbfbe; cursor: not-allowed; box-shadow: none; }
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: var(--md-sys-color-on-primary);
+            border-radius: 50%; width: 18px; height: 18px;
+            animation: spin 1s linear infinite; margin-left: 12px;
+        }
+        #back-to-home-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 16px; margin-bottom: 24px; background-color: transparent;
+            color: var(--md-sys-color-primary); font-size: 14px; font-weight: 500; border-radius: 20px;
+        }
+        #back-to-home-btn:hover { background-color: rgba(0, 106, 102, 0.08); }
+        .card {
+            background-color: var(--md-sys-color-surface);
+            border: 1px solid #e0e0e0;
+            border-left: 5px solid var(--md-sys-color-primary);
+            border-radius: 12px; padding: 12px 18px; margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0, 0.1); position: relative;
+        }
+        .phrase-card { border-left-color: #ef7859; }
+        .card h3 {
+            margin: 0; padding-right: 40px; color: var(--md-sys-color-on-surface);
+            font-size: 1.3em; font-weight: 500; display: flex;
+            align-items: center; flex-wrap: wrap;
+        }
+        .card .pronunciation { color: var(--md-sys-color-on-surface-variant); font-size: 0.8em; margin-left: 8px; }
+        .card .definition {
+            font-weight: 400; color: var(--md-sys-color-on-surface); margin: 0; line-height: 1.4;
+        }
+        .card h3 + .definition { margin-top: 8px; }
+        .card .definition + .definition { margin-top: 0px; }
+        .card .example-list {
+            padding-left: 0; margin: 12px 0 0 0;
+            list-style-type: none; display: none;
+        }
+        .card .example-list li {
+            position: relative; padding-left: 32px; 
+            margin-bottom: 12px; color: var(--md-sys-color-on-surface-variant);
+        }
+        .icon-btn {
+            background-color: transparent; border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center; padding: 0; margin: 0;
+        }
+        .icon-btn:hover { background-color: rgba(0, 0, 0, 0.08); }
+        .icon-btn .material-symbols-outlined { color: var(--md-sys-color-on-surface-variant); }
+        .toggle-btn {
+            position: absolute; top: 8px; right: 8px; width: 36px; height: 36px;
+        }
+        .audio-btn { padding: 4px; margin-left: 4px; }
+        .audio-btn .material-symbols-outlined { font-size: 20px; }
+        .sentence-audio-btn {
+            position: absolute; left: 0; top: 0; width: 24px; height: 24px;
+        }
+        .sentence-audio-btn .material-symbols-outlined { font-size: 20px; }
+        #main-audio-player {
+            display: none; margin-top: 32px; background-color: var(--md-sys-color-surface-container-high);
+            padding: 28px; border-radius: 16px;
+        }
+        #track-selection { display: flex; gap: 8px; margin-bottom: 20px; }
+        .track-btn {
+            flex-grow: 1; padding: 10px 12px; border-radius: 20px;
+            border: 1px solid var(--md-sys-color-outline);
+            background-color: transparent; color: var(--md-sys-color-on-surface-variant);
+            font-weight: 500; font-size: 14px;
+        }
+        .track-btn.active {
+            background-color: var(--md-sys-color-primary-container-active);
+            color: var(--md-sys-color-on-primary-container); border-color: transparent;
+        }
+        .track-btn:disabled { color: var(--md-sys-color-outline); cursor: not-allowed; opacity: 0.7; }
+        #player-controls { display: flex; align-items: center; gap: 16px; }
+        #play-pause-btn { width: 48px; height: 48px; background-color: transparent; }
+        #play-pause-btn .material-symbols-outlined { font-size: 40px; color: var(--md-sys-color-primary); }
+        .time-display { font-size: 14px; color: var(--md-sys-color-on-surface-variant); min-width: 45px; text-align: center; }
+        #progress-bar {
+            -webkit-appearance: none; appearance: none; width: 100%; height: 4px;
+            background: var(--md-sys-color-outline); border-radius: 2px; outline: none; cursor: pointer;
+        }
+        #progress-bar::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none; width: 16px; height: 16px;
+            background: var(--md-sys-color-primary); border-radius: 50%;
+        }
+        #progress-bar::-moz-range-thumb {
+            width: 16px; height: 16px; background: var(--md-sys-color-primary);
+            border-radius: 50%; border: none;
+        }
+        
+        /* --- QR Scanner Modal --- */
+        #qr-scanner-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 1000;
+            justify-content: center; align-items: center;
+        }
+        #qr-scanner-container {
+            width: 90vw; max-width: 500px; background: #fff; border-radius: 16px;
+            padding: 20px; text-align: center; position: relative;
+        }
+        #qr-reader { border: 2px solid var(--md-sys-color-outline); border-radius: 8px; }
+        #close-scanner-btn {
+            position: absolute; top: 10px; right: 10px; width: 36px; height: 36px;
+        }
+        #home-error-message {
+            color: var(--md-sys-color-error); font-size: 14px; font-weight: 500;
+            margin-top: -8px; min-height: 1.5em;
+        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div id="home-page" class="page">
+        <h1>常春藤單字提取工具</h1>
+        <div id="controls">
+            <label for="url-input">請在此貼上或掃描文章網址：</label>
+            <div class="input-wrapper">
+                <input type="url" id="url-input" placeholder="https://www.ivy.com.tw/newsLetter/...">
+                <button id="qr-scanner-btn" class="icon-btn" title="掃描 QR Code">
+                    <span class="material-symbols-outlined">qr_code_scanner</span>
+                </button>
+            </div>
+            <p id="home-error-message"></p>
+            <button id="extract-btn">
+                <span id="btn-text">提取單字與音檔</span>
+            </button>
+        </div>
+        <div style="padding: 15px; background-color: #e9ecef; border: 1px solid #ced4da; border-radius: 12px; color: #495057; font-size: 14px;">
+            <h3 style="margin-top:0; color: #495057; font-size: 1em;">工具說明</h3>
+            <ul style="padding-left: 20px; margin: 0;">
+                <li>本工具透過第三方代理服務運作，僅供個人學習與教育目的使用。</li>
+                <li>請尊重目標網站的智慧財產權，切勿用於商業或其他侵權行為。</li>
+            </ul>
+        </div>
+    </div>
+    <div id="content-page" class="page">
+        <button id="back-to-home-btn">
+            <span class="material-symbols-outlined">arrow_back</span>返回首頁
+        </button>
+        <div id="main-audio-player">
+            <div id="track-selection">
+                <button class="track-btn" id="reading-btn">聽朗讀</button>
+                <button class="track-btn" id="explanation-btn">聽講解</button>
+            </div>
+            <div id="player-controls">
+                <button id="play-pause-btn" class="icon-btn" title="播放/暫停"><span class="material-symbols-outlined">play_circle</span></button>
+                <span id="current-time" class="time-display">00:00</span>
+                <input type="range" id="progress-bar" value="0" step="0.1">
+                <span id="total-time" class="time-display">00:00</span>
+            </div>
+        </div>
+        <div id="output-area">
+            <h2 id="words-header">單字 (Words in Use)</h2>
+            <div id="words-output"></div>
+            <h2 id="phrases-header">片語 (Phrases)</h2>
+            <div id="phrases-output"></div>
+        </div>
+    </div>
+    <div id="qr-scanner-modal">
+        <div id="qr-scanner-container">
+            <button id="close-scanner-btn" class="icon-btn">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <p>將 QR Code 對準掃描框</p>
+            <div id="qr-reader"></div>
+        </div>
+    </div>
+    
+    <audio id="word-audio-player" style="display: none;"></audio>
+    <audio id="main-track-player" style="display: none;"></audio>
+
+    <!-- QR Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+    <script>
+        // --- Page Navigation ---
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+        
+        // --- Global Variables & Elements ---
+        let cardCounter = 0;
+        const wordAudioPlayer = document.getElementById('word-audio-player');
+        const mainTrackPlayer = document.getElementById('main-track-player');
+        let readingAudioUrl = null;
+        let explanationAudioUrl = null;
+        const homeErrorMessage = document.getElementById('home-error-message');
+
+        // --- UI & Player Functions ---
+        function setButtonState(isLoading, message = '提取單字與音檔') {
+            const button = document.getElementById('extract-btn');
+            const btnText = document.getElementById('btn-text');
+            button.disabled = isLoading;
+            btnText.textContent = message;
+            const existingLoader = button.querySelector('.loader');
+            if (existingLoader) existingLoader.remove();
+            if (isLoading) {
+                const loader = document.createElement('span');
+                loader.className = 'loader';
+                button.appendChild(loader);
+            }
+        }
+        function playWordAudio(audioUrl) {
+            if(wordAudioPlayer.src !== audioUrl) wordAudioPlayer.src = audioUrl;
+            wordAudioPlayer.play();
+        }
+        function toggleExamples(listId, button) {
+            const list = document.getElementById(listId);
+            const icon = button.querySelector('.material-symbols-outlined');
+            list.style.display = list.style.display === 'block' ? 'none' : 'block';
+            icon.textContent = list.style.display === 'block' ? 'expand_less' : 'expand_more';
+        }
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '00:00';
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+        
+        // --- Main Player Logic ---
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const playPauseIcon = playPauseBtn.querySelector('.material-symbols-outlined');
+        const progressBar = document.getElementById('progress-bar');
+        const currentTimeEl = document.getElementById('current-time');
+        const totalTimeEl = document.getElementById('total-time');
+        const readingBtn = document.getElementById('reading-btn');
+        const explanationBtn = document.getElementById('explanation-btn');
+
+        function loadTrack(url, activeBtnId) {
+            mainTrackPlayer.src = url;
+            mainTrackPlayer.load();
+            playPauseIcon.textContent = 'play_circle';
+            progressBar.value = 0;
+            currentTimeEl.textContent = '00:00';
+            totalTimeEl.textContent = '00:00';
+            document.querySelectorAll('.track-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(activeBtnId)?.classList.add('active');
+        }
+        
+        function resetMainPlayer() {
+            mainTrackPlayer.pause();
+            mainTrackPlayer.removeAttribute('src');
+            mainTrackPlayer.load();
+            playPauseIcon.textContent = 'play_circle';
+            progressBar.value = 0;
+            currentTimeEl.textContent = '00:00';
+            totalTimeEl.textContent = '00:00';
+        }
+
+        playPauseBtn.addEventListener('click', () => { mainTrackPlayer.paused ? mainTrackPlayer.play() : mainTrackPlayer.pause(); });
+        mainTrackPlayer.addEventListener('play', () => { playPauseIcon.textContent = 'pause_circle'; });
+        mainTrackPlayer.addEventListener('pause', () => { playPauseIcon.textContent = 'play_circle'; });
+        mainTrackPlayer.addEventListener('ended', () => { playPauseIcon.textContent = 'play_circle'; });
+        mainTrackPlayer.addEventListener('loadedmetadata', () => {
+            if(mainTrackPlayer.duration) {
+                progressBar.max = mainTrackPlayer.duration;
+                totalTimeEl.textContent = formatTime(mainTrackPlayer.duration);
+            }
+        });
+        mainTrackPlayer.addEventListener('timeupdate', () => {
+            progressBar.value = mainTrackPlayer.currentTime;
+            currentTimeEl.textContent = formatTime(mainTrackPlayer.currentTime);
+        });
+        progressBar.addEventListener('input', () => { mainTrackPlayer.currentTime = progressBar.value; });
+        readingBtn.addEventListener('click', () => { if(readingAudioUrl) loadTrack(readingAudioUrl, 'reading-btn'); });
+        explanationBtn.addEventListener('click', () => { if(explanationAudioUrl) loadTrack(explanationAudioUrl, 'explanation-btn'); });
+
+        // --- Parsing Logic ---
+        function generateExamplesHTML(itemElement) {
+            return Array.from(itemElement.querySelectorAll('.my-voca-sentence-wraper')).map(wrapper => {
+                const sentenceText = wrapper.querySelector('.my-voca-sentence-con')?.innerHTML.trim() || '';
+                const sentenceAudioEl = wrapper.querySelector('.voc_play[data-sound-url]');
+                const sentenceAudioUrl = sentenceAudioEl ? sentenceAudioEl.getAttribute('data-sound-url') : null;
+                const sentenceAudioButtonHTML = sentenceAudioUrl ? `<button class="icon-btn sentence-audio-btn" onclick="playWordAudio('${sentenceAudioUrl}')" title="播放例句"><span class="material-symbols-outlined">volume_up</span></button>` : ``;
+                return `<li>${sentenceAudioButtonHTML}${sentenceText}</li>`;
+            }).join('');
+        }
+
+        function parseAndDisplay(htmlContent) {
+            const wordsOutput = document.getElementById('words-output');
+            const phrasesOutput = document.getElementById('phrases-output');
+            cardCounter = 0;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+            
+            const readingLink = doc.querySelector('#media1_url a');
+            const explanationLink = doc.querySelector('#media2_url a');
+            readingAudioUrl = readingLink ? readingLink.href : null;
+            explanationAudioUrl = explanationLink ? explanationLink.href : null;
+            
+            const playerContainer = document.getElementById('main-audio-player');
+            if (readingAudioUrl || explanationAudioUrl) {
+                playerContainer.style.display = 'block';
+                readingBtn.disabled = !readingAudioUrl;
+                explanationBtn.disabled = !explanationAudioUrl;
+                if (readingAudioUrl) loadTrack(readingAudioUrl, 'reading-btn');
+                else if (explanationAudioUrl) loadTrack(explanationAudioUrl, 'explanation-btn');
+            } else { playerContainer.style.display = 'none'; }
+
+            let wordCount = 0;
+            doc.querySelectorAll('#words_block .row[style*="left:0.5em"]').forEach(item => {
+                 cardCounter++;
+                 const wordElement = item.querySelector('.my-voca-word');
+                 if (!wordElement) return;
+                 const word = wordElement.firstChild.textContent.trim();
+                 const pronunciation = item.querySelector('.my-voca-word > div') ? item.querySelector('.my-voca-word > div').textContent.trim() : '';
+                 const definitionsHTML = Array.from(item.querySelectorAll('.my-voca-mean-wraper'))
+                    .map(def => `<p class="definition">${def.textContent.trim().replace(/\s*=\s*/, ' = ')}</p>`).join('');
+                 const wordAudioEl = item.querySelector('.my-voca-word .voc_play[data-sound-url]');
+                 const wordAudioUrl = wordAudioEl ? wordAudioEl.getAttribute('data-sound-url') : null;
+                 const wordAudioButtonHTML = wordAudioUrl ? `<button class="icon-btn audio-btn" onclick="playWordAudio('${wordAudioUrl}')" title="播放發音"><span class="material-symbols-outlined">volume_up</span></button>` : '';
+                 const examplesHTML = generateExamplesHTML(item);
+                 let toggleButtonHTML = '', exampleListHTML = '';
+                 if (examplesHTML) {
+                    toggleButtonHTML = `<button class="icon-btn toggle-btn" onclick="toggleExamples('example-list-${cardCounter}', this)" title="顯示/隱藏例句"><span class="material-symbols-outlined">expand_more</span></button>`;
+                    exampleListHTML = `<ul class="example-list" id="example-list-${cardCounter}">${examplesHTML}</ul>`;
+                 }
+                 wordsOutput.innerHTML += `<div class="card">
+                    ${toggleButtonHTML}
+                    <h3>${word}<span class="pronunciation">${pronunciation}</span>${wordAudioButtonHTML}</h3>
+                    ${definitionsHTML}
+                    ${exampleListHTML}
+                 </div>`;
+                 wordCount++;
+            });
+            let phraseCount = 0;
+            doc.querySelectorAll('#phrases_block .row[style*="left:0.5em"]').forEach(item => {
+                 cardCounter++;
+                 const phraseElement = item.querySelector('.my-voca-word');
+                 if (!phraseElement) return;
+                 const phraseTitle = phraseElement.firstChild.textContent.trim();
+                 const phraseDef = phraseElement.querySelector('div') ? phraseElement.querySelector('div').textContent.trim() : '';
+                 const examplesHTML = generateExamplesHTML(item);
+                 let toggleButtonHTML = '', exampleListHTML = '';
+                 if (examplesHTML) {
+                    toggleButtonHTML = `<button class="icon-btn toggle-btn" onclick="toggleExamples('example-list-${cardCounter}', this)" title="顯示/隱藏例句"><span class="material-symbols-outlined">expand_more</span></button>`;
+                    exampleListHTML = `<ul class="example-list" id="example-list-${cardCounter}">${examplesHTML}</ul>`;
+                 }
+                 phrasesOutput.innerHTML += `<div class="card phrase-card">
+                    ${toggleButtonHTML}
+                    <h3>${phraseTitle}</h3>
+                    <p class="definition">${phraseDef}</p>
+                    ${exampleListHTML}
+                 </div>`;
+                 phraseCount++;
+            });
+            
+            if (wordCount > 0) document.getElementById('words-header').style.display = 'block';
+            if (phraseCount > 0) document.getElementById('phrases-header').style.display = 'block';
+            return (wordCount > 0 || phraseCount > 0);
+        }
+
+        // --- Main Handler ---
+        async function handleExtract() {
+            const targetUrl = document.getElementById('url-input').value.trim();
+            if (!targetUrl || !targetUrl.startsWith('http')) {
+                homeErrorMessage.textContent = '請輸入一個有效的網址！'; return;
+            }
+            homeErrorMessage.textContent = '';
+            setButtonState(true, '正在抓取與解析...');
+            const proxyUrl = `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(targetUrl)}`;
+            try {
+                const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(20000) });
+                if (!response.ok) throw new Error(`伺服器回應錯誤，狀態碼: ${response.status}`);
+                const htmlContent = await response.text();
+                if (htmlContent && htmlContent.toLowerCase().includes('<html')) {
+                    const success = parseAndDisplay(htmlContent);
+                    if (success) {
+                        showPage('content-page');
+                    } else {
+                        homeErrorMessage.textContent = '提取失敗：未在此頁面找到符合格式的單字或片語。';
+                    }
+                } else {
+                    throw new Error('代理伺服器回傳了無效的內容');
+                }
+            } catch (error) {
+                console.error('抓取失敗:', error);
+                alert(`抓取失敗：${error.message}。\n\n請檢查網址或稍後再試。`);
+            } finally {
+                setButtonState(false);
+            }
+        }
+        
+        // --- QR Scanner Logic ---
+        const scannerModal = document.getElementById('qr-scanner-modal');
+        const scannerContainer = document.getElementById('qr-scanner-container');
+        const html5QrCode = new Html5Qrcode("qr-reader");
+
+        function onScanSuccess(decodedText, decodedResult) {
+            html5QrCode.stop().then(() => {
+                scannerModal.style.display = 'none';
+                document.getElementById('url-input').value = decodedText;
+                handleExtract(); // Automatically trigger extraction after scan
+            }).catch(err => console.error("Failed to stop scanner", err));
+        }
+        function onScanFailure(error) { /* console.warn(`QR error = ${error}`); */ }
+        
+        document.getElementById('qr-scanner-btn').addEventListener('click', () => {
+            scannerModal.style.display = 'flex';
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                onScanSuccess, 
+                onScanFailure
+            ).catch(err => {
+                alert(`無法啟動相機：${err}`);
+                scannerModal.style.display = 'none';
+            });
+        });
+        
+        document.getElementById('close-scanner-btn').addEventListener('click', () => {
+             html5QrCode.stop().catch(err => {});
+             scannerModal.style.display = 'none';
+        });
+
+        // --- Event Listeners ---
+        document.getElementById('extract-btn').addEventListener('click', handleExtract);
+        document.getElementById('back-to-home-btn').addEventListener('click', () => {
+            document.getElementById('words-output').innerHTML = '';
+            document.getElementById('phrases-output').innerHTML = '';
+            document.getElementById('words-header').style.display = 'none';
+            document.getElementById('phrases-header').style.display = 'none';
+            document.getElementById('main-audio-player').style.display = 'none';
+            homeErrorMessage.textContent = '';
+            resetMainPlayer();
+            showPage('home-page');
+        });
+
+        // Initial Page Load
+        showPage('home-page');
+    </script>
+</body>
+</html>
