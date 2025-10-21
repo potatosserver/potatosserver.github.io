@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>常春藤單字提取工具 (QR掃描版)</title>
+    <title>常春藤單字提取工具 (分頁版)</title>
     
     <!-- Google Fonts & Material Symbols -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,6 +40,7 @@
         h1 {
             color: var(--md-sys-color-primary); font-weight: 700;
             padding-bottom: 8px; border-bottom: 1px solid var(--md-sys-color-outline);
+            font-size: 1.8em; margin-bottom: 24px;
         }
         h2 {
             color: var(--md-sys-color-on-surface-variant); font-size: 1.2em;
@@ -81,7 +82,8 @@
         }
         #back-to-home-btn {
             display: inline-flex; align-items: center; gap: 8px;
-            padding: 8px 16px; margin-bottom: 24px; background-color: transparent;
+            padding: 8px 16px; margin-bottom: 16px; /* Reduced margin */
+            background-color: transparent;
             color: var(--md-sys-color-primary); font-size: 14px; font-weight: 500; border-radius: 20px;
         }
         #back-to-home-btn:hover { background-color: rgba(0, 106, 102, 0.08); }
@@ -119,7 +121,8 @@
         .icon-btn:hover { background-color: rgba(0, 0, 0, 0.08); }
         .icon-btn .material-symbols-outlined { color: var(--md-sys-color-on-surface-variant); }
         .toggle-btn {
-            position: absolute; top: 8px; right: 8px; width: 36px; height: 36px;
+            position: absolute; top: 8px; right: 8px;
+            width: 36px; height: 36px;
         }
         .audio-btn { padding: 4px; margin-left: 4px; }
         .audio-btn .material-symbols-outlined { font-size: 20px; }
@@ -128,8 +131,9 @@
         }
         .sentence-audio-btn .material-symbols-outlined { font-size: 20px; }
         #main-audio-player {
-            display: none; margin-top: 32px; background-color: var(--md-sys-color-surface-container-high);
+            display: none; background-color: var(--md-sys-color-surface-container-high);
             padding: 28px; border-radius: 16px;
+            margin-bottom: 32px;
         }
         #track-selection { display: flex; gap: 8px; margin-bottom: 20px; }
         .track-btn {
@@ -159,8 +163,6 @@
             width: 16px; height: 16px; background: var(--md-sys-color-primary);
             border-radius: 50%; border: none;
         }
-        
-        /* --- QR Scanner Modal --- */
         #qr-scanner-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); z-index: 1000;
@@ -182,6 +184,7 @@
     </style>
 </head>
 <body>
+
     <div id="home-page" class="page">
         <h1>常春藤單字提取工具</h1>
         <div id="controls">
@@ -205,10 +208,12 @@
             </ul>
         </div>
     </div>
+
     <div id="content-page" class="page">
         <button id="back-to-home-btn">
             <span class="material-symbols-outlined">arrow_back</span>返回首頁
         </button>
+        <h1 id="article-title">文章標題</h1>
         <div id="main-audio-player">
             <div id="track-selection">
                 <button class="track-btn" id="reading-btn">聽朗讀</button>
@@ -228,6 +233,7 @@
             <div id="phrases-output"></div>
         </div>
     </div>
+    
     <div id="qr-scanner-modal">
         <div id="qr-scanner-container">
             <button id="close-scanner-btn" class="icon-btn">
@@ -241,7 +247,6 @@
     <audio id="word-audio-player" style="display: none;"></audio>
     <audio id="main-track-player" style="display: none;"></audio>
 
-    <!-- QR Scanner Library -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <script>
@@ -356,6 +361,10 @@
             const parser = new DOMParser();
             const doc = parser.parseFromString(htmlContent, 'text/html');
             
+            // --- Extract Title ---
+            const title = doc.querySelector('.column_viewtitle .title')?.textContent.trim();
+            document.getElementById('article-title').textContent = title || '未知標題';
+            
             const readingLink = doc.querySelector('#media1_url a');
             const explanationLink = doc.querySelector('#media2_url a');
             readingAudioUrl = readingLink ? readingLink.href : null;
@@ -456,17 +465,16 @@
         
         // --- QR Scanner Logic ---
         const scannerModal = document.getElementById('qr-scanner-modal');
-        const scannerContainer = document.getElementById('qr-scanner-container');
         const html5QrCode = new Html5Qrcode("qr-reader");
 
         function onScanSuccess(decodedText, decodedResult) {
             html5QrCode.stop().then(() => {
                 scannerModal.style.display = 'none';
                 document.getElementById('url-input').value = decodedText;
-                handleExtract(); // Automatically trigger extraction after scan
+                handleExtract();
             }).catch(err => console.error("Failed to stop scanner", err));
         }
-        function onScanFailure(error) { /* console.warn(`QR error = ${error}`); */ }
+        function onScanFailure(error) {}
         
         document.getElementById('qr-scanner-btn').addEventListener('click', () => {
             scannerModal.style.display = 'flex';
@@ -499,7 +507,7 @@
             showPage('home-page');
         });
 
-        // Initial Page Load
+        // --- Initial Page Load ---
         showPage('home-page');
     </script>
 </body>
