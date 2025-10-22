@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>常春藤單字提取工具 (分頁版)</title>
+    <title>常春藤單字提取與文章列表</title>
     
     <!-- Google Fonts & Material Symbols -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
     <style>
+        /* --- Base & Extractor Styles (from ivy.html) --- */
         :root {
             --md-sys-color-primary: #006a66;
             --md-sys-color-on-primary: #ffffff;
@@ -27,8 +28,8 @@
             --md-sys-color-error: #b3261e;
         }
         body {
-            font-family: 'Roboto', sans-serif;
-            line-height: 1.5;
+            font-family: 'Roboto', 'Noto Sans TC', sans-serif;
+            line-height: 1.6;
             color: var(--md-sys-color-on-surface);
             max-width: 800px;
             margin: 20px auto;
@@ -46,149 +47,186 @@
             color: var(--md-sys-color-on-surface-variant); font-size: 1.2em;
             font-weight: 500; margin-top: 40px; display: none;
         }
-        #controls {
-            background-color: var(--md-sys-color-surface-container);
-            padding: 24px; border-radius: 16px; margin: 32px 0;
-        }
+        #controls { background-color: var(--md-sys-color-surface-container); padding: 24px; border-radius: 16px; margin: 32px 0; }
         #controls label { font-weight: 500; margin-bottom: 8px; display: block; }
         .input-wrapper { position: relative; display: flex; align-items: center; }
-        input[type="url"] {
-            width: 100%; padding: 14px 50px 14px 16px; border: 1px solid var(--md-sys-color-outline);
-            border-radius: 8px; font-size: 16px; margin-bottom: 16px; box-sizing: border-box;
-            background-color: var(--md-sys-color-surface);
-        }
-        input[type="url"]:focus {
-            outline: 2px solid var(--md-sys-color-primary);
-            border-color: var(--md-sys-color-primary);
-        }
-        #qr-scanner-btn {
-            position: absolute; right: 10px; top: 11px;
-            width: 36px; height: 36px;
-        }
+        input[type="url"] { width: 100%; padding: 14px 50px 14px 16px; border: 1px solid var(--md-sys-color-outline); border-radius: 8px; font-size: 16px; margin-bottom: 16px; box-sizing: border-box; background-color: var(--md-sys-color-surface); }
+        input[type="url"]:focus { outline: 2px solid var(--md-sys-color-primary); border-color: var(--md-sys-color-primary); }
         button { cursor: pointer; transition: background-color 0.3s, box-shadow 0.3s; border: none; }
-        button#extract-btn {
-            display: flex; align-items: center; justify-content: center; width: 100%;
-            padding: 14px; background-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary);
-            border-radius: 28px; font-size: 16px; font-weight: 500;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
+        button#extract-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 14px; background-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border-radius: 28px; font-size: 16px; font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         button#extract-btn:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
         button#extract-btn:disabled { background-color: #9dbfbe; cursor: not-allowed; box-shadow: none; }
-        .loader {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top-color: var(--md-sys-color-on-primary);
-            border-radius: 50%; width: 18px; height: 18px;
-            animation: spin 1s linear infinite; margin-left: 12px;
-        }
-        #back-to-home-btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 8px 16px; margin-bottom: 16px; /* Reduced margin */
-            background-color: transparent;
-            color: var(--md-sys-color-primary); font-size: 14px; font-weight: 500; border-radius: 20px;
-        }
+        .loader { border: 4px solid rgba(255, 255, 255, 0.3); border-top-color: var(--md-sys-color-on-primary); border-radius: 50%; width: 18px; height: 18px; animation: spin 1s linear infinite; margin-left: 12px; }
+        #back-to-home-btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; margin-bottom: 16px; background-color: transparent; color: var(--md-sys-color-primary); font-size: 14px; font-weight: 500; border-radius: 20px; }
         #back-to-home-btn:hover { background-color: rgba(0, 106, 102, 0.08); }
-        .card {
-            background-color: var(--md-sys-color-surface);
-            border: 1px solid #e0e0e0;
-            border-left: 5px solid var(--md-sys-color-primary);
-            border-radius: 12px; padding: 12px 18px; margin-bottom: 16px;
-            box-shadow: 0 1px 2px rgba(0,0,0, 0.1); position: relative;
-        }
+        .card { background-color: var(--md-sys-color-surface); border: 1px solid #e0e0e0; border-left: 5px solid var(--md-sys-color-primary); border-radius: 12px; padding: 12px 18px; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(0,0,0, 0.1); position: relative; }
         .phrase-card { border-left-color: #ef7859; }
-        .card h3 {
-            margin: 0; padding-right: 40px; color: var(--md-sys-color-on-surface);
-            font-size: 1.3em; font-weight: 500; display: flex;
-            align-items: center; flex-wrap: wrap;
-        }
+        .card h3 { margin: 0; padding-right: 40px; color: var(--md-sys-color-on-surface); font-size: 1.3em; font-weight: 500; display: flex; align-items: center; flex-wrap: wrap; }
         .card .pronunciation { color: var(--md-sys-color-on-surface-variant); font-size: 0.8em; margin-left: 8px; }
-        .card .definition {
-            font-weight: 400; color: var(--md-sys-color-on-surface); margin: 0; line-height: 1.4;
-        }
+        .card .definition { font-weight: 400; color: var(--md-sys-color-on-surface); margin: 0; line-height: 1.4; }
         .card h3 + .definition { margin-top: 8px; }
         .card .definition + .definition { margin-top: 0px; }
-        .card .example-list {
-            padding-left: 0; margin: 12px 0 0 0;
-            list-style-type: none; display: none;
-        }
-        .card .example-list li {
-            position: relative; padding-left: 32px; 
-            margin-bottom: 12px; color: var(--md-sys-color-on-surface-variant);
-        }
-        .icon-btn {
-            background-color: transparent; border-radius: 50%;
-            display: inline-flex; align-items: center; justify-content: center; padding: 0; margin: 0;
-        }
+        .card .example-list { padding-left: 0; margin: 12px 0 0 0; list-style-type: none; display: none; }
+        .card .example-list li { position: relative; padding-left: 32px; margin-bottom: 12px; color: var(--md-sys-color-on-surface-variant); }
+        .icon-btn { background-color: transparent; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; padding: 0; margin: 0; }
         .icon-btn:hover { background-color: rgba(0, 0, 0, 0.08); }
-        .icon-btn .material-symbols-outlined { color: var(--md-sys-color-on-surface-variant); }
-        .toggle-btn {
-            position: absolute; top: 8px; right: 8px;
-            width: 36px; height: 36px;
-        }
+        #qr-scanner-btn, .toggle-btn, #close-scanner-btn { width: 36px; height: 36px; }
+        #qr-scanner-btn { position: absolute; right: 10px; top: 11px; }
+        .toggle-btn { position: absolute; top: 8px; right: 8px; }
         .audio-btn { padding: 4px; margin-left: 4px; }
         .audio-btn .material-symbols-outlined { font-size: 20px; }
-        .sentence-audio-btn {
-            position: absolute; left: 0; top: 0; width: 24px; height: 24px;
-        }
+        .sentence-audio-btn { position: absolute; left: 0; top: 0; width: 24px; height: 24px; }
         .sentence-audio-btn .material-symbols-outlined { font-size: 20px; }
-        #main-audio-player {
-            display: none; background-color: var(--md-sys-color-surface-container-high);
-            padding: 28px; border-radius: 16px;
-            margin-bottom: 32px;
-        }
+        #main-audio-player { display: none; background-color: var(--md-sys-color-surface-container-high); padding: 28px; border-radius: 16px; margin-bottom: 32px; }
         #track-selection { display: flex; gap: 8px; margin-bottom: 20px; }
-        .track-btn {
-            flex-grow: 1; padding: 10px 12px; border-radius: 20px;
-            border: 1px solid var(--md-sys-color-outline);
-            background-color: transparent; color: var(--md-sys-color-on-surface-variant);
-            font-weight: 500; font-size: 14px;
-        }
-        .track-btn.active {
-            background-color: var(--md-sys-color-primary-container-active);
-            color: var(--md-sys-color-on-primary-container); border-color: transparent;
-        }
+        .track-btn { flex-grow: 1; padding: 10px 12px; border-radius: 20px; border: 1px solid var(--md-sys-color-outline); background-color: transparent; color: var(--md-sys-color-on-surface-variant); font-weight: 500; font-size: 14px; }
+        .track-btn.active { background-color: var(--md-sys-color-primary-container-active); color: var(--md-sys-color-on-primary-container); border-color: transparent; }
         .track-btn:disabled { color: var(--md-sys-color-outline); cursor: not-allowed; opacity: 0.7; }
         #player-controls { display: flex; align-items: center; gap: 16px; }
         #play-pause-btn { width: 48px; height: 48px; background-color: transparent; }
         #play-pause-btn .material-symbols-outlined { font-size: 40px; color: var(--md-sys-color-primary); }
         .time-display { font-size: 14px; color: var(--md-sys-color-on-surface-variant); min-width: 45px; text-align: center; }
-        #progress-bar {
-            -webkit-appearance: none; appearance: none; width: 100%; height: 4px;
-            background: var(--md-sys-color-outline); border-radius: 2px; outline: none; cursor: pointer;
-        }
-        #progress-bar::-webkit-slider-thumb {
-            -webkit-appearance: none; appearance: none; width: 16px; height: 16px;
-            background: var(--md-sys-color-primary); border-radius: 50%;
-        }
-        #progress-bar::-moz-range-thumb {
-            width: 16px; height: 16px; background: var(--md-sys-color-primary);
-            border-radius: 50%; border: none;
-        }
-        #qr-scanner-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 1000;
-            justify-content: center; align-items: center;
-        }
-        #qr-scanner-container {
-            width: 90vw; max-width: 500px; background: #fff; border-radius: 16px;
-            padding: 20px; text-align: center; position: relative;
-        }
+        #progress-bar { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; background: var(--md-sys-color-outline); border-radius: 2px; outline: none; cursor: pointer; }
+        #progress-bar::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; background: var(--md-sys-color-primary); border-radius: 50%; }
+        #progress-bar::-moz-range-thumb { width: 16px; height: 16px; background: var(--md-sys-color-primary); border-radius: 50%; border: none; }
+        #qr-scanner-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1001; justify-content: center; align-items: center; }
+        #qr-scanner-container { width: 90vw; max-width: 500px; background: #fff; border-radius: 16px; padding: 20px; text-align: center; position: relative; }
         #qr-reader { border: 2px solid var(--md-sys-color-outline); border-radius: 8px; }
-        #close-scanner-btn {
-            position: absolute; top: 10px; right: 10px; width: 36px; height: 36px;
-        }
-        #home-error-message {
-            color: var(--md-sys-color-error); font-size: 14px; font-weight: 500;
-            margin-top: -8px; min-height: 1.5em;
-        }
+        #close-scanner-btn { position: absolute; top: 10px; right: 10px; }
+        #home-error-message { color: var(--md-sys-color-error); font-size: 14px; font-weight: 500; margin-top: -8px; min-height: 1.5em; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* --- Floating Button & Panel Styles --- */
+        #toggle-article-list-btn {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            z-index: 998;
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        #article-list-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 90vw;
+            max-width: 400px;
+            height: 100%;
+            background-color: #f9f9f9;
+            box-shadow: -4px 0 15px rgba(0,0,0,0.15);
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        #article-list-panel.is-open {
+            transform: translateX(0);
+        }
+        .panel-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .panel-header h1 {
+            font-size: 1.4em;
+            color: #005a3c;
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+        #panel-content {
+            padding: 0 20px 20px 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        
+        /* --- MODIFIED: Loading indicator with spinner --- */
+        #list-loading {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1em;
+            color: #888;
+            padding-top: 50px;
+        }
+        .list-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top-color: var(--md-sys-color-primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        .list-error { color: #d8000c; background-color: #ffbaba; border: 1px solid #d8000c; padding: 15px; border-radius: 8px; text-align: center; margin: 20px; }
+        
+        /* --- Article List Styles (from ai_studio_code.html, adapted) --- */
+        #article-list-container { padding-left: 0; }
+        .month-header { margin-top: 30px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #005a3c; color: #005a3c; font-size: 1.5em; }
+        .article-item { background-color: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 15px 20px; margin-bottom: 12px; list-style-type: none; transition: box-shadow 0.2s ease-in-out, transform 0.2s ease; cursor: pointer; }
+        .article-item:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); transform: translateY(-2px); }
+        .article-item .title { color: #0066cc; font-size: 1.1em; font-weight: 500; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .article-item .date { display: block; font-size: 0.9em; color: #666; margin-bottom: 5px; }
+        #close-panel-btn .material-symbols-outlined { font-size: 28px; }
+
     </style>
 </head>
 <body>
 
+    <!-- --- Global Floating Button --- -->
+    <button id="toggle-article-list-btn">
+        <span class="material-symbols-outlined">list_alt</span>
+        文章列表
+    </button>
+    
+    <!-- --- Floating Article List Panel --- -->
+    <div id="modal-overlay"></div>
+    <div id="article-list-panel">
+        <div class="panel-header">
+            <h1>文章列表</h1>
+            <button id="close-panel-btn" class="icon-btn" title="關閉">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div id="panel-content">
+            <!-- MODIFIED: HTML for the new loading indicator -->
+            <div id="list-loading">
+                <div class="list-spinner"></div>
+                <span>正在載入資料中...</span>
+            </div>
+            <div id="article-list-container"></div>
+        </div>
+    </div>
+
+    <!-- --- Page 1: Home/Extractor --- -->
     <div id="home-page" class="page">
         <h1>常春藤單字提取工具</h1>
         <div id="controls">
-            <label for="url-input">請在此貼上或掃描文章網址：</label>
+            <label for="url-input">請在此貼上、掃描或從文章列表選取：</label>
             <div class="input-wrapper">
                 <input type="url" id="url-input" placeholder="https://www.ivy.com.tw/newsLetter/...">
                 <button id="qr-scanner-btn" class="icon-btn" title="掃描 QR Code">
@@ -209,6 +247,7 @@
         </div>
     </div>
 
+    <!-- --- Page 2: Content --- -->
     <div id="content-page" class="page">
         <button id="back-to-home-btn">
             <span class="material-symbols-outlined">arrow_back</span>返回首頁
@@ -234,6 +273,7 @@
         </div>
     </div>
     
+    <!-- --- QR Scanner Modal --- -->
     <div id="qr-scanner-modal">
         <div id="qr-scanner-container">
             <button id="close-scanner-btn" class="icon-btn">
@@ -361,7 +401,6 @@
             const parser = new DOMParser();
             const doc = parser.parseFromString(htmlContent, 'text/html');
             
-            // --- Extract Title ---
             const title = doc.querySelector('.column_viewtitle .title')?.textContent.trim();
             document.getElementById('article-title').textContent = title || '未知標題';
             
@@ -386,8 +425,7 @@
                  if (!wordElement) return;
                  const word = wordElement.firstChild.textContent.trim();
                  const pronunciation = item.querySelector('.my-voca-word > div') ? item.querySelector('.my-voca-word > div').textContent.trim() : '';
-                 const definitionsHTML = Array.from(item.querySelectorAll('.my-voca-mean-wraper'))
-                    .map(def => `<p class="definition">${def.textContent.trim().replace(/\s*=\s*/, ' = ')}</p>`).join('');
+                 const definitionsHTML = Array.from(item.querySelectorAll('.my-voca-mean-wraper')).map(def => `<p class="definition">${def.textContent.trim().replace(/\s*=\s*/, ' = ')}</p>`).join('');
                  const wordAudioEl = item.querySelector('.my-voca-word .voc_play[data-sound-url]');
                  const wordAudioUrl = wordAudioEl ? wordAudioEl.getAttribute('data-sound-url') : null;
                  const wordAudioButtonHTML = wordAudioUrl ? `<button class="icon-btn audio-btn" onclick="playWordAudio('${wordAudioUrl}')" title="播放發音"><span class="material-symbols-outlined">volume_up</span></button>` : '';
@@ -397,12 +435,7 @@
                     toggleButtonHTML = `<button class="icon-btn toggle-btn" onclick="toggleExamples('example-list-${cardCounter}', this)" title="顯示/隱藏例句"><span class="material-symbols-outlined">expand_more</span></button>`;
                     exampleListHTML = `<ul class="example-list" id="example-list-${cardCounter}">${examplesHTML}</ul>`;
                  }
-                 wordsOutput.innerHTML += `<div class="card">
-                    ${toggleButtonHTML}
-                    <h3>${word}<span class="pronunciation">${pronunciation}</span>${wordAudioButtonHTML}</h3>
-                    ${definitionsHTML}
-                    ${exampleListHTML}
-                 </div>`;
+                 wordsOutput.innerHTML += `<div class="card"> ${toggleButtonHTML} <h3>${word}<span class="pronunciation">${pronunciation}</span>${wordAudioButtonHTML}</h3> ${definitionsHTML} ${exampleListHTML} </div>`;
                  wordCount++;
             });
             let phraseCount = 0;
@@ -418,12 +451,7 @@
                     toggleButtonHTML = `<button class="icon-btn toggle-btn" onclick="toggleExamples('example-list-${cardCounter}', this)" title="顯示/隱藏例句"><span class="material-symbols-outlined">expand_more</span></button>`;
                     exampleListHTML = `<ul class="example-list" id="example-list-${cardCounter}">${examplesHTML}</ul>`;
                  }
-                 phrasesOutput.innerHTML += `<div class="card phrase-card">
-                    ${toggleButtonHTML}
-                    <h3>${phraseTitle}</h3>
-                    <p class="definition">${phraseDef}</p>
-                    ${exampleListHTML}
-                 </div>`;
+                 phrasesOutput.innerHTML += `<div class="card phrase-card"> ${toggleButtonHTML} <h3>${phraseTitle}</h3> <p class="definition">${phraseDef}</p> ${exampleListHTML} </div>`;
                  phraseCount++;
             });
             
@@ -451,13 +479,15 @@
                         showPage('content-page');
                     } else {
                         homeErrorMessage.textContent = '提取失敗：未在此頁面找到符合格式的單字或片語。';
+                        showPage('home-page');
                     }
                 } else {
                     throw new Error('代理伺服器回傳了無效的內容');
                 }
             } catch (error) {
                 console.error('抓取失敗:', error);
-                alert(`抓取失敗：${error.message}。\n\n請檢查網址或稍後再試。`);
+                homeErrorMessage.textContent = `抓取失敗: ${error.message}`;
+                showPage('home-page');
             } finally {
                 setButtonState(false);
             }
@@ -479,10 +509,8 @@
         document.getElementById('qr-scanner-btn').addEventListener('click', () => {
             scannerModal.style.display = 'flex';
             html5QrCode.start(
-                { facingMode: "environment" }, 
-                { fps: 10, qrbox: { width: 250, height: 250 } },
-                onScanSuccess, 
-                onScanFailure
+                { facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } },
+                onScanSuccess, onScanFailure
             ).catch(err => {
                 alert(`無法啟動相機：${err}`);
                 scannerModal.style.display = 'none';
@@ -493,6 +521,93 @@
              html5QrCode.stop().catch(err => {});
              scannerModal.style.display = 'none';
         });
+
+        // --- Article List Logic ---
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbx2otgRUoMgTf73QWaWFgwcQhfHFxb4RNFguTxUV8FgO6b57oJAi91lLI-xgCRZS3mO/exec';
+
+        async function fetchAndRenderArticles() {
+            const container = document.getElementById('article-list-container');
+            const loadingDiv = document.getElementById('list-loading');
+            try {
+                const response = await fetch(GAS_URL);
+                if (!response.ok) throw new Error(`網路請求失敗，狀態碼: ${response.status}`);
+                const data = await response.json();
+                const articlesHtml = data[0];
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(articlesHtml, 'text/html');
+                let allArticles = [];
+                const monthBlocks = doc.querySelectorAll('.newsbook_box');
+                monthBlocks.forEach(block => {
+                    const monthHeader = block.querySelector('.top_date h4').textContent.trim();
+                    const yearMatch = monthHeader.match(/(\d{4})/);
+                    if (!yearMatch) return;
+                    const year = yearMatch[1];
+                    const articleNodes = block.querySelectorAll('a.list_title');
+                    articleNodes.forEach(node => {
+                        const dateText = node.querySelector('p.date').textContent.trim();
+                        const month = dateText.substring(0, 2);
+                        const day = dateText.substring(2, 4);
+                        const fullDate = `${year}-${month}-${day}`;
+                        if (!isNaN(new Date(fullDate))) {
+                            allArticles.push({
+                                title: node.querySelector('h6.word_title').textContent.trim(),
+                                link: node.href,
+                                dateDisplay: dateText,
+                                fullDate: fullDate
+                            });
+                        }
+                    });
+                });
+                allArticles.sort((a, b) => {
+                    const dateA = new Date(a.fullDate);
+                    const dateB = new Date(b.fullDate);
+                    if (dateB.getFullYear() !== dateA.getFullYear()) return dateB.getFullYear() - dateA.getFullYear();
+                    if (dateB.getMonth() !== dateA.getMonth()) return dateB.getMonth() - dateA.getMonth();
+                    return dateA.getDate() - dateB.getDate();
+                });
+                renderGroupedArticles(allArticles, container);
+                loadingDiv.style.display = 'none';
+            } catch (error) {
+                console.error('載入文章列表時發生錯誤:', error);
+                loadingDiv.style.display = 'none';
+                container.innerHTML = `<div class="list-error"><strong>錯誤：</strong> 無法載入文章列表。<br>${error.message}</div>`;
+            }
+        }
+
+        function renderGroupedArticles(sortedArticles, container) {
+            container.innerHTML = '';
+            let currentMonthHeader = '';
+            sortedArticles.forEach(article => {
+                const articleDate = new Date(article.fullDate);
+                const articleMonthHeader = `${articleDate.getFullYear()} 年 ${articleDate.getMonth() + 1} 月`;
+                if (articleMonthHeader !== currentMonthHeader) {
+                    currentMonthHeader = articleMonthHeader;
+                    const headerElement = document.createElement('h2');
+                    headerElement.className = 'month-header';
+                    headerElement.textContent = currentMonthHeader;
+                    headerElement.style.display = 'block'; // Make sure month headers are visible
+                    container.appendChild(headerElement);
+                }
+                const itemElement = document.createElement('div');
+                itemElement.className = 'article-item';
+                itemElement.dataset.url = article.link; // Store URL in data attribute
+                itemElement.innerHTML = `<span class="date">${article.dateDisplay}</span><span class="title">${article.title}</span>`;
+                container.appendChild(itemElement);
+            });
+        }
+        
+        // --- Floating Panel Control ---
+        const panel = document.getElementById('article-list-panel');
+        const overlay = document.getElementById('modal-overlay');
+        function toggleArticlePanel(forceClose = false) {
+            if (forceClose || panel.classList.contains('is-open')) {
+                panel.classList.remove('is-open');
+                overlay.style.display = 'none';
+            } else {
+                panel.classList.add('is-open');
+                overlay.style.display = 'block';
+            }
+        }
 
         // --- Event Listeners ---
         document.getElementById('extract-btn').addEventListener('click', handleExtract);
@@ -506,9 +621,30 @@
             resetMainPlayer();
             showPage('home-page');
         });
+        
+        document.getElementById('toggle-article-list-btn').addEventListener('click', () => toggleArticlePanel());
+        document.getElementById('close-panel-btn').addEventListener('click', () => toggleArticlePanel());
+        overlay.addEventListener('click', () => toggleArticlePanel());
+        
+        document.getElementById('article-list-container').addEventListener('click', (event) => {
+            const articleItem = event.target.closest('.article-item');
+            if (articleItem && articleItem.dataset.url) {
+                // Go to home page if not already there, to show loading state
+                if (!document.getElementById('home-page').classList.contains('active')) {
+                    document.getElementById('back-to-home-btn').click();
+                }
+                // Set URL and extract
+                document.getElementById('url-input').value = articleItem.dataset.url;
+                toggleArticlePanel(true); // Force close panel
+                handleExtract();
+            }
+        });
 
         // --- Initial Page Load ---
-        showPage('home-page');
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('home-page');
+            fetchAndRenderArticles(); // Pre-fetch the article list on page load
+        });
     </script>
 </body>
 </html>
