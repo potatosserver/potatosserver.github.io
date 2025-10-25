@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Leaflet 中文地圖範例 (高雄)</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+
+  <!-- 鎖定函式庫的穩定版本 -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.21/leaflet-maplibre-gl.js"></script>
+
+  <style>
+    body { margin: 0; padding: 0; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script>
+  // 樣式檔 URL
+  const styleUrl = 'https://tiles.openfreemap.org/styles/liberty';
+  
+  // 使用 async/await 語法來處理非同步的樣式載入和修改
+  async function initializeMap() {
+    // --- 解決方案 1: 載入並修改樣式檔，使其支援中文 ---
+    const response = await fetch(styleUrl);
+    const style = await response.json();
+
+    // 遍歷所有圖層
+    for (const layer of style.layers) {
+      // 檢查是否為有文字標籤的圖層
+      if (layer.layout && layer.layout['text-field']) {
+        // 修改 text-field 規則，優先顯示中文
+        // ['coalesce', A, B, C] -> 嘗試顯示 A，如果沒有就顯示 B，再沒有就顯示 C
+        layer.layout['text-field'] = [
+          'coalesce',
+          ['get', 'name:zh-Hant'], // 優先：繁體中文
+          ['get', 'name:zh'],      // 其次：通用中文
+          ['get', 'name:en'],      // 再次：英文
+          ['get', 'name']        // 最後：預設名稱
+        ];
+      }
+    }
+
+    // --- 初始化地圖 ---
+    const map = L.map('map').setView([22.680947, 120.317491], 19);
+
+    L.maplibreGL({
+      // 直接使用我們修改過的 style 物件，而不是 URL
+      style: style,
+      maplibreGLOptions: {
+        crossOrigin: 'anonymous'
+      }
+    }).addTo(map);
+
+    // --- 解決方案 2: 修正初始載入問題 ---
+    // 在短暫延遲後，強制 Leaflet 重新計算地圖容器大小
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 100); // 100 毫秒的延遲通常足夠
+  }
+
+  // 執行地圖初始化函式
+  initializeMap();
+</script>
+
+</body>
+</html>
