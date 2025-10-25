@@ -15,19 +15,54 @@
   <style>
     body { margin: 0; padding: 0; }
     #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    #style-switcher {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+      background: white;
+      padding: 5px;
+      border-radius: 5px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+    }
+    #style-switcher button {
+      margin: 2px;
+      padding: 5px 10px;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      background-color: #fff;
+    }
+    #style-switcher button:hover {
+      background-color: #f4f4f4;
+    }
   </style>
 </head>
 <body>
 
 <div id="map"></div>
+<!-- 更新此處的按鈕順序以符合圖片 -->
+<div id="style-switcher">
+  <button id="positron">Positron</button>
+  <button id="bright">Bright</button>
+  <button id="liberty">Liberty</button>
+  <button id="3d">3D</button>
+</div>
 
 <script>
-  // 樣式檔 URL
-  const styleUrl = 'https://tiles.openfreemap.org/styles/liberty';
-  
-  // 使用 async/await 語法來處理非同步的樣式載入和修改
-  async function initializeMap() {
-    // --- 解決方案 1: 載入並修改樣式檔，使其支援中文 ---
+  // 樣式檔 URL 列表
+  const styleUrls = {
+    liberty: 'https://tiles.openfreemap.org/styles/liberty',
+    positron: 'https://tiles.openfreemap.org/styles/positron',
+    bright: 'https://tiles.openfreemap.org/styles/bright',
+    '3d': 'https://tiles.openfreemap.org/styles/liberty' // 3D 模式使用 Liberty 風格
+  };
+
+  let map;
+  let maplibreGLLayer;
+
+  // 切換樣式的函式
+  async function switchStyle(styleUrl) {
+    // 載入並修改樣式檔，使其支援中文
     const response = await fetch(styleUrl);
     const style = await response.json();
 
@@ -36,7 +71,6 @@
       // 檢查是否為有文字標籤的圖層
       if (layer.layout && layer.layout['text-field']) {
         // 修改 text-field 規則，優先顯示中文
-        // ['coalesce', A, B, C] -> 嘗試顯示 A，如果沒有就顯示 B，再沒有就顯示 C
         layer.layout['text-field'] = [
           'coalesce',
           ['get', 'name:zh-Hant'], // 優先：繁體中文
@@ -46,17 +80,37 @@
         ];
       }
     }
+    
+    // 如果已有圖層，則設定新的樣式，否則就建立新圖層
+    if (maplibreGLLayer) {
+      maplibreGLLayer.getMaplibreMap().setStyle(style);
+    } else {
+      maplibreGLLayer = L.maplibreGL({
+        style: style,
+        maplibreGLOptions: {
+          crossOrigin: 'anonymous'
+        }
+      }).addTo(map);
+    }
+  }
+  
+  // 重設視角為 2D 俯瞰的函式
+  function resetPitch() {
+    const maplibreMap = maplibreGLLayer.getMaplibreMap();
+    // 檢查目前視角是否傾斜
+    if (maplibreMap.getPitch() !== 0) {
+      // 使用 flyTo 平順地恢復視角
+      maplibreMap.flyTo({ pitch: 0 });
+    }
+  }
 
+  // 使用 async/await 語法來處理非同步的樣式載入和修改
+  async function initializeMap() {
     // --- 初始化地圖 ---
-    const map = L.map('map').setView([22.680947, 120.317491], 19);
+    map = L.map('map').setView([22.680947, 120.317491], 19);
 
-    L.maplibreGL({
-      // 直接使用我們修改過的 style 物件，而不是 URL
-      style: style,
-      maplibreGLOptions: {
-        crossOrigin: 'anonymous'
-      }
-    }).addTo(map);
+    // 初始載入 Liberty 樣式 (預設樣式不變)
+    await switchStyle(styleUrls.liberty);
 
     // --- 解決方案 2: 修正初始載入問題 ---
     // 在短暫延遲後，強制 Leaflet 重新計算地圖容器大小
@@ -67,6 +121,37 @@
 
   // 執行地圖初始化函式
   initializeMap();
+  
+  // --- 為按鈕加上事件監聽器 ---
+
+  // Liberty 按鈕: 切換樣式並恢復視角
+  document.getElementById('liberty').addEventListener('click', () => {
+    switchStyle(styleUrls.liberty);
+    resetPitch();
+  });
+
+  // Positron 按鈕: 切換樣式並恢復視角
+  document.getElementById('positron').addEventListener('click', () => {
+    switchStyle(styleUrls.positron);
+    resetPitch();
+  });
+
+  // Bright 按鈕: 切換樣式並恢復視角
+  document.getElementById('bright').addEventListener('click', () => {
+    switchStyle(styleUrls.bright);
+    resetPitch();
+  });
+
+  // 3D 按鈕: 切換樣式並傾斜視角
+  document.getElementById('3d').addEventListener('click', () => {
+      switchStyle(styleUrls['3d']);
+      const maplibreMap = maplibreGLLayer.getMaplibreMap();
+      // 僅在視角為 0 時才飛至 3D 視角，避免重複觸發
+      if (maplibreMap.getPitch() === 0) {
+        maplibreMap.flyTo({pitch: 60, zoom: 17});
+      }
+  });
+
 </script>
 
 </body>
