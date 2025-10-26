@@ -1,3 +1,5 @@
+--- START OF FILE map.html ---
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -40,8 +42,8 @@
 <body>
 
 <div id="map"></div>
-<!-- 更新此處的按鈕順序以符合圖片 -->
 <div id="style-switcher">
+  <button id="colorful">Colorful</button> <!-- 新增 Colorful 按鈕 -->
   <button id="positron">Positron</button>
   <button id="bright">Bright</button>
   <button id="liberty">Liberty</button>
@@ -51,6 +53,7 @@
 <script>
   // 樣式檔 URL 列表
   const styleUrls = {
+    colorful: 'https://cmok.openstreetmap.org/demo/shortbread/colorful.json', // 圖磚來源: cmok.openstreetmap.org
     liberty: 'https://tiles.openfreemap.org/styles/liberty',
     positron: 'https://tiles.openfreemap.org/styles/positron',
     bright: 'https://tiles.openfreemap.org/styles/bright',
@@ -62,15 +65,51 @@
 
   // 切換樣式的函式
   async function switchStyle(styleUrl) {
-    // 載入並修改樣式檔，使其支援中文
     const response = await fetch(styleUrl);
     const style = await response.json();
 
-    // 遍歷所有圖層
+    // 取得樣式檔的來源網域，用於解析相對路徑
+    // 例如: "https://cmok.openstreetmap.org"
+    const styleOrigin = new URL(styleUrl).origin; 
+
+    // 修正 glyphs 的相對路徑
+    if (style.glyphs && typeof style.glyphs === 'string' && style.glyphs.startsWith('/')) {
+      style.glyphs = styleOrigin + style.glyphs;
+    }
+
+    // 修正 sprite 的相對路徑（考慮到 sprite 可能是物件陣列或單一字串）
+    if (Array.isArray(style.sprite)) {
+      style.sprite = style.sprite.map(s => {
+        if (s.url && typeof s.url === 'string' && s.url.startsWith('/')) {
+          return { ...s, url: styleOrigin + s.url };
+        }
+        return s;
+      });
+    } else if (style.sprite && typeof style.sprite === 'string' && style.sprite.startsWith('/')) {
+      style.sprite = styleOrigin + style.sprite;
+    }
+
+    // *** 新增的修正：處理 sources 中的 tiles 絕對路徑 ***
+    if (style.sources) {
+      for (const sourceId in style.sources) {
+        const source = style.sources[sourceId];
+        // 檢查是否為 vector 或 raster 類型的 source，且有 tiles 屬性
+        if ((source.type === 'vector' || source.type === 'raster') && source.tiles && Array.isArray(source.tiles)) {
+          source.tiles = source.tiles.map(tileUrl => {
+            if (typeof tileUrl === 'string' && tileUrl.startsWith('/')) {
+              // 將相對路徑轉換為絕對路徑
+              return styleOrigin + tileUrl;
+            }
+            return tileUrl;
+          });
+        }
+      }
+    }
+    // *** 結束新增的修正 ***
+
+    // 遍歷所有圖層，修改 text-field 規則，使其優先顯示中文
     for (const layer of style.layers) {
-      // 檢查是否為有文字標籤的圖層
       if (layer.layout && layer.layout['text-field']) {
-        // 修改 text-field 規則，優先顯示中文
         layer.layout['text-field'] = [
           'coalesce',
           ['get', 'name:zh-Hant'], // 優先：繁體中文
@@ -109,8 +148,8 @@
     // --- 初始化地圖 ---
     map = L.map('map').setView([22.680947, 120.317491], 19);
 
-    // 初始載入 Liberty 樣式 (預設樣式不變)
-    await switchStyle(styleUrls.liberty);
+    // 初始載入 Colorful 樣式 (已修改為預設載入)
+    await switchStyle(styleUrls.colorful);
 
     // --- 解決方案 2: 修正初始載入問題 ---
     // 在短暫延遲後，強制 Leaflet 重新計算地圖容器大小
@@ -124,9 +163,9 @@
   
   // --- 為按鈕加上事件監聽器 ---
 
-  // Liberty 按鈕: 切換樣式並恢復視角
-  document.getElementById('liberty').addEventListener('click', () => {
-    switchStyle(styleUrls.liberty);
+  // Colorful 按鈕: 切換樣式並恢復視角
+  document.getElementById('colorful').addEventListener('click', () => {
+    switchStyle(styleUrls.colorful);
     resetPitch();
   });
 
@@ -139,6 +178,12 @@
   // Bright 按鈕: 切換樣式並恢復視角
   document.getElementById('bright').addEventListener('click', () => {
     switchStyle(styleUrls.bright);
+    resetPitch();
+  });
+
+  // Liberty 按鈕: 切換樣式並恢復視角
+  document.getElementById('liberty').addEventListener('click', () => {
+    switchStyle(styleUrls.liberty);
     resetPitch();
   });
 
