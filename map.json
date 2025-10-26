@@ -9,7 +9,7 @@
             ],
             "type": "raster"
         },
-        "openmaptiles": {  // 這裡的鍵名保持為 "openmaptiles"
+        "openmaptiles": { 
           "attribution": "© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
           "tiles": [
             "https://cmok.openstreetmap.org/shortbread_v1/{z}/{x}/{y}.mvt"
