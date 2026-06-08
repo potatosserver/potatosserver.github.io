@@ -402,27 +402,37 @@
             }
         }
 
-        // 雲端資料同步 Commit (封裝獲取最新 SHA 防止寫入衝突)
+        // 修正後的雲端資料同步 Commit 函式 (防止 alert 阻塞造成的黑畫面)
         async function syncToGitHub(actionText) {
             const preloader = document.getElementById('preloader');
-            if (preloader) preloader.classList.remove('hidden');
+            if (preloader) preloader.classList.remove('hidden'); // 顯示動畫
 
             try {
                 // 1. 強制向 GitHub 讀取最新版本取得正確 SHA 值
                 const latest = await fetchDatabase();
                 dbSha = latest.sha;
 
-                // 2. 呼叫 js/main.js 的 saveDatabase 寫入資料
+                // 2. 進行儲存
                 const res = await saveDatabase(dbCache, dbSha);
                 dbSha = res.content.sha; // 更新本地 SHA 變數
                 
-                alert(`${actionText}成功！已透過 API 自動 Commit 更新至 GitHub Pages。`);
-                renderAdminAnnouncements();
+                // 先關閉預載動畫，讓瀏覽器收起黑屏
+                if (preloader) preloader.classList.add('hidden');
+                
+                // 延遲 50 毫秒再彈出 alert，防止阻塞渲染執行緒
+                setTimeout(() => {
+                    alert(`${actionText}成功！已透過 API 自動 Commit 更新至 GitHub Pages。`);
+                    renderAdminAnnouncements();
+                }, 50);
+
             } catch (err) {
                 console.error(err);
-                alert('與 GitHub 同步更新時發生錯誤：' + err.message);
-            } finally {
+                // 發生錯誤時同樣先收起黑屏
                 if (preloader) preloader.classList.add('hidden');
+                
+                setTimeout(() => {
+                    alert('與 GitHub 同步更新時發生錯誤：' + err.message);
+                }, 50);
             }
         }
     </script>
