@@ -24,13 +24,13 @@
     <main class="full-width-content">
         <!-- 
             M3 卡片縮減頂部內距 (1rem)
-            新增：min-height (450px) 避免短文字空洞
-            新增：margin-bottom (3rem) 確保底部永遠留有美觀的卡片空隙
+            min-height (450px) 避免短文字空洞
+            margin-bottom (3rem) 確保底部永遠留有美觀的卡片空隙
         -->
         <div class="card admin-view-fade" style="padding: 1rem 1.75rem 1.75rem 1.75rem; margin-top: 1rem; min-height: 450px; margin-bottom: 3rem;">
             
             <!-- 返回首頁連結 (高亮色固定，左側完全無縫隙對齊) -->
-            <div style="margin-bottom: 0.75rem; border-bottom: 1px solid var(--md-sys-color-outline); padding-bottom: 0.5rem;">
+            <div style="margin-bottom: 1rem; border-bottom: 1px solid var(--md-sys-color-outline); padding-bottom: 0.5rem; text-align: left;">
                 <a href="index.html" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--md-sys-color-primary); font-weight: 500; font-size: 0.95rem; padding: 0.25rem 0; background: transparent; border: none; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
                     <span class="material-symbols-outlined">arrow_back</span>
                     <span>返回首頁</span>
@@ -38,7 +38,7 @@
             </div>
 
             <!-- 公告主體內容 -->
-            <div id="announcement-detail-content">
+            <div id="announcement-detail-content" style="text-align: left;">
                 <p style="color: var(--md-sys-color-text-muted);">正在讀取公告詳細內容...</p>
             </div>
             
@@ -70,8 +70,8 @@
 
             if (!annId) {
                 container.innerHTML = `
-                    <h2 style="border-bottom:none; margin-top:0;"><span class="material-symbols-outlined" style="color:var(--md-sys-color-primary);">error</span><span>未指定公告 ID</span></h2>
-                    <p>請返回首頁重試。</p>
+                    <h2 style="border-bottom:none; margin-top:0; text-align:left;"><span class="material-symbols-outlined" style="color:var(--md-sys-color-primary);">error</span><span>未指定公告 ID</span></h2>
+                    <p style="text-align:left;">請返回首頁重試。</p>
                 `;
                 return;
             }
@@ -83,22 +83,22 @@
 
                 if (!ann) {
                     container.innerHTML = `
-                        <h2 style="border-bottom:none; margin-top:0;"><span class="material-symbols-outlined" style="color:var(--md-sys-color-primary);">find_in_page</span><span>找不到該公告內容</span></h2>
-                        <p>該公告可能已被管理員移除。</p>
+                        <h2 style="border-bottom:none; margin-top:0; text-align:left;"><span class="material-symbols-outlined" style="color:var(--md-sys-color-primary);">find_in_page</span><span>找不到該公告內容</span></h2>
+                        <p style="text-align:left;">該公告可能已被管理員移除。</p>
                     `;
                     return;
                 }
 
-                // 成功尋獲，渲染標題、日期、詳細內容 (標題與內文皆已開通高亮解析)
+                // 成功尋獲，強制加入 text-align: left 解決置中跑版問題
                 container.innerHTML = `
-                    <div style="display: flex; gap: 0.5rem; align-items: center; color: var(--md-sys-color-primary); margin-bottom: 0.5rem; font-size: 0.95rem;">
+                    <div style="display: flex; gap: 0.5rem; align-items: center; color: var(--md-sys-color-primary); margin-bottom: 0.5rem; font-size: 0.95rem; text-align: left;">
                         <span class="material-symbols-outlined" style="font-size: 1.25em;">calendar_month</span>
                         <span>發布日期：${ann.date}</span>
                     </div>
-                    <h1 style="color: var(--md-sys-color-text-main); margin-bottom: 1.25rem; border-bottom: 2px solid var(--md-sys-color-primary); padding-bottom: 0.75rem; line-height: 1.4; font-size: 2rem; letter-spacing: -0.02em;">
+                    <h1 style="color: var(--md-sys-color-text-main); margin-bottom: 1.25rem; border-bottom: 2px solid var(--md-sys-color-primary); padding-bottom: 0.75rem; line-height: 1.4; font-size: 2rem; letter-spacing: -0.02em; text-align: left;">
                         ${parseHighlights(ann.title)}
                     </h1>
-                    <div style="font-size: 1.05rem; line-height: 1.8; color: var(--md-sys-color-text-main); white-space: pre-wrap; letter-spacing: 0.02em;">
+                    <div style="font-size: 1.05rem; line-height: 1.8; color: var(--md-sys-color-text-main); white-space: pre-wrap; letter-spacing: 0.02em; text-align: left;">
                         ${parseHighlights(ann.content)}
                     </div>
                 `;
@@ -108,8 +108,8 @@
             } catch (error) {
                 console.error(error);
                 container.innerHTML = `
-                    <h2 style="border-bottom:none; margin-top:0;"><span class="material-symbols-outlined" style="color:#ef4444;">wifi_off</span><span>讀取失敗</span></h2>
-                    <p>無法與 GitHub 伺服器取得連線，請檢查網路設定。</p>
+                    <h2 style="border-bottom:none; margin-top:0; text-align:left;"><span class="material-symbols-outlined" style="color:#ef4444;">wifi_off</span><span>讀取失敗</span></h2>
+                    <p style="text-align:left;">無法與 GitHub 伺服器取得連線，請檢查網路設定。</p>
                 `;
             }
         }
