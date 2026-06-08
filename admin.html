@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理後台</title>
+    <title>管理後台 | Andrew</title>
     <!-- 引入 Google Material Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="style.css">
@@ -46,27 +46,27 @@
         <!-- 右側主要內容區域 -->
         <main class="main-content">
             
-            <!-- 2.1 連線設定面板 (M3 雙欄並排美化版) -->
+            <!-- 2.1 連線設定面板 (M3 雙欄等高完美對齊版) -->
             <section id="panel-settings" class="admin-panel-section">
                 <h2 style="margin-top: 0; margin-bottom: 2rem; border-bottom: 1px solid var(--md-sys-color-outline); padding-bottom: 1rem;">
                     <span class="material-symbols-outlined" style="color: var(--md-sys-color-primary); margin-right: 8px;">cloud_sync</span>
                     <span>系統狀態與設定</span>
                 </h2>
                 
-                <div class="portfolio-grid" style="align-items: start;">
-                    <!-- A. 左欄：GitHub 管理員個人名片卡 (動態自 API 下載) -->
-                    <div class="card" style="padding: 2.5rem 2rem; align-items: center; text-align: center;">
+                <!-- 移除了 align-items: start，使其預設為 stretch 進行左右等高對齊 -->
+                <div class="portfolio-grid">
+                    
+                    <!-- A. 左欄：GitHub 管理員個人名片卡 (移除了個人自介) -->
+                    <div class="card" style="padding: 2.5rem 2rem; align-items: center; text-align: center; justify-content: center; height: 100%;">
                         <!-- 使用者大頭貼 -->
                         <img id="profile-avatar" src="" alt="頭像" style="width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--md-sys-color-primary); margin-bottom: 1.25rem; background-color: rgba(255,255,255,0.05); object-fit: cover;">
                         <!-- 使用者顯示名稱 -->
                         <h3 id="profile-name" style="margin-bottom: 0.25rem; font-size: 1.4rem;">載入中...</h3>
                         <!-- 使用者 GitHub 使用者名稱 -->
-                        <a id="profile-login" href="#" target="_blank" style="color: var(--md-sys-color-primary); text-decoration: none; font-size: 0.95rem; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 1rem;">
+                        <a id="profile-login" href="#" target="_blank" style="color: var(--md-sys-color-primary); text-decoration: none; font-size: 0.95rem; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 1.75rem;">
                             <span>@username</span>
                             <span class="material-symbols-outlined" style="font-size: 14px;">open_in_new</span>
                         </a>
-                        <!-- 個人簡介 (Bio) -->
-                        <p id="profile-bio" style="font-size: 0.85rem; color: var(--md-sys-color-text-muted); line-height: 1.5; margin-bottom: 1.75rem; max-width: 250px;">載入個人自介中...</p>
                         
                         <!-- 綠色驗證合格徽章 -->
                         <span class="m3-badge-pinned" style="background-color: rgba(74, 222, 128, 0.12); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.2); box-shadow: none;">
@@ -75,11 +75,11 @@
                         </span>
                     </div>
 
-                    <!-- B. 右欄：儲存庫連線資訊與操作 -->
-                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <!-- B. 右欄：儲存庫連線資訊與操作 (設定 height: 100% 以完美對齊左欄) -->
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem; height: 100%;">
                         
-                        <!-- 雲端設定詳情卡片 -->
-                        <div class="card" style="padding: 1.75rem 2rem;">
+                        <!-- 雲端設定詳情卡片 ( flex-grow: 1 彈性膨脹撐滿空間 ) -->
+                        <div class="card" style="padding: 1.75rem 2rem; flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
                             <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
                                 <span class="material-symbols-outlined">database</span>
                                 <span>同步儲存庫細節</span>
@@ -479,6 +479,7 @@
             const btn = document.getElementById('btn-github-login');
             if (btn) {
                 btn.addEventListener('click', () => {
+                    // 動態使用來自 config.json 的 GITHUB_CLIENT_ID
                     const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=repo`;
                     window.location.href = githubAuthUrl;
                 });
@@ -487,6 +488,7 @@
 
         async function exchangeCodeForToken(code) {
             try {
+                // 動態使用來自 config.json 的 CLOUDFLARE_WORKER_URL
                 const response = await fetch(CLOUDFLARE_WORKER_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -592,7 +594,7 @@
         }
 
         // ===================================================
-        // 新增：安全獲取 GitHub 管理員帳號個人頭像與資料
+        // 新增：安全獲取 GitHub 管理員帳號個人頭像與資料 (已移除個人自介讀取)
         // ===================================================
         async function loadGitHubUserProfile() {
             const token = localStorage.getItem('gh_token');
@@ -613,7 +615,6 @@
                     document.getElementById('profile-name').innerText = userData.name || userData.login;
                     document.getElementById('profile-login').href = userData.html_url;
                     document.getElementById('profile-login').querySelector('span').innerText = `@${userData.login}`;
-                    document.getElementById('profile-bio').innerText = userData.bio || '尚未在 GitHub 上填寫個人簡介。';
                     
                     // 動態更新右側儲存庫連線資訊
                     document.getElementById('repo-info-owner').innerText = REPO_OWNER;
@@ -994,6 +995,7 @@
                                 <span>置頂</span>
                             </span>
                         ` : ''}
+                        <!-- 【已開通】：後台列表標題高亮 -->
                         <strong style="color: var(--md-sys-color-text-main);">${parseHighlights(ann.title)}</strong>
                     </div>
                     <div style="display: flex; gap: 0.5rem;">
@@ -1006,7 +1008,7 @@
 
         // 點擊編輯公告：安全防禦，強制自動取消重置現有編輯狀態後開啟
         function editAnnouncement(id) {
-            resetAnnForm(); // 安全防禦：先取消重置現有編輯狀態
+            resetAnnForm(); // 安全防禦
             const ann = dbCache.announcements.find(item => item.id === id);
             if (ann) {
                 document.getElementById('ann-id').value = ann.id;
