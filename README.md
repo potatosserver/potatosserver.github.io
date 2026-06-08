@@ -30,4 +30,4 @@
 
 如果您需要查看、修改或自行部署 Cloudflare Worker 後端，請參考以下目錄：
 
-👉 [點此查看：Cloudflare Worker 原始碼 (worker/worker.js)](worker/)
+👉 [點此查看：Cloudflare Worker 原始碼 (worker/worker.js)](worker/worker.js)
