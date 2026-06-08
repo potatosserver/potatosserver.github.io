@@ -164,7 +164,7 @@
             console.log("DOM 解析完畢，開始載入導覽列與進行登入檢查。");
             await loadNavbar();
             await checkAuth();
-            bindFormEvents(); // 將表單事件安全地在 DOM 完成後綁定
+            bindFormEvents(); 
         });
 
         // 檢查驗證狀態
@@ -250,7 +250,8 @@
 
         // 側邊欄切換面板與按鈕點擊控制
         function bindSidebarEvents() {
-            const buttons = document.querySelectorAll('.sidebar-btn');
+            // 【核心修正】：限制僅選取側邊欄容器內部的按鈕，防止誤選表單按鈕
+            const buttons = document.querySelectorAll('#sidebar-container .sidebar-btn');
             console.log("已成功獲取並綁定側邊欄按鈕事件。數量：", buttons.length);
             
             buttons.forEach(btn => {
