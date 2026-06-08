@@ -8,24 +8,64 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="preloader">
+        <svg class="loader-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <circle class="loader-circle" cx="60" cy="60" r="50" fill="none"/>
+        </svg>
+    </div>
+
     <header id="navbar-container" class="navbar"></header>
 
     <main class="full-width-content">
         <section>
             <h2><span class="material-symbols-outlined">person</span>關於我</h2>
-            <p>
-                目前就讀於高雄新莊高中三年級。雙子座的個性驅使我對許多領域都抱持著強烈的好奇心，尤其是在軟體開發的世界裡，總有挖掘不完的新鮮事。
-            </p>
-            <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem;"><span class="material-symbols-outlined">psychology</span>我的技能</h3>
-            <ul style="padding-left: 1.5rem; color: var(--text-secondary-color);">
-                <li><strong>語言:</strong> Python, C++, JavaScript</li>
-                <li><strong>領域:</strong> 前端開發, Discord Bot 製作, 資料串接</li>
-                <li><strong>興趣:</strong> 探索新的 API、打造實用的小工具、自動化處理生活中的瑣事</li>
-            </ul>
+            <p id="about-bio">讀取中...</p>
+            
+            <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">
+                <span class="material-symbols-outlined" id="skills-icon">psychology</span>
+                <span id="skills-section-title">我的技能</span>
+            </h3>
+            <ul style="padding-left: 1.5rem; color: var(--md-sys-color-text-muted);" id="dynamic-skills-list"></ul>
         </section>
     </main>
 
     <script src="js/main.js"></script>
-    <script>document.addEventListener('DOMContentLoaded', loadNavbar);</script>
+    <script>
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                setTimeout(() => preloader.classList.add('hidden'), 200);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadNavbar();
+            await loadAboutData();
+        });
+
+        async function loadAboutData() {
+            try {
+                const res = await fetchDatabase();
+                const about = res.data.profile.about;
+
+                if (about) {
+                    document.getElementById('about-bio').innerText = about.bio;
+                    document.getElementById('skills-section-title').innerText = about.skills_title;
+                    document.getElementById('skills-icon').innerText = about.skills_icon || "psychology";
+
+                    const skillsList = about.skills_list || [];
+                    const listContainer = document.getElementById('dynamic-skills-list');
+                    listContainer.innerHTML = skillsList.map(skill => `
+                        <li style="margin-bottom:0.5rem;">
+                            <strong>${skill.label}：</strong>
+                            <span>${skill.value}</span>
+                        </li>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error("無法載入個人檔案：", err);
+            }
+        }
+    </script>
 </body>
 </html>

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>管理後台 | Andrew</title>
+    <!-- 引入 Google Material Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="style.css">
 </head>
@@ -15,11 +16,10 @@
         </svg>
     </div>
 
+    <!-- 頂部共用導覽列 -->
     <header id="navbar-container" class="navbar"></header>
 
-    <!-- ===================================================
-         1. 未登入狀態
-         =================================================== -->
+    <!-- 1. 未登入狀態 -->
     <div id="login-view" class="full-width-content" style="display: none; max-width: 480px; text-align: center; margin-top: 15vh;">
         <div class="card" style="padding: 3rem 2rem;">
             <span class="material-symbols-outlined" style="font-size: 4rem; color: var(--md-sys-color-primary); margin-bottom: 1rem;">lock</span>
@@ -32,9 +32,7 @@
         </div>
     </div>
 
-    <!-- ===================================================
-         2. 已登入狀態
-         =================================================== -->
+    <!-- 2. 已登入狀態 -->
     <div id="admin-view" class="layout-container" style="display: none;">
         
         <div id="sidebar-container"></div>
@@ -64,17 +62,118 @@
                 </div>
             </section>
 
-            <!-- 2.2 公告管理面板 -->
-            <section id="panel-announcements" class="admin-panel-section" style="display: none;">
-                <h2 style="margin-top: 0;">
-                    <span class="material-symbols-outlined" style="color: var(--md-sys-color-primary);">campaign</span>
-                    <span>公告管理</span>
-                </h2>
+            <!-- 2.2 【新增】個人與首頁設定面板 -->
+            <section id="panel-profile" class="admin-panel-section" style="display: none;">
+                <div class="admin-panel-header">
+                    <h2>
+                        <span class="material-symbols-outlined" style="color: var(--md-sys-color-primary); margin-right: 8px;">person</span>
+                        <span>個人與品牌設定</span>
+                    </h2>
+                </div>
                 
-                <div class="card" style="padding: 2rem; margin-bottom: 2rem;">
+                <form id="form-profile">
+                    <!-- A. 主題視覺設定 -->
+                    <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
+                        <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1rem;">🎨 網頁主題視覺</h3>
+                        <div style="display: flex; align-items: center; gap: 1.5rem;">
+                            <input type="color" id="profile-color" class="m3-text-field" style="width: 80px; height: 50px; padding: 4px; cursor: pointer;">
+                            <div>
+                                <strong>網站主題高亮色</strong>
+                                <p style="margin: 0; font-size: 0.85rem; color: var(--md-sys-color-text-muted);">這會即時修改全站的按鈕、置頂標籤與強調文字外觀色調。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- B. 首頁文案設定 -->
+                    <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
+                        <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1.25rem;">🏠 首頁文案控制</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.2rem;">
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.5rem; font-weight: bold;">主標題 (H1)</label>
+                                <input type="text" id="home-input-title" class="m3-text-field" required>
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.5rem; font-weight: bold;">副標題</label>
+                                <input type="text" id="home-input-subtitle" class="m3-text-field" required>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <label style="margin-bottom: 0.5rem; font-weight: bold;">介紹內文 (支援高亮標記 {h}字詞{/h} )</label>
+                            <textarea id="home-input-desc" rows="4" class="m3-text-field" required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- C. 關於我文案與技能 -->
+                    <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
+                        <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1.25rem;">👤 關於我文案控制</h3>
+                        <div style="display: flex; flex-direction: column; margin-bottom: 1.2rem;">
+                            <label style="margin-bottom: 0.5rem; font-weight: bold;">個人簡介</label>
+                            <textarea id="about-input-bio" rows="4" class="m3-text-field" required></textarea>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.5rem; font-weight: bold;">技能區塊標題</label>
+                                <input type="text" id="about-input-skills-title" class="m3-text-field" required>
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.5rem; font-weight: bold;">技能標題圖示</label>
+                                <select id="about-input-skills-icon" class="m3-text-field">
+                                    <option value="psychology">🧠 心理學/技能 (psychology)</option>
+                                    <option value="code">💻 程式開發 (code)</option>
+                                    <option value="school">🎓 學校/教育 (school)</option>
+                                    <option value="badge">🎖️ 徽章榮譽 (badge)</option>
+                                    <option value="person">👤 個人肖像 (person)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 三組預定義技能項目 (穩定性最高、最容易編輯) -->
+                        <div style="border-top: 1px solid var(--md-sys-color-outline); padding-top: 1.2rem;">
+                            <h4 style="margin-bottom: 1rem;">我的技能列表 (三組細項)</h4>
+                            
+                            <!-- 技能 1 -->
+                            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 0.75rem;">
+                                <input type="text" id="skill-lbl-0" class="m3-text-field" placeholder="標籤：例如 語言" required>
+                                <input type="text" id="skill-val-0" class="m3-text-field" placeholder="內容：例如 Python, C++" required>
+                            </div>
+                            <!-- 技能 2 -->
+                            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 0.75rem;">
+                                <input type="text" id="skill-lbl-1" class="m3-text-field" placeholder="標籤：例如 領域" required>
+                                <input type="text" id="skill-val-1" class="m3-text-field" placeholder="內容：例如 前端開發" required>
+                            </div>
+                            <!-- 技能 3 -->
+                            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 0.75rem;">
+                                <input type="text" id="skill-lbl-2" class="m3-text-field" placeholder="標籤：例如 興趣" required>
+                                <input type="text" id="skill-val-2" class="m3-text-field" placeholder="內容：自動化生活瑣事" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="sidebar-btn active" style="width: auto; padding: 0.9rem 2rem; margin-bottom: 3rem;">
+                        <span class="material-symbols-outlined">save</span>
+                        <span>儲存品牌與視覺設定</span>
+                    </button>
+                </form>
+            </section>
+
+            <!-- 2.3 公告管理面板 -->
+            <section id="panel-announcements" class="admin-panel-section" style="display: none;">
+                <div class="admin-panel-header">
+                    <h2>
+                        <span class="material-symbols-outlined" style="color: var(--md-sys-color-primary); margin-right: 8px;">campaign</span>
+                        <span>公告管理</span>
+                    </h2>
+                    <button id="btn-add-ann-trigger" class="sidebar-btn active" style="width: auto; padding: 0.6rem 1.25rem;">
+                        <span class="material-symbols-outlined">add_box</span>
+                        <span>新增公告</span>
+                    </button>
+                </div>
+                
+                <div id="ann-form-view" class="card admin-view-fade" style="padding: 2rem; margin-bottom: 2rem; display: none;">
                     <h3 id="form-ann-title" style="margin-bottom: 1.5rem; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.5rem;">
                         <span class="material-symbols-outlined">add_box</span>
-                        <span>新增系統公告</span>
+                        <span>建立公告內容</span>
                     </h3>
                     
                     <form id="form-announcement">
@@ -83,32 +182,34 @@
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.2rem;">
                             <div style="display: flex; flex-direction: column;">
                                 <label style="margin-bottom: 0.5rem; font-weight: bold;">公告標題</label>
-                                <input type="text" id="ann-input-title" required>
+                                <input type="text" id="ann-input-title" class="m3-text-field">
                             </div>
                             <div style="display: flex; flex-direction: column;">
                                 <label style="margin-bottom: 0.5rem; font-weight: bold;">發布日期</label>
-                                <input type="date" id="ann-input-date" required>
+                                <input type="date" id="ann-input-date" class="m3-text-field">
                             </div>
                         </div>
 
                         <div style="display: flex; flex-direction: column; margin-bottom: 1.2rem;">
                             <label style="margin-bottom: 0.5rem; font-weight: bold;">詳細內容 (支援換行)</label>
-                            <textarea id="ann-input-content" rows="6" required></textarea>
+                            <textarea id="ann-input-content" rows="6" class="m3-text-field"></textarea>
                         </div>
 
-                        <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <input type="checkbox" id="ann-input-pinned" style="width: 18px; height: 18px; cursor: pointer;">
-                            <label for="ann-input-pinned" style="font-weight: bold; cursor: pointer; color: var(--md-sys-color-primary);">將此公告置頂</label>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label class="m3-checkbox-container">
+                                <input type="checkbox" id="ann-input-pinned" class="m3-checkbox-input">
+                                <span>將此公告置頂</span>
+                            </label>
                         </div>
 
                         <div style="display: flex; gap: 1rem;">
                             <button type="submit" id="btn-ann-submit" class="sidebar-btn active" style="width: auto; padding: 0.75rem 1.5rem;">儲存公告</button>
-                            <button type="button" id="btn-ann-cancel" class="sidebar-btn" style="width: auto; padding: 0.75rem 1.5rem; display: none; background: #64748b;">取消編輯</button>
+                            <button type="button" id="btn-ann-cancel" class="sidebar-btn" style="width: auto; padding: 0.75rem 1.5rem; background: #64748b;">取消編輯</button>
                         </div>
                     </form>
                 </div>
 
-                <div class="card" style="padding: 2rem;">
+                <div id="ann-list-view" class="card admin-view-fade" style="padding: 2rem;">
                     <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
                         <span class="material-symbols-outlined">list_alt</span>
                         <span>現有公告列表</span>
@@ -119,17 +220,23 @@
                 </div>
             </section>
 
-            <!-- 2.3 作品管理面板 -->
+            <!-- 2.4 作品管理面板 -->
             <section id="panel-projects" class="admin-panel-section" style="display: none;">
-                <h2 style="margin-top: 0;">
-                    <span class="material-symbols-outlined" style="color: var(--md-sys-color-primary);">folder</span>
-                    <span>作品管理</span>
-                </h2>
+                <div class="admin-panel-header">
+                    <h2>
+                        <span class="material-symbols-outlined" style="color: var(--md-sys-color-primary); margin-right: 8px;">folder</span>
+                        <span>作品管理</span>
+                    </h2>
+                    <button id="btn-add-proj-trigger" class="sidebar-btn active" style="width: auto; padding: 0.6rem 1.25rem;">
+                        <span class="material-symbols-outlined">create_new_folder</span>
+                        <span>新增專案</span>
+                    </button>
+                </div>
                 
-                <div class="card" style="padding: 2rem; margin-bottom: 2rem;">
+                <div id="proj-form-view" class="card admin-view-fade" style="padding: 2rem; margin-bottom: 2rem; display: none;">
                     <h3 id="form-proj-title" style="margin-bottom: 1.5rem; color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.5rem;">
                         <span class="material-symbols-outlined">create_new_folder</span>
-                        <span>新增作品專案</span>
+                        <span>建立作品專案</span>
                     </h3>
                     
                     <form id="form-project">
@@ -138,27 +245,27 @@
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.2rem;">
                             <div style="display: flex; flex-direction: column;">
                                 <label style="margin-bottom: 0.5rem; font-weight: bold;">專案名稱 (作品名稱)</label>
-                                <input type="text" id="proj-input-title" required>
+                                <input type="text" id="proj-input-title" class="m3-text-field">
                             </div>
                             <div style="display: flex; flex-direction: column;">
                                 <label style="margin-bottom: 0.5rem; font-weight: bold;">GitHub 專案連結 (URL)</label>
-                                <input type="url" id="proj-input-url" required>
+                                <input type="url" id="proj-input-url" class="m3-text-field">
                             </div>
                         </div>
 
                         <div style="display: flex; flex-direction: column; margin-bottom: 1.5rem;">
                             <label style="margin-bottom: 0.5rem; font-weight: bold;">作品詳細描述</label>
-                            <textarea id="proj-input-desc" rows="4" required></textarea>
+                            <textarea id="proj-input-desc" rows="4" class="m3-text-field"></textarea>
                         </div>
 
                         <div style="display: flex; gap: 1rem;">
                             <button type="submit" id="btn-proj-submit" class="sidebar-btn active" style="width: auto; padding: 0.75rem 1.5rem;">儲存作品</button>
-                            <button type="button" id="btn-proj-cancel" class="sidebar-btn" style="width: auto; padding: 0.75rem 1.5rem; display: none; background: #64748b;">取消編輯</button>
+                            <button type="button" id="btn-proj-cancel" class="sidebar-btn" style="width: auto; padding: 0.75rem 1.5rem; background: #64748b;">取消編輯</button>
                         </div>
                     </form>
                 </div>
 
-                <div class="card" style="padding: 2rem;">
+                <div id="proj-list-view" class="card admin-view-fade" style="padding: 2rem;">
                     <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
                         <span class="material-symbols-outlined">folder_open</span>
                         <span>現有專案列表</span>
@@ -172,16 +279,15 @@
         </main>
     </div>
 
+    <!-- 載入共用 JavaScript 邏輯 -->
     <script src="js/main.js"></script>
     <script>
         const GITHUB_CLIENT_ID = 'Ov23limDuIK15ITZ4Tuo'; 
         const WORKER_URL = 'https://github-oauth-handler.potatosserver.workers.dev/'; 
         const REDIRECT_URI = window.location.origin + window.location.pathname;
 
-        let dbCache = { announcements: [], projects: [] };
+        let dbCache = { profile: { theme: {}, home: {}, about: {} }, announcements: [], projects: [] };
         let dbSha = '';
-
-        console.log("後台指令稿載入成功，準備初始化。");
 
         window.addEventListener('load', () => {
             const preloader = document.getElementById('preloader');
@@ -191,11 +297,12 @@
         });
 
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log("DOM 解析完畢，開始載入導覽列與進行登入檢查。");
             await loadNavbar();
             await checkAuth();
             bindFormEvents(); 
             bindProjectFormEvents(); 
+            bindUIViewEvents(); 
+            bindProfileFormEvents(); // 綁定個人設定提交
         });
 
         async function checkAuth() {
@@ -204,16 +311,13 @@
             const code = urlParams.get('code');
 
             if (token) {
-                console.log("驗證狀態：已登入。");
                 document.getElementById('admin-view').style.display = 'flex';
                 await loadSidebar();
             } else if (code) {
-                console.log("驗證狀態：偵測到 OAuth 臨時 Code，開始交換 Token。");
                 const preloader = document.getElementById('preloader');
                 if (preloader) preloader.classList.remove('hidden');
                 await exchangeCodeForToken(code);
             } else {
-                console.log("驗證狀態：未登入。顯示安全登入卡片。");
                 document.getElementById('login-view').style.display = 'block';
                 bindLoginEvent();
             }
@@ -223,7 +327,6 @@
             const btn = document.getElementById('btn-github-login');
             if (btn) {
                 btn.addEventListener('click', () => {
-                    console.log("重導向至 GitHub OAuth 授權頁面...");
                     const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=repo`;
                     window.location.href = githubAuthUrl;
                 });
@@ -232,7 +335,6 @@
 
         async function exchangeCodeForToken(code) {
             try {
-                console.log("向 Cloudflare Worker 發送交換請求...");
                 const response = await fetch(WORKER_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -242,27 +344,22 @@
                 const data = await response.json();
 
                 if (data.access_token) {
-                    console.log("Token 交換成功！安全寫入 localStorage。");
                     localStorage.setItem('gh_token', data.access_token);
                     window.history.replaceState({}, document.title, window.location.pathname);
                     location.reload();
                 } else {
-                    console.error("交換 Token 失敗：", data);
-                    alert('登入失敗，無法交換安全金鑰。原因：' + (data.error_description || data.error || '未定義錯誤。'));
+                    alert('登入失敗。原因：' + (data.error_description || '未知錯誤。'));
                     window.history.replaceState({}, document.title, window.location.pathname);
                     location.reload();
                 }
             } catch (error) {
-                console.error('與驗證端通訊錯誤：', error);
+                console.error(error);
                 alert('伺服器連線異常。');
-                window.history.replaceState({}, document.title, window.location.pathname);
-                location.reload();
             }
         }
 
         async function loadSidebar() {
             try {
-                console.log("開始動態載入側邊欄組件...");
                 const response = await fetch('components/sidebar.html');
                 if (response.ok) {
                     const html = await response.text();
@@ -277,7 +374,6 @@
 
         function bindSidebarEvents() {
             const buttons = document.querySelectorAll('#sidebar-container .sidebar-btn');
-            console.log("已成功獲取並綁定側邊欄按鈕事件。數量：", buttons.length);
             
             buttons.forEach(btn => {
                 btn.addEventListener('click', function(e) {
@@ -287,11 +383,14 @@
                     this.classList.add('active');
 
                     const btnId = this.id;
-                    console.log(`切換管理面板：${btnId}`);
                     hideAllPanels();
+                    resetAllViewsToDefault();
 
                     if (btnId === 'btn-menu-settings') {
                         document.getElementById('panel-settings').style.display = 'block';
+                    } else if (btnId === 'btn-menu-profile') {
+                        document.getElementById('panel-profile').style.display = 'block';
+                        refreshProfile(); // 下載個人檔案資料
                     } else if (btnId === 'btn-menu-projects') {
                         document.getElementById('panel-projects').style.display = 'block';
                         refreshProjects(); 
@@ -322,6 +421,104 @@
             }
         }
 
+        function bindUIViewEvents() {
+            document.getElementById('btn-add-ann-trigger').addEventListener('click', () => {
+                document.getElementById('ann-list-view').style.display = 'none';
+                document.getElementById('ann-form-view').style.display = 'block';
+                document.getElementById('btn-add-ann-trigger').style.display = 'none';
+            });
+
+            document.getElementById('btn-add-proj-trigger').addEventListener('click', () => {
+                document.getElementById('proj-list-view').style.display = 'none';
+                document.getElementById('proj-form-view').style.display = 'block';
+                document.getElementById('btn-add-proj-trigger').style.display = 'none';
+            });
+        }
+
+        function resetAllViewsToDefault() {
+            document.getElementById('ann-list-view').style.display = 'block';
+            document.getElementById('ann-form-view').style.display = 'none';
+            const addAnnTrigger = document.getElementById('btn-add-ann-trigger');
+            if (addAnnTrigger) addAnnTrigger.style.display = 'inline-flex';
+            resetAnnForm();
+
+            document.getElementById('proj-list-view').style.display = 'block';
+            document.getElementById('proj-form-view').style.display = 'none';
+            const addProjTrigger = document.getElementById('btn-add-proj-trigger');
+            if (addProjTrigger) addProjTrigger.style.display = 'inline-flex';
+            resetProjForm();
+        }
+
+        // ===================================================
+        // 新增：個人設定控制邏輯
+        // ===================================================
+        async function refreshProfile() {
+            try {
+                const res = await fetchDatabase();
+                dbCache = res.data;
+                dbSha = res.sha;
+
+                // 填入表單
+                const profile = dbCache.profile || {};
+                const theme = profile.theme || {};
+                const home = profile.home || {};
+                const about = profile.about || {};
+
+                document.getElementById('profile-color').value = theme.highlight_color || '#7B9DFF';
+                document.getElementById('home-input-title').value = home.title || '';
+                document.getElementById('home-input-subtitle').value = home.subtitle || '';
+                document.getElementById('home-input-desc').value = home.description || '';
+                document.getElementById('about-input-bio').value = about.bio || '';
+                document.getElementById('about-input-skills-title').value = about.skills_title || '我的技能';
+                document.getElementById('about-input-skills-icon').value = about.skills_icon || 'psychology';
+
+                const skills = about.skills_list || [];
+                for (let i = 0; i < 3; i++) {
+                    const skill = skills[i] || { label: '', value: '' };
+                    document.getElementById(`skill-lbl-${i}`).value = skill.label;
+                    document.getElementById(`skill-val-${i}`).value = skill.value;
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert("載入設定檔失敗！");
+            }
+        }
+
+        function bindProfileFormEvents() {
+            const form = document.getElementById('form-profile');
+            if (form) {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    const highlight_color = document.getElementById('profile-color').value;
+                    const home_title = document.getElementById('home-input-title').value.trim();
+                    const home_subtitle = document.getElementById('home-input-subtitle').value.trim();
+                    const home_desc = document.getElementById('home-input-desc').value;
+                    const about_bio = document.getElementById('about-input-bio').value;
+                    const skills_title = document.getElementById('about-input-skills-title').value.trim();
+                    const skills_icon = document.getElementById('about-input-skills-icon').value;
+
+                    const skills_list = [];
+                    for (let i = 0; i < 3; i++) {
+                        skills_list.push({
+                            label: document.getElementById(`skill-lbl-${i}`).value.trim(),
+                            value: document.getElementById(`skill-val-${i}`).value.trim()
+                        });
+                    }
+
+                    // 寫入快取
+                    dbCache.profile = {
+                        theme: { highlight_color },
+                        home: { title: home_title, subtitle: home_subtitle, description: home_desc },
+                        about: { bio: about_bio, skills_title, skills_icon, skills_list }
+                    };
+
+                    await syncToGitHub('個人品牌設定更新');
+                });
+            }
+        }
+
         // ===================================================
         // 雲端公告管理 (CRUD) 控制邏輯
         // ===================================================
@@ -330,7 +527,6 @@
             if (form) {
                 form.addEventListener('submit', async function(e) {
                     e.preventDefault();
-                    console.log("偵測到「儲存公告」事件觸發");
 
                     const annId = document.getElementById('ann-id').value;
                     const title = document.getElementById('ann-input-title').value.trim();
@@ -358,14 +554,11 @@
                     }
 
                     await syncToGitHub('公告儲存');
-                    resetAnnForm();
+                    resetAllViewsToDefault();
                 });
             }
 
-            const cancelBtn = document.getElementById('btn-ann-cancel');
-            if (cancelBtn) {
-                cancelBtn.addEventListener('click', resetAnnForm);
-            }
+            document.getElementById('btn-ann-cancel').addEventListener('click', resetAllViewsToDefault);
         }
 
         async function refreshAnnouncements() {
@@ -395,10 +588,15 @@
             items.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             listContainer.innerHTML = items.map(ann => `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--md-sys-color-background); border: 1px solid var(--md-sys-color-outline); border-radius: var(--md-shape-corner-medium);">
-                    <div>
-                        <span style="font-size: 0.85rem; color: var(--md-sys-color-primary); font-weight: bold; margin-right: 10px;">${ann.date}</span>
-                        ${ann.pinned ? '<span style="background:var(--md-sys-color-primary); color:var(--md-sys-color-on-primary); font-size:0.75rem; padding: 2px 6px; border-radius:var(--md-shape-corner-full); font-weight:bold; margin-right:10px;">置頂</span>' : ''}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.15rem; background: var(--md-sys-color-background); border: 1px solid var(--md-sys-color-outline); border-radius: var(--md-shape-corner-medium);">
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <span style="font-size: 0.85rem; color: var(--md-sys-color-primary); font-weight: bold; margin-right: 5px;">${ann.date}</span>
+                        ${ann.pinned ? `
+                            <span class="m3-badge-pinned">
+                                <span class="material-symbols-outlined">push_pin</span>
+                                <span>置頂</span>
+                            </span>
+                        ` : ''}
                         <strong style="color: var(--md-sys-color-text-main);">${ann.title}</strong>
                     </div>
                     <div style="display: flex; gap: 0.5rem;">
@@ -418,8 +616,11 @@
                 document.getElementById('ann-input-content').value = ann.content;
                 document.getElementById('ann-input-pinned').checked = ann.pinned || false;
 
+                document.getElementById('ann-list-view').style.display = 'none';
+                document.getElementById('ann-form-view').style.display = 'block';
+                document.getElementById('btn-add-ann-trigger').style.display = 'none';
+
                 document.getElementById('form-ann-title').innerHTML = '<span class="material-symbols-outlined">edit_note</span><span>編輯系統公告</span>';
-                document.getElementById('btn-ann-cancel').style.display = 'inline-flex';
                 document.getElementById('form-announcement').scrollIntoView({ behavior: 'smooth' });
             }
         }
@@ -428,7 +629,6 @@
             document.getElementById('form-announcement').reset();
             document.getElementById('ann-id').value = '';
             document.getElementById('form-ann-title').innerHTML = '<span class="material-symbols-outlined">add_box</span><span>新增系統公告</span>';
-            document.getElementById('btn-ann-cancel').style.display = 'none';
         }
 
         async function deleteAnnouncement(id) {
@@ -444,10 +644,8 @@
         function bindProjectFormEvents() {
             const form = document.getElementById('form-project');
             if (form) {
-                console.log("作品專案表單監聽器準備完畢。");
                 form.addEventListener('submit', async function(e) {
                     e.preventDefault();
-                    console.log("偵測到「儲存作品」事件觸發");
 
                     const projId = document.getElementById('proj-id').value;
                     const title = document.getElementById('proj-input-title').value.trim();
@@ -466,23 +664,18 @@
                     };
 
                     if (projId) {
-                        console.log("目前處於作品【編輯模式】，更新 ID：", projId);
                         const idx = dbCache.projects.findIndex(item => item.id === projId);
                         if (idx > -1) dbCache.projects[idx] = currentProjData;
                     } else {
-                        console.log("目前處於作品【新增模式】");
                         dbCache.projects.push(currentProjData);
                     }
 
                     await syncToGitHub('作品專案儲存');
-                    resetProjForm();
+                    resetAllViewsToDefault();
                 });
             }
 
-            const cancelBtn = document.getElementById('btn-proj-cancel');
-            if (cancelBtn) {
-                cancelBtn.addEventListener('click', resetProjForm);
-            }
+            document.getElementById('btn-proj-cancel').addEventListener('click', resetAllViewsToDefault);
         }
 
         async function refreshProjects() {
@@ -490,7 +683,6 @@
             listContainer.innerHTML = '<p style="color: var(--md-sys-color-text-muted);">讀取雲端專案中...</p>';
             
             try {
-                console.log("獲取雲端最新專案列表...");
                 const res = await fetchDatabase();
                 dbCache = res.data;
                 dbSha = res.sha;
@@ -511,7 +703,7 @@
             }
 
             listContainer.innerHTML = items.map(proj => `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--md-sys-color-background); border: 1px solid var(--md-sys-color-outline); border-radius: var(--md-shape-corner-medium);">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.15rem; background: var(--md-sys-color-background); border: 1px solid var(--md-sys-color-outline); border-radius: var(--md-shape-corner-medium);">
                     <div>
                         <strong style="color: var(--md-sys-color-text-main);">${proj.title}</strong>
                         <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--md-sys-color-text-muted); text-overflow: ellipsis; white-space: nowrap; overflow: hidden; max-width: 400px;">${proj.description}</p>
@@ -525,7 +717,6 @@
         }
 
         function editProject(id) {
-            console.log("準備編輯作品專案 ID：", id);
             const proj = dbCache.projects.find(item => item.id === id);
             if (proj) {
                 document.getElementById('proj-id').value = proj.id;
@@ -533,8 +724,11 @@
                 document.getElementById('proj-input-url').value = proj.github_url;
                 document.getElementById('proj-input-desc').value = proj.description;
 
+                document.getElementById('proj-list-view').style.display = 'none';
+                document.getElementById('proj-form-view').style.display = 'block';
+                document.getElementById('btn-add-proj-trigger').style.display = 'none';
+
                 document.getElementById('form-proj-title').innerHTML = '<span class="material-symbols-outlined">edit</span><span>編輯作品專案</span>';
-                document.getElementById('btn-proj-cancel').style.display = 'inline-flex';
                 document.getElementById('form-project').scrollIntoView({ behavior: 'smooth' });
             }
         }
@@ -543,7 +737,6 @@
             document.getElementById('form-project').reset();
             document.getElementById('proj-id').value = '';
             document.getElementById('form-proj-title').innerHTML = '<span class="material-symbols-outlined">create_new_folder</span><span>新增作品專案</span>';
-            document.getElementById('btn-proj-cancel').style.display = 'none';
         }
 
         async function deleteProject(id) {
@@ -559,18 +752,13 @@
         async function syncToGitHub(actionText) {
             const preloader = document.getElementById('preloader');
             if (preloader) preloader.classList.remove('hidden'); 
-            console.log("【同步】開啟動畫，開始進行 GitHub API 上傳。");
 
             try {
-                console.log("【同步】正在重新獲取最新 SHA 值...");
                 const latest = await fetchDatabase();
                 dbSha = latest.sha;
-                console.log("【同步】最新 SHA 獲取成功：", dbSha);
 
-                console.log("【同步】開始調用 saveDatabase 上傳資料...");
                 const res = await saveDatabase(dbCache, dbSha);
                 dbSha = res.content.sha; 
-                console.log("【同步】API 上傳成功！新 Commit SHA：", dbSha);
                 
                 if (preloader) preloader.classList.add('hidden');
                 

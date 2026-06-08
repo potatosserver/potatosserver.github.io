@@ -150,6 +150,11 @@ html, body {
     border: 1px solid var(--md-sys-color-outline);
 }
 
+.nav-link-admin.active {
+    background-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+}
+
 /* ==========================================
    3. M3 側邊欄 (Sidebar - 藥丸導覽選單)
    ========================================== */
@@ -159,7 +164,7 @@ html, body {
     border-right: 1px solid var(--md-sys-color-outline);
     padding: 2rem 1.25rem;
     position: fixed;
-    top: var(--nav-height); /* 完美避開頂部導覽列 */
+    top: var(--nav-height); /* 避開頂部導覽列 */
     bottom: 0;
     left: 0;
     z-index: 900;
@@ -388,27 +393,121 @@ p {
 }
 
 /* ==========================================
-   6. M3 欄位輸入框 (Text Fields)
+   6. 新增：M3 進階自訂控制項 & 置頂標籤
    ========================================== */
-input[type="text"], input[type="date"], input[type="url"], textarea {
-    background-color: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--md-sys-color-outline);
-    border-radius: var(--md-shape-corner-medium); /* 12px 圓角 */
-    padding: 0.85rem 1.1rem;
-    color: var(--md-sys-color-text-main);
-    font-family: inherit;
-    font-size: 0.95rem;
-    transition: border-color 0.2s, background-color 0.2s;
+
+/* 自製紅底白字置頂標籤 */
+.m3-badge-pinned {
+    background-color: #ff5252; /* M3 經典警示紅 */
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 0.25rem 0.65rem;
+    border-radius: var(--md-shape-corner-full);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    letter-spacing: 0.05em;
+    border: none;
+    box-shadow: 0 2px 4px rgba(255, 82, 82, 0.2);
 }
 
-input[type="text"]:focus, input[type="date"]:focus, input[type="url"]:focus, textarea:focus {
+.m3-badge-pinned .material-symbols-outlined {
+    font-size: 13px;
+    color: #ffffff;
+}
+
+/* M3 文字輸入欄位、下拉選單、日期選擇器 */
+.m3-text-field {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid var(--md-sys-color-outline) !important;
+    border-radius: var(--md-shape-corner-medium) !important; /* 12px 圓角 */
+    padding: 0.85rem 1.15rem !important;
+    color: var(--md-sys-color-text-main) !important;
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.m3-text-field:focus {
     outline: none;
+    border-color: var(--md-sys-color-primary) !important;
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 0 0 0 3px rgba(123, 157, 255, 0.15) !important;
+}
+
+/* 自訂 M3 複選框 (Checkbox) */
+.m3-checkbox-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 500;
+    color: var(--md-sys-color-text-main);
+}
+
+.m3-checkbox-input {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--md-sys-color-outline);
+    border-radius: 6px;
+    outline: none;
+    background-color: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    display: inline-block;
+}
+
+.m3-checkbox-input:checked {
+    background-color: var(--md-sys-color-primary);
     border-color: var(--md-sys-color-primary);
-    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.m3-checkbox-input:checked::after {
+    content: "check";
+    font-family: 'Material Symbols Outlined';
+    font-size: 15px;
+    color: var(--md-sys-color-on-primary);
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* 後台大標題面板：標題在左、新增按鈕在右 */
+.admin-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--md-sys-color-outline);
+    padding-bottom: 1rem;
+}
+
+.admin-panel-header h2 {
+    border-bottom: none;
+    margin: 0;
+    padding-bottom: 0;
+}
+
+/* 後台視圖漸變動畫 */
+.admin-view-fade {
+    animation: m3Fade 0.3s ease-in-out;
+}
+
+@keyframes m3Fade {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* ==========================================
-   7. 響應式佈局 (RWD)
+   8. 響應式佈局 (RWD)
    ========================================== */
 @media (max-width: 768px) {
     .navbar {

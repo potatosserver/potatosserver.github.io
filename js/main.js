@@ -1,13 +1,9 @@
 // js/main.js
 
-// ==========================================
-// 核心儲存庫設定 (已更新為您的實際主頁儲存庫)
-// ==========================================
 const REPO_OWNER = 'potatosserver';
-const REPO_NAME = 'potatosserver.github.io'; // 已修正為您的個人主頁儲存庫
+const REPO_NAME = 'potatosserver.github.io'; 
 const DATABASE_PATH = 'data/projects_articles.json';
 
-// 輔助函式：支援 UTF-8 中文的 Base64 編解碼 (防亂碼)
 function utf8_to_b64(str) {
     return window.btoa(unescape(encodeURIComponent(str)));
 }
@@ -16,7 +12,19 @@ function b64_to_utf8(str) {
     return decodeURIComponent(escape(window.atob(str)));
 }
 
-// 1. 載入共用導覽列
+// 動態修改 CSS 主題變數，實現一鍵變色
+function applyDynamicTheme(color) {
+    if (color) {
+        document.documentElement.style.setProperty('--md-sys-color-primary', color);
+    }
+}
+
+// 將 {h} 轉為 <span class="highlight">
+function parseHighlights(text) {
+    if (!text) return "";
+    return text.replace(/{h}/g, '<span class="highlight">').replace(/{\/h}/g, '</span>');
+}
+
 async function loadNavbar() {
     try {
         const response = await fetch('components/navbar.html');
@@ -47,10 +55,9 @@ function highlightCurrentPage() {
     });
 }
 
-// 2. [讀取] 獲取 GitHub 最新資料庫內容與 SHA 值
+// 獲取最新資料庫 (獲取後會自動執行一次配色檢查)
 async function fetchDatabase() {
     const token = localStorage.getItem('gh_token');
-    // 加入時間戳參數防瀏覽器快取
     const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${DATABASE_PATH}?nocache=${new Date().getTime()}`;
     
     const headers = { "Accept": "application/vnd.github.v3+json" };
@@ -65,14 +72,19 @@ async function fetchDatabase() {
 
     const fileInfo = await response.json();
     const decodedContent = b64_to_utf8(fileInfo.content);
+    const database = JSON.parse(decodedContent);
+
+    // 【自動套用變色】只要頁面載入資料庫，就會自動讀取配置更新主題色
+    if (database.profile && database.profile.theme && database.profile.theme.highlight_color) {
+        applyDynamicTheme(database.profile.theme.highlight_color);
+    }
     
     return {
         sha: fileInfo.sha,
-        data: JSON.parse(decodedContent)
+        data: database
     };
 }
 
-// 3. [寫入] 將資料更新並 Commit 回 GitHub
 async function saveDatabase(jsonData, sha) {
     const token = localStorage.getItem('gh_token');
     if (!token) {

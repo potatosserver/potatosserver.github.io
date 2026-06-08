@@ -18,14 +18,14 @@
     <header id="navbar-container" class="navbar"></header>
 
     <main class="full-width-content">
+        <!-- 個人簡介：改為容器以供動態載入 -->
         <section id="home-section">
-            <h1>Hello, 我是卓稟鈞 (Andrew)！</h1>
-            <p style="font-size: 1.2rem; color: var(--md-sys-color-text-main);">一個對寫程式充滿無限好奇心的高中生。</p>
-            <p>
-                我熱衷於用 <span class="highlight">Python、C++</span> 和<span class="highlight">前端技術</span>，將腦中的奇思妙想打造成真正能解決問題的工具。從 Discord Bot 到交通查詢 App，我的目標始終是——<strong class="highlight">讓科技更貼近生活</strong>。
-            </p>
+            <h1 id="home-title">讀取中...</h1>
+            <p id="home-subtitle" style="font-size: 1.2rem; color: var(--md-sys-color-text-main); margin-bottom: 0.5rem;"></p>
+            <p id="home-desc"></p>
         </section>
 
+        <!-- 最新動態公告區塊 -->
         <section class="announcement-section" style="padding: 1.5rem 1rem;">
             <div class="announcement-header" style="padding-left: 0.5rem; margin-bottom: 0.5rem;">
                 <span class="material-symbols-outlined" style="color: var(--md-sys-color-primary);">campaign</span>
@@ -48,15 +48,24 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             await loadNavbar();
-            await loadDynamicAnnouncements();
+            await loadDynamicHomeData();
         });
 
-        async function loadDynamicAnnouncements() {
+        async function loadDynamicHomeData() {
             const container = document.getElementById('dynamic-announcements');
             try {
                 const result = await fetchDatabase();
-                const announcements = result.data.announcements || [];
+                const profile = result.data.profile;
 
+                // 1. 動態套用首頁文案與 {h} 轉換
+                if (profile && profile.home) {
+                    document.getElementById('home-title').innerText = profile.home.title;
+                    document.getElementById('home-subtitle').innerText = profile.home.subtitle;
+                    document.getElementById('home-desc').innerHTML = parseHighlights(profile.home.description);
+                }
+
+                // 2. 渲染公告
+                const announcements = result.data.announcements || [];
                 if (announcements.length === 0) {
                     container.innerHTML = '<li class="announcement-item" style="padding:0.75rem 0.5rem;"><span class="announcement-content">目前尚無公告。</span></li>';
                     return;
@@ -72,9 +81,14 @@
                     <li class="announcement-item" style="padding: 0; border-bottom: 1px solid var(--md-sys-color-outline);">
                         <a href="announcement-detail.html?id=${ann.id}" style="display: flex; align-items: flex-start; gap: 1rem; width: 100%; padding: 0.95rem 0.75rem; text-decoration: none; color: inherit; transition: background-color 0.2s; border-radius: var(--md-shape-corner-large);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.03)'" onmouseout="this.style.backgroundColor='transparent'">
                             <span class="announcement-date" style="color: var(--md-sys-color-primary); font-weight: 600; font-size: 0.85rem; white-space: nowrap; padding-top: 0.15rem; margin: 0;">${ann.date}</span>
-                            <span class="announcement-content" style="color: var(--md-sys-color-text-main); font-size: 0.95rem; line-height: 1.5;">
-                                ${ann.pinned ? '<span style="color:var(--md-sys-color-primary); font-weight:bold; margin-right:5px;">[置頂]</span>' : ''}
-                                ${ann.title}
+                            <span class="announcement-content" style="color: var(--md-sys-color-text-main); font-size: 0.95rem; line-height: 1.5; display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                ${ann.pinned ? `
+                                    <span class="m3-badge-pinned">
+                                        <span class="material-symbols-outlined">push_pin</span>
+                                        <span>置頂</span>
+                                    </span>
+                                ` : ''}
+                                <span>${ann.title}</span>
                             </span>
                         </a>
                     </li>
