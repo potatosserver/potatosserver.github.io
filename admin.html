@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理後台 | Andrew</title>
+    <title>管理後台</title>
     <!-- 引入 Google Material Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="style.css">
@@ -46,25 +46,74 @@
         <!-- 右側主要內容區域 -->
         <main class="main-content">
             
-            <!-- 2.1 連線設定面板 -->
+            <!-- 2.1 連線設定面板 (M3 雙欄並排美化版) -->
             <section id="panel-settings" class="admin-panel-section">
-                <h2 style="margin-top: 0;">
-                    <span class="material-symbols-outlined" style="color: var(--md-sys-color-primary);">cloud_sync</span>
-                    <span>雲端同步狀態</span>
+                <h2 style="margin-top: 0; margin-bottom: 2rem; border-bottom: 1px solid var(--md-sys-color-outline); padding-bottom: 1rem;">
+                    <span class="material-symbols-outlined" style="color: var(--md-sys-color-primary); margin-right: 8px;">cloud_sync</span>
+                    <span>系統狀態與設定</span>
                 </h2>
-                <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
-                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-                        <span id="connection-indicator" class="material-symbols-outlined" style="color: #4ade80; font-size: 2.5rem;">check_circle</span>
-                        <div>
-                            <h3 id="connection-status">已成功與 GitHub 建立安全連線</h3>
-                            <p style="margin: 0; font-size: 0.9rem; color: var(--md-sys-color-text-muted);">您的身分權杖已安全儲存於本地瀏覽器中。</p>
-                        </div>
+                
+                <div class="portfolio-grid" style="align-items: start;">
+                    <!-- A. 左欄：GitHub 管理員個人名片卡 (動態自 API 下載) -->
+                    <div class="card" style="padding: 2.5rem 2rem; align-items: center; text-align: center;">
+                        <!-- 使用者大頭貼 -->
+                        <img id="profile-avatar" src="" alt="頭像" style="width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--md-sys-color-primary); margin-bottom: 1.25rem; background-color: rgba(255,255,255,0.05); object-fit: cover;">
+                        <!-- 使用者顯示名稱 -->
+                        <h3 id="profile-name" style="margin-bottom: 0.25rem; font-size: 1.4rem;">載入中...</h3>
+                        <!-- 使用者 GitHub 使用者名稱 -->
+                        <a id="profile-login" href="#" target="_blank" style="color: var(--md-sys-color-primary); text-decoration: none; font-size: 0.95rem; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 1rem;">
+                            <span>@username</span>
+                            <span class="material-symbols-outlined" style="font-size: 14px;">open_in_new</span>
+                        </a>
+                        <!-- 個人簡介 (Bio) -->
+                        <p id="profile-bio" style="font-size: 0.85rem; color: var(--md-sys-color-text-muted); line-height: 1.5; margin-bottom: 1.75rem; max-width: 250px;">載入個人自介中...</p>
+                        
+                        <!-- 綠色驗證合格徽章 -->
+                        <span class="m3-badge-pinned" style="background-color: rgba(74, 222, 128, 0.12); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.2); box-shadow: none;">
+                            <span class="material-symbols-outlined" style="color: #4ade80;">verified</span>
+                            <span>擁有人已驗證</span>
+                        </span>
                     </div>
-                    <div style="border-top: 1px solid var(--md-sys-color-outline); padding-top: 1.5rem; margin-top: 1.5rem;">
-                        <button id="btn-logout" class="sidebar-btn" style="width: auto; background-color: #ef4444; color: white; border-color: #ef4444;">
-                            <span class="material-symbols-outlined">logout</span>
-                            <span>登出管理系統</span>
-                        </button>
+
+                    <!-- B. 右欄：儲存庫連線資訊與操作 -->
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        
+                        <!-- 雲端設定詳情卡片 -->
+                        <div class="card" style="padding: 1.75rem 2rem;">
+                            <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span class="material-symbols-outlined">database</span>
+                                <span>同步儲存庫細節</span>
+                            </h3>
+                            <div style="display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.95rem;">
+                                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--md-sys-color-outline); padding-bottom: 0.6rem;">
+                                    <span style="color: var(--md-sys-color-text-muted);">帳號擁有者</span>
+                                    <strong id="repo-info-owner" style="font-family: monospace;">...</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--md-sys-color-outline); padding-bottom: 0.6rem;">
+                                    <span style="color: var(--md-sys-color-text-muted);">目標儲存庫</span>
+                                    <strong id="repo-info-name" style="font-family: monospace;">...</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: var(--md-sys-color-text-muted);">資料路徑</span>
+                                    <strong id="repo-info-path" style="font-family: monospace;">...</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 系統安全動作卡片 -->
+                        <div class="card" style="padding: 1.75rem 2rem;">
+                            <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span class="material-symbols-outlined">settings_power</span>
+                                <span>系統操作</span>
+                            </h3>
+                            <div style="display: flex; gap: 1rem;">
+                                <button id="btn-logout" class="sidebar-btn" style="width: auto; background-color: #ef4444; color: white; border-color: #ef4444; padding: 0.6rem 1.25rem;">
+                                    <span class="material-symbols-outlined">logout</span>
+                                    <span>登出管理系統</span>
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </section>
@@ -397,6 +446,7 @@
             }
         });
 
+        // 頁面生命週期初始化
         document.addEventListener('DOMContentLoaded', async () => {
             await loadNavbar();
             await loadConfig(); // 確保全域 GITHUB_CLIENT_ID 與 CLOUDFLARE_WORKER_URL 載入完畢！
@@ -429,7 +479,6 @@
             const btn = document.getElementById('btn-github-login');
             if (btn) {
                 btn.addEventListener('click', () => {
-                    // 動態使用來自 config.json 的 GITHUB_CLIENT_ID
                     const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=repo`;
                     window.location.href = githubAuthUrl;
                 });
@@ -438,7 +487,6 @@
 
         async function exchangeCodeForToken(code) {
             try {
-                // 動態使用來自 config.json 的 CLOUDFLARE_WORKER_URL
                 const response = await fetch(CLOUDFLARE_WORKER_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -468,7 +516,10 @@
                 if (response.ok) {
                     const html = await response.text();
                     document.getElementById('sidebar-container').innerHTML = html;
-                    bindSidebarEvents();
+                    
+                    // 核心：啟用網址 Hash 監聽路由
+                    window.addEventListener('hashchange', handleAdminRouting);
+                    await handleAdminRouting(); // 載入完畢後，執行首次路由指引
                     bindLogoutEvent();
                 }
             } catch (error) {
@@ -476,34 +527,49 @@
             }
         }
 
-        function bindSidebarEvents() {
+        // ===================================================
+        // 核心：M3 網址 Hash 單頁路由 (SPA Hash Router)
+        // ===================================================
+        async function handleAdminRouting() {
+            const token = localStorage.getItem('gh_token');
+            if (!token) return; // 未驗證通過前不執行路由切換
+
+            const hash = window.location.hash || '#settings';
+            const panelId = hash.replace('#', '');
+
+            const panelMap = {
+                'settings': 'panel-settings',
+                'profile': 'panel-profile',
+                'projects': 'panel-projects',
+                'articles': 'panel-announcements'
+            };
+
+            const targetPanelId = panelMap[panelId];
+            if (!targetPanelId) return;
+
+            hideAllPanels();
+            resetAllViewsToDefault();
+
+            document.getElementById(targetPanelId).style.display = 'block';
+
             const buttons = document.querySelectorAll('#sidebar-container .sidebar-btn');
-            
             buttons.forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    buttons.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-
-                    const btnId = this.id;
-                    hideAllPanels();
-                    resetAllViewsToDefault();
-
-                    if (btnId === 'btn-menu-settings') {
-                        document.getElementById('panel-settings').style.display = 'block';
-                    } else if (btnId === 'btn-menu-profile') {
-                        document.getElementById('panel-profile').style.display = 'block';
-                        refreshProfile(); 
-                    } else if (btnId === 'btn-menu-projects') {
-                        document.getElementById('panel-projects').style.display = 'block';
-                        refreshProjects(); 
-                    } else if (btnId === 'btn-menu-articles') {
-                        document.getElementById('panel-announcements').style.display = 'block';
-                        refreshAnnouncements(); 
-                    }
-                });
+                btn.classList.remove('active');
+                const href = btn.getAttribute('href');
+                if (href === hash) {
+                    btn.classList.add('active');
+                }
             });
+
+            if (panelId === 'profile') {
+                await refreshProfile(); 
+            } else if (panelId === 'projects') {
+                await refreshProjects(); 
+            } else if (panelId === 'articles') {
+                await refreshAnnouncements(); 
+            } else if (panelId === 'settings') {
+                await loadGitHubUserProfile(); // 切換至連線設定時自動載入 GitHub 個人檔案
+            }
         }
 
         function hideAllPanels() {
@@ -526,10 +592,43 @@
         }
 
         // ===================================================
-        // 核心：M3 視圖切換與防禦性全重置 (防止複數編輯框開啟)
+        // 新增：安全獲取 GitHub 管理員帳號個人頭像與資料
+        // ===================================================
+        async function loadGitHubUserProfile() {
+            const token = localStorage.getItem('gh_token');
+            if (!token) return;
+
+            try {
+                const response = await fetch('https://api.github.com/user', {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                if (response.ok) {
+                    const userData = await response.json();
+                    
+                    // 動態更新 M3 個人設定名片卡
+                    document.getElementById('profile-avatar').src = userData.avatar_url;
+                    document.getElementById('profile-name').innerText = userData.name || userData.login;
+                    document.getElementById('profile-login').href = userData.html_url;
+                    document.getElementById('profile-login').querySelector('span').innerText = `@${userData.login}`;
+                    document.getElementById('profile-bio').innerText = userData.bio || '尚未在 GitHub 上填寫個人簡介。';
+                    
+                    // 動態更新右側儲存庫連線資訊
+                    document.getElementById('repo-info-owner').innerText = REPO_OWNER;
+                    document.getElementById('repo-info-name').innerText = REPO_NAME;
+                    document.getElementById('repo-info-path').innerText = DATABASE_PATH;
+                }
+            } catch (err) {
+                console.error("無法自 GitHub 下載管理員個人資料：", err);
+            }
+        }
+
+        // ===================================================
+        // M3 視圖點擊切換事件綁定 (開啟新編輯前強制取消前一個編輯)
         // ===================================================
         function bindUIViewEvents() {
-            // 公告新增按鈕 ( 關閉現有編輯 )
             document.getElementById('btn-add-ann-trigger').addEventListener('click', () => {
                 resetAnnForm(); 
                 document.getElementById('ann-list-view').style.display = 'none';
@@ -537,7 +636,6 @@
                 document.getElementById('btn-add-ann-trigger').style.display = 'none';
             });
 
-            // 作品新增按鈕 ( 關閉現有編輯 )
             document.getElementById('btn-add-proj-trigger').addEventListener('click', () => {
                 resetProjForm();
                 document.getElementById('proj-list-view').style.display = 'none';
@@ -545,7 +643,6 @@
                 document.getElementById('btn-add-proj-trigger').style.display = 'none';
             });
 
-            // 主題修改按鈕 ( 關閉其他個人編輯框 )
             document.getElementById('btn-edit-theme').addEventListener('click', () => {
                 closeAllProfileEditModes(); 
                 document.getElementById('theme-view-mode').style.display = 'none';
@@ -553,7 +650,6 @@
                 document.getElementById('btn-edit-theme').style.display = 'none';
             });
 
-            // 首頁修改按鈕 ( 關閉其他個人編輯框 )
             document.getElementById('btn-edit-home').addEventListener('click', () => {
                 closeAllProfileEditModes();
                 document.getElementById('home-view-mode').style.display = 'none';
@@ -561,7 +657,6 @@
                 document.getElementById('btn-edit-home').style.display = 'none';
             });
 
-            // 關於我修改按鈕 ( 關閉其他個人編輯框 )
             document.getElementById('btn-edit-about').addEventListener('click', () => {
                 closeAllProfileEditModes();
                 document.getElementById('about-view-mode').style.display = 'none';
@@ -569,7 +664,6 @@
                 document.getElementById('btn-edit-about').style.display = 'none';
             });
 
-            // 聯絡方式新增按鈕 ( 關閉其他個人編輯框 )
             document.getElementById('btn-add-contact-trigger').addEventListener('click', () => {
                 closeAllProfileEditModes();
                 document.getElementById('contact-list-view').style.display = 'none';
@@ -578,27 +672,23 @@
             });
         }
 
-        // 核心安全防禦：強制關閉個人資料下所有卡片的編輯狀態
+        // 強制關閉個人設定底下所有子卡片的編輯狀態 (回復為唯讀預覽)
         function closeAllProfileEditModes() {
-            // 還原主題視覺
             document.getElementById('theme-view-mode').style.display = 'flex';
             document.getElementById('theme-form-mode').style.display = 'none';
             document.getElementById('btn-edit-theme').style.display = 'inline-flex';
             document.getElementById('form-theme').reset();
 
-            // 還原首頁文案
             document.getElementById('home-view-mode').style.display = 'block';
             document.getElementById('home-form-mode').style.display = 'none';
             document.getElementById('btn-edit-home').style.display = 'inline-flex';
             document.getElementById('form-home').reset();
 
-            // 還原關於我
             document.getElementById('about-view-mode').style.display = 'block';
             document.getElementById('about-form-mode').style.display = 'none';
             document.getElementById('btn-edit-about').style.display = 'inline-flex';
             document.getElementById('form-about').reset();
 
-            // 還原聯絡方式
             document.getElementById('contact-list-view').style.display = 'block';
             document.getElementById('contact-form-view').style.display = 'none';
             document.getElementById('btn-add-contact-trigger').style.display = 'inline-flex';
@@ -607,27 +697,24 @@
 
         // 將所有版面與表單重置為預設唯讀檢視與清單狀態
         function resetAllViewsToDefault() {
-            // 公告
             document.getElementById('ann-list-view').style.display = 'block';
             document.getElementById('ann-form-view').style.display = 'none';
             const addAnnTrigger = document.getElementById('btn-add-ann-trigger');
             if (addAnnTrigger) addAnnTrigger.style.display = 'inline-flex';
             resetAnnForm();
 
-            // 作品
             document.getElementById('proj-list-view').style.display = 'block';
             document.getElementById('proj-form-view').style.display = 'none';
             const addProjTrigger = document.getElementById('btn-add-proj-trigger');
             if (addProjTrigger) addProjTrigger.style.display = 'inline-flex';
             resetProjForm();
 
-            // 關閉所有個人設定分拆卡片的編輯
             closeAllProfileEditModes();
         }
 
 
         // ===================================================
-        // 模組化：分拆式個人設定、自動載入與獨立分開儲存
+        // 分拆式個人設定、自動載入與各小區塊獨立分開儲存
         // ===================================================
         async function refreshProfile() {
             try {
@@ -678,7 +765,6 @@
                     return '';
                 }).join('');
 
-                // -- 4. 聯絡人列表渲染 --
                 renderAdminContacts();
 
             } catch (err) {
@@ -800,7 +886,7 @@
             `).join('');
         }
 
-        // 點擊修改聯絡管道：安全重置其餘編輯器並開啟
+        // 點擊編輯聯絡人：安全重置其餘編輯器並開啟
         function editContact(id) {
             closeAllProfileEditModes(); 
             const c = dbCache.contacts.find(item => item.id === id);
@@ -918,7 +1004,7 @@
             `).join('');
         }
 
-        // 點擊編輯公告：強制自動取消前一個編輯狀態後開啟
+        // 點擊編輯公告：安全防禦，強制自動取消重置現有編輯狀態後開啟
         function editAnnouncement(id) {
             resetAnnForm(); // 安全防禦：先取消重置現有編輯狀態
             const ann = dbCache.announcements.find(item => item.id === id);
