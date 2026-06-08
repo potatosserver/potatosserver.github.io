@@ -22,12 +22,12 @@
 
     <!-- 主要內容區 -->
     <main class="full-width-content">
-        <!-- 卡片內邊距調整為 1.75rem，使其更精緻緊湊 -->
-        <div class="card admin-view-fade" style="padding: 1.75rem; margin-top: 1rem;">
+        <!-- 將頂部 padding-top 大幅壓縮至 1rem，其餘方向維持 1.75rem -->
+        <div class="card admin-view-fade" style="padding: 1rem 1.75rem 1.75rem 1.75rem; margin-top: 1rem;">
             
-            <!-- 【緊湊排版】：大幅收緊返回按鈕的上下留白 -->
-            <div style="margin-bottom: 1rem; border-bottom: 1px solid var(--md-sys-color-outline); padding-bottom: 0.75rem;">
-                <a href="index.html" class="sidebar-btn" style="width: auto; display: inline-flex; align-items: center; padding: 0.5rem 1rem;">
+            <!-- 【完美對齊與極窄間距】：返回首頁導航連結 -->
+            <div style="margin-bottom: 0.75rem; border-bottom: 1px solid var(--md-sys-color-outline); padding-bottom: 0.5rem;">
+                <a href="index.html" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--md-sys-color-text-main); font-weight: 500; font-size: 0.95rem; padding: 0.25rem 0; background: transparent; border: none; transition: color 0.2s;" onmouseover="this.style.color='var(--md-sys-color-primary)'" onmouseout="this.style.color='var(--md-sys-color-text-main)'">
                     <span class="material-symbols-outlined">arrow_back</span>
                     <span>返回首頁</span>
                 </a>
@@ -73,7 +73,6 @@
             }
 
             try {
-                // 呼叫 js/main.js 的讀取核心 API
                 const result = await fetchDatabase();
                 const announcements = result.data.announcements || [];
                 const ann = announcements.find(item => item.id === annId);
@@ -96,7 +95,6 @@
                     <div style="font-size: 1.05rem; line-height: 1.8; color: var(--md-sys-color-text-main); white-space: pre-wrap; letter-spacing: 0.02em;">${ann.content}</div>
                 `;
 
-                // 動態同步更新瀏覽器的分頁標題
                 document.title = `${ann.title} | 系統公告`;
 
             } catch (error) {
