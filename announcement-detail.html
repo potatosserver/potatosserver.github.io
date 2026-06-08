@@ -24,13 +24,13 @@
     <main class="full-width-content">
         <!-- 
             M3 卡片縮減頂部內距 (1rem)
-            新增：min-height (450px) 撐開短內容空間
+            新增：min-height (450px) 避免短文字空洞
             新增：margin-bottom (3rem) 確保底部永遠留有美觀的卡片空隙
         -->
         <div class="card admin-view-fade" style="padding: 1rem 1.75rem 1.75rem 1.75rem; margin-top: 1rem; min-height: 450px; margin-bottom: 3rem;">
             
-            <!-- 返回首頁導航連結 (高亮色固定，左側完全對齊) -->
-            <div style="margin-bottom: 1rem; border-bottom: 1px solid var(--md-sys-color-outline); padding-bottom: 0.5rem;">
+            <!-- 返回首頁連結 (高亮色固定，左側完全無縫隙對齊) -->
+            <div style="margin-bottom: 0.75rem; border-bottom: 1px solid var(--md-sys-color-outline); padding-bottom: 0.5rem;">
                 <a href="index.html" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--md-sys-color-primary); font-weight: 500; font-size: 0.95rem; padding: 0.25rem 0; background: transparent; border: none; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
                     <span class="material-symbols-outlined">arrow_back</span>
                     <span>返回首頁</span>
@@ -89,14 +89,18 @@
                     return;
                 }
 
-                // 成功尋獲，內文使用 parseHighlights 處理，開通公告內文高亮功能！
+                // 成功尋獲，渲染標題、日期、詳細內容 (標題與內文皆已開通高亮解析)
                 container.innerHTML = `
                     <div style="display: flex; gap: 0.5rem; align-items: center; color: var(--md-sys-color-primary); margin-bottom: 0.5rem; font-size: 0.95rem;">
                         <span class="material-symbols-outlined" style="font-size: 1.25em;">calendar_month</span>
                         <span>發布日期：${ann.date}</span>
                     </div>
-                    <h1 style="color: var(--md-sys-color-text-main); margin-bottom: 1.25rem; border-bottom: 2px solid var(--md-sys-color-primary); padding-bottom: 0.75rem; line-height: 1.4; font-size: 2rem; letter-spacing: -0.02em;">${ann.title}</h1>
-                    <div style="font-size: 1.05rem; line-height: 1.8; color: var(--md-sys-color-text-main); white-space: pre-wrap; letter-spacing: 0.02em;">${parseHighlights(ann.content)}</div>
+                    <h1 style="color: var(--md-sys-color-text-main); margin-bottom: 1.25rem; border-bottom: 2px solid var(--md-sys-color-primary); padding-bottom: 0.75rem; line-height: 1.4; font-size: 2rem; letter-spacing: -0.02em;">
+                        ${parseHighlights(ann.title)}
+                    </h1>
+                    <div style="font-size: 1.05rem; line-height: 1.8; color: var(--md-sys-color-text-main); white-space: pre-wrap; letter-spacing: 0.02em;">
+                        ${parseHighlights(ann.content)}
+                    </div>
                 `;
 
                 document.title = `${ann.title} | 系統公告`;

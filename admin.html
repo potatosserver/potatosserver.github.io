@@ -21,7 +21,7 @@
     <header id="navbar-container" class="navbar"></header>
 
     <!-- ===================================================
-         1. 未登入狀態
+         1. 未登入狀態：安全登入卡片
          =================================================== -->
     <div id="login-view" class="full-width-content" style="display: none; max-width: 480px; text-align: center; margin-top: 15vh;">
         <div class="card" style="padding: 3rem 2rem;">
@@ -36,7 +36,7 @@
     </div>
 
     <!-- ===================================================
-         2. 已登入狀態
+         2. 已登入狀態：後台管理介面佈局
          =================================================== -->
     <div id="admin-view" class="layout-container" style="display: none;">
         
@@ -74,7 +74,7 @@
                 <div class="admin-panel-header">
                     <h2>
                         <span class="material-symbols-outlined" style="color: var(--md-sys-color-primary); margin-right: 8px;">person</span>
-                        <span>個人與聯絡設定</span>
+                        <span>個人設定</span>
                     </h2>
                 </div>
 
@@ -876,7 +876,8 @@
                                 <span>置頂</span>
                             </span>
                         ` : ''}
-                        <strong style="color: var(--md-sys-color-text-main);">${ann.title}</strong>
+                        <!-- 【已開通】：後台列表標題高亮 -->
+                        <strong style="color: var(--md-sys-color-text-main);">${parseHighlights(ann.title)}</strong>
                     </div>
                     <div style="display: flex; gap: 0.5rem;">
                         <button onclick="editAnnouncement('${ann.id}')" class="sidebar-btn" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.85rem; background:#eab308; color:#000;">編輯</button>
@@ -908,13 +909,6 @@
             document.getElementById('form-announcement').reset();
             document.getElementById('ann-id').value = '';
             document.getElementById('form-ann-title').innerHTML = '<span class="material-symbols-outlined">add_box</span><span>新增系統公告</span>';
-        }
-
-        async function deleteAnnouncement(id) {
-            if (confirm('確定要永久刪除此公告嗎？這個動作將會自動同步提交至 GitHub。')) {
-                dbCache.announcements = dbCache.announcements.filter(item => item.id !== id);
-                await syncToGitHub('刪除公告');
-            }
         }
 
         // ===================================================
