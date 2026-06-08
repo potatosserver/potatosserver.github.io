@@ -33,7 +33,7 @@
       "id": "ann-1",
       "title": "網站系統成功升級！",
       "date": "2026-06-08",
-      "content": "目前已將所有分頁進行實體檔案拆分，並部署至 {h}GitHub Pages{\\h}，支援雲端管理！",
+      "content": "目前已將所有分頁進行實體檔案拆分，並部署至 {h}GitHub Pages{/h}，支援雲端管理！",
       "pinned": false
     }
   ],
