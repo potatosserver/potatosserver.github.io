@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>管理後台 | Andrew</title>
-    <!-- 引入 Icon 樣式表，解決圖示載入不出來的問題 -->
+    <!-- 引入 Google Material Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <!-- 預載入動畫 (Preloader) -->
     <div id="preloader">
         <svg class="loader-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
             <circle class="loader-circle" cx="60" cy="60" r="50" fill="none"/>
@@ -19,28 +20,136 @@
     <!-- 頂部共用導覽列 -->
     <header id="navbar-container" class="navbar"></header>
 
-    <!-- 側邊欄容器 -->
-    <div id="sidebar-container"></div>
+    <!-- ===================================================
+         1. 未登入狀態：安全登入卡片
+         =================================================== -->
+    <div id="login-view" class="full-width-content" style="display: none; max-width: 480px; text-align: center; margin-top: 15vh;">
+        <div class="card" style="padding: 3rem 2rem;">
+            <span class="material-symbols-outlined" style="font-size: 4rem; color: var(--primary-color); margin-bottom: 1rem;">lock</span>
+            <h2 style="border-bottom: none; justify-content: center; margin-top: 0; margin-bottom: 0.5rem;">管理員登入</h2>
+            <p style="margin-bottom: 2rem; color: var(--text-secondary-color);">此區域僅供網頁擁有者存取，請使用您的 GitHub 帳號進行身分驗證。</p>
+            <button id="btn-github-login" class="sidebar-btn active" style="justify-content: center; font-size: 1.1rem; padding: 1rem;">
+                <span class="material-symbols-outlined">login</span>
+                <span>使用 GitHub 帳號登入</span>
+            </button>
+        </div>
+    </div>
 
-    <!-- 右側主要內容區域 -->
-    <main class="main-content">
-        <section id="admin-panel">
-            <h2 style="margin-top: 0; border-bottom: none; padding-bottom: 0;">
-                <span class="material-symbols-outlined" style="font-size: 1.5em; color: var(--primary-color);">admin_panel_settings</span>
-                <span>系統管理後台</span>
-            </h2>
-            <p style="color: var(--text-secondary-color); margin-bottom: 2rem;">請使用左側選單切換設定與內容管理項目。</p>
+    <!-- ===================================================
+         2. 已登入狀態：後台管理介面佈局
+         =================================================== -->
+    <div id="admin-view" class="layout-container" style="display: none;">
+        
+        <!-- 左側側邊欄容器 -->
+        <div id="sidebar-container"></div>
+
+        <!-- 右側主要內容區域 -->
+        <main class="main-content">
             
-            <div class="card" style="padding: 2rem;">
-                <h3 style="color: var(--primary-color); margin-bottom: 1rem;">歡迎使用管理系統</h3>
-                <p>在這裡，您將能夠透過 GitHub API 進行雲端資料更新。目前系統外觀已調整完畢，下一個階段我們將開始實作與 GitHub 儲存庫的連線設定。</p>
-            </div>
-        </section>
-    </main>
+            <!-- 2.1 連線設定面板 (預設顯示) -->
+            <section id="panel-settings" class="admin-panel-section">
+                <h2 style="margin-top: 0;">
+                    <span class="material-symbols-outlined" style="color: var(--primary-color);">cloud_sync</span>
+                    <span>雲端同步狀態</span>
+                </h2>
+                <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <span id="connection-indicator" class="material-symbols-outlined" style="color: #4ade80; font-size: 2.5rem;">check_circle</span>
+                        <div>
+                            <h3 id="connection-status">已成功與 GitHub 建立安全連線</h3>
+                            <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary-color);">您的身分權杖已安全儲存於本地瀏覽器中。</p>
+                        </div>
+                    </div>
+                    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; margin-top: 1.5rem;">
+                        <button id="btn-logout" class="sidebar-btn" style="width: auto; background-color: #ef4444; color: white; border-color: #ef4444;">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span>登出管理系統</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
 
+            <!-- 2.2 公告管理面板 (預設隱藏) -->
+            <section id="panel-announcements" class="admin-panel-section" style="display: none;">
+                <h2 style="margin-top: 0;">
+                    <span class="material-symbols-outlined" style="color: var(--primary-color);">campaign</span>
+                    <span>公告管理</span>
+                </h2>
+                
+                <!-- 新增 / 編輯表單 -->
+                <div class="card" style="padding: 2rem; margin-bottom: 2rem;">
+                    <h3 id="form-ann-title" style="margin-bottom: 1.5rem; color: var(--primary-color);">📢 新增系統公告</h3>
+                    
+                    <form id="form-announcement">
+                        <input type="hidden" id="ann-id">
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.2rem;">
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">公告標題</label>
+                                <input type="text" id="ann-input-title" required style="width: 100%; padding: 0.75rem; background: var(--bg-color); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--border-radius-sm); color: var(--text-color);">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">發布日期</label>
+                                <input type="date" id="ann-input-date" required style="width: 100%; padding: 0.75rem; background: var(--bg-color); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--border-radius-sm); color: var(--text-color);">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 1.2rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">詳細內容 (支援換行)</label>
+                            <textarea id="ann-input-content" rows="6" required style="width: 100%; padding: 0.75rem; background: var(--bg-color); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--border-radius-sm); color: var(--text-color); font-family: inherit; resize: vertical;"></textarea>
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="ann-input-pinned" style="width: 18px; height: 18px; cursor: pointer;">
+                            <label for="ann-input-pinned" style="font-weight: bold; cursor: pointer; color: var(--primary-color);">將此公告置頂</label>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem;">
+                            <button type="submit" id="btn-ann-submit" class="sidebar-btn active" style="width: auto; padding: 0.75rem 1.5rem;">儲存公告</button>
+                            <button type="button" id="btn-ann-cancel" class="sidebar-btn" style="width: auto; padding: 0.75rem 1.5rem; display: none; background: #64748b;">取消編輯</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 雲端現有公告清單 -->
+                <div class="card" style="padding: 2rem;">
+                    <h3 style="margin-bottom: 1.5rem;">📁 現有公告列表</h3>
+                    <div id="admin-ann-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <p style="color: var(--text-secondary-color);">正在讀取雲端資料庫清單...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2.3 作品管理面板 (預設隱藏) -->
+            <section id="panel-projects" class="admin-panel-section" style="display: none;">
+                <h2 style="margin-top: 0;">
+                    <span class="material-symbols-outlined" style="color: var(--primary-color);">folder</span>
+                    <span>作品管理</span>
+                </h2>
+                <div class="card" style="padding: 2rem;">
+                    <h3>新增 / 編輯作品卡片</h3>
+                    <p style="color: var(--text-secondary-color); margin-bottom: 1.5rem;">此功能架構已預備完畢，可依照與公告系統相同的邏輯對接 `projects` 陣列。</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- 載入共用 JavaScript 邏輯 -->
     <script src="js/main.js"></script>
     <script>
-        // Preloader 控制
+        // ==========================================
+        // 核心 OAuth 驗證設定
+        // ==========================================
+        const GITHUB_CLIENT_ID = 'Ov23limDuIK15ITZ4Tuo'; // 您的 Client ID
+        const WORKER_URL = 'https://github-oauth-handler.potatosserver.workers.dev/'; // 您的 Cloudflare Worker 網址
+        const REDIRECT_URI = window.location.origin + window.location.pathname;
+
+        // 本地資料庫緩存與 SHA 值變數
+        let dbCache = { announcements: [], projects: [] };
+        let dbSha = '';
+
+        // 確保 Preloader 控制
         window.addEventListener('load', () => {
             const preloader = document.getElementById('preloader');
             if (preloader) {
@@ -48,36 +157,274 @@
             }
         });
 
-        // 載入導覽列與側邊欄
-        async function loadAdminLayout() {
-            // 載入頂部導覽列 (使用 js/main.js 內定義的 loadNavbar)
+        // 頁面初始化
+        document.addEventListener('DOMContentLoaded', async () => {
             await loadNavbar();
-            
-            // 載入左側側邊欄
+            checkAuth();
+        });
+
+        // 檢查驗證狀態
+        async function checkAuth() {
+            const token = localStorage.getItem('gh_token');
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+
+            if (token) {
+                // 已登入：隱藏登入卡片，顯示後台版面並下載側邊欄
+                document.getElementById('admin-view').style.display = 'flex';
+                await loadSidebar();
+            } else if (code) {
+                // 偵測到代碼：顯示 Preloader 表示正在換取正式 Token 中
+                const preloader = document.getElementById('preloader');
+                if (preloader) preloader.classList.remove('hidden');
+                
+                await exchangeCodeForToken(code);
+            } else {
+                // 未登入：顯示登入介面
+                document.getElementById('login-view').style.display = 'block';
+                bindLoginEvent();
+            }
+        }
+
+        // 綁定登入按鈕
+        function bindLoginEvent() {
+            document.getElementById('btn-github-login').addEventListener('click', () => {
+                // 請求寫入權限，用來讀寫您的 GitHub 數據庫 json
+                const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=repo`;
+                window.location.href = githubAuthUrl;
+            });
+        }
+
+        // 與 Cloudflare Worker 連線交換 Token
+        async function exchangeCodeForToken(code) {
+            try {
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+
+                const data = await response.json();
+
+                if (data.access_token) {
+                    // 交換成功：寫入本地，重置網址並重刷頁面完成登入
+                    localStorage.setItem('gh_token', data.access_token);
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    location.reload();
+                } else {
+                    alert('登入失敗，無法交換金鑰。原因：' + (data.error_description || data.error || '未定義錯誤。'));
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    location.reload();
+                }
+            } catch (error) {
+                console.error('與驗證端通訊錯誤：', error);
+                alert('伺服器連線異常。');
+                window.history.replaceState({}, document.title, window.location.pathname);
+                location.reload();
+            }
+        }
+
+        // 載入側邊欄
+        async function loadSidebar() {
             try {
                 const response = await fetch('components/sidebar.html');
                 if (response.ok) {
                     const html = await response.text();
                     document.getElementById('sidebar-container').innerHTML = html;
                     bindSidebarEvents();
+                    bindLogoutEvent();
                 }
             } catch (error) {
                 console.error('側邊欄組件載入失敗:', error);
             }
         }
 
-        // 綁定側邊欄按鈕的選取切換效果
+        // 側邊欄切換面板與按鈕點擊控制
         function bindSidebarEvents() {
             const buttons = document.querySelectorAll('.sidebar-btn');
+            
             buttons.forEach(btn => {
                 btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 1. 切換 active 按鈕效果
                     buttons.forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
+
+                    // 2. 依據按鈕 id 切換顯示右側特定的管理面板
+                    const btnId = this.id;
+                    hideAllPanels();
+
+                    if (btnId === 'btn-menu-settings') {
+                        document.getElementById('panel-settings').style.display = 'block';
+                    } else if (btnId === 'btn-menu-projects') {
+                        document.getElementById('panel-projects').style.display = 'block';
+                    } else if (btnId === 'btn-menu-articles') {
+                        document.getElementById('panel-announcements').style.display = 'block';
+                        refreshAnnouncements(); // 切換到公告版面時自動刷新清單
+                    }
                 });
             });
         }
 
-        document.addEventListener('DOMContentLoaded', loadAdminLayout);
+        // 隱藏所有後台面板
+        function hideAllPanels() {
+            const panels = document.querySelectorAll('.admin-panel-section');
+            panels.forEach(panel => {
+                panel.style.display = 'none';
+            });
+        }
+
+        // 綁定登出按鈕
+        function bindLogoutEvent() {
+            document.getElementById('btn-logout').addEventListener('click', () => {
+                if (confirm('確定要登出管理系統嗎？')) {
+                    localStorage.removeItem('gh_token');
+                    location.reload();
+                }
+            });
+        }
+
+        // ===================================================
+        // 雲端公告管理 (CRUD) API 對接控制邏輯
+        // ===================================================
+
+        // 自雲端更新本地公告快取
+        async function refreshAnnouncements() {
+            const listContainer = document.getElementById('admin-ann-list');
+            listContainer.innerHTML = '<p style="color: var(--text-secondary-color);">讀取雲端最新資料中...</p>';
+            
+            try {
+                const res = await fetchDatabase();
+                dbCache = res.data;
+                dbSha = res.sha;
+                renderAdminAnnouncements();
+            } catch (err) {
+                console.error(err);
+                listContainer.innerHTML = '<p style="color: #ef4444;">下載資料庫失敗，請確認 data/projects_articles.json 檔案是否存在。</p>';
+            }
+        }
+
+        // 渲染後台公告列表
+        function renderAdminAnnouncements() {
+            const listContainer = document.getElementById('admin-ann-list');
+            const items = dbCache.announcements || [];
+
+            if (items.length === 0) {
+                listContainer.innerHTML = '<p style="color: var(--text-secondary-color);">目前沒有任何公告項目。</p>';
+                return;
+            }
+
+            // 依發布日期從新到舊排序
+            items.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            listContainer.innerHTML = items.map(ann => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-color); border: 1px solid rgba(255,255,255,0.05); border-radius: var(--border-radius-md);">
+                    <div>
+                        <span style="font-size: 0.85rem; color: var(--primary-color); font-weight: bold; margin-right: 10px;">${ann.date}</span>
+                        ${ann.pinned ? '<span style="background:var(--primary-color); color:var(--on-primary-color); font-size:0.75rem; padding: 1px 4px; border-radius:4px; font-weight:bold; margin-right:10px;">置頂</span>' : ''}
+                        <strong style="color: var(--text-color);">${ann.title}</strong>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button onclick="editAnnouncement('${ann.id}')" class="sidebar-btn" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.85rem; background:#eab308; border-color:#eab308; color:#000;">編輯</button>
+                        <button onclick="deleteAnnouncement('${ann.id}')" class="sidebar-btn" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.85rem; background:#ef4444; border-color:#ef4444; color:#fff;">刪除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 綁定公告表單提交 (新增 & 修改)
+        document.getElementById('form-announcement').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const annId = document.getElementById('ann-id').value;
+            const title = document.getElementById('ann-input-title').value.trim();
+            const date = document.getElementById('ann-input-date').value;
+            const content = document.getElementById('ann-input-content').value;
+            const pinned = document.getElementById('ann-input-pinned').checked;
+
+            if (!dbCache.announcements) dbCache.announcements = [];
+
+            const currentAnnData = {
+                id: annId || 'ann-' + Date.now(),
+                title,
+                date,
+                content,
+                pinned
+            };
+
+            if (annId) {
+                // 編輯模式：取代原項目
+                const idx = dbCache.announcements.findIndex(item => item.id === annId);
+                if (idx > -1) dbCache.announcements[idx] = currentAnnData;
+            } else {
+                // 新增模式
+                dbCache.announcements.push(currentAnnData);
+            }
+
+            // 同步 Commit 回 GitHub
+            await syncToGitHub('公告儲存');
+            resetAnnForm();
+        });
+
+        // 點擊編輯按鈕：將選定公告數據帶回表單
+        function editAnnouncement(id) {
+            const ann = dbCache.announcements.find(item => item.id === id);
+            if (ann) {
+                document.getElementById('ann-id').value = ann.id;
+                document.getElementById('ann-input-title').value = ann.title;
+                document.getElementById('ann-input-date').value = ann.date;
+                document.getElementById('ann-input-content').value = ann.content;
+                document.getElementById('ann-input-pinned').checked = ann.pinned || false;
+
+                document.getElementById('form-ann-title').innerText = '📝 編輯系統公告';
+                document.getElementById('btn-ann-cancel').style.display = 'inline-flex';
+                // 平滑滾動至編輯表單
+                document.getElementById('form-announcement').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // 取消編輯按鈕綁定
+        document.getElementById('btn-ann-cancel').addEventListener('click', resetAnnForm);
+
+        function resetAnnForm() {
+            document.getElementById('form-announcement').reset();
+            document.getElementById('ann-id').value = '';
+            document.getElementById('form-ann-title').innerText = '📢 新增系統公告';
+            document.getElementById('btn-ann-cancel').style.display = 'none';
+        }
+
+        // 刪除公告項目
+        async function deleteAnnouncement(id) {
+            if (confirm('確定要永久刪除此公告嗎？這個動作將會自動同步提交至 GitHub。')) {
+                dbCache.announcements = dbCache.announcements.filter(item => item.id !== id);
+                await syncToGitHub('刪除公告');
+            }
+        }
+
+        // 雲端資料同步 Commit (封裝獲取最新 SHA 防止寫入衝突)
+        async function syncToGitHub(actionText) {
+            const preloader = document.getElementById('preloader');
+            if (preloader) preloader.classList.remove('hidden');
+
+            try {
+                // 1. 強制向 GitHub 讀取最新版本取得正確 SHA 值
+                const latest = await fetchDatabase();
+                dbSha = latest.sha;
+
+                // 2. 呼叫 js/main.js 的 saveDatabase 寫入資料
+                const res = await saveDatabase(dbCache, dbSha);
+                dbSha = res.content.sha; // 更新本地 SHA 變數
+                
+                alert(`${actionText}成功！已透過 API 自動 Commit 更新至 GitHub Pages。`);
+                renderAdminAnnouncements();
+            } catch (err) {
+                console.error(err);
+                alert('與 GitHub 同步更新時發生錯誤：' + err.message);
+            } finally {
+                if (preloader) preloader.classList.add('hidden');
+            }
+        }
     </script>
 </body>
 </html>

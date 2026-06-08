@@ -1,0 +1,32 @@
+{
+  "announcements": [
+    {
+      "id": "ann-1",
+      "date": "2026-06-08",
+      "title": "網站系統成功升級！",
+      "content": "目前已將所有分頁進行實體檔案拆分，並部署至 GitHub Pages，支援雲端管理！",
+      "pinned": true
+    },
+    {
+      "id": "ann-2",
+      "date": "2026-06-05",
+      "title": "YouBike 2.0 查詢工具測試中",
+      "content": "正在測試將 YouBike 2.0 查詢工具與個人網站進行更深度的整合，敬請期待。",
+      "pinned": false
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj-1",
+      "title": "YouBike 2.0 即時查詢",
+      "description": "串接 YouBike 官方 API，提供即時站點車輛與空位查詢的網頁應用。",
+      "github_url": "https://github.com/potatosserver/YouBike"
+    },
+    {
+      "id": "proj-2",
+      "title": "高雄即時公車",
+      "description": "一個能夠查詢高雄地區公車即時動態的應用程式。",
+      "github_url": "https://github.com/potatosserver/kaohsiung_live_bus"
+    }
+  ]
+}

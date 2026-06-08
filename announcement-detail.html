@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系統公告 | Andrew</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="preloader">
+        <svg class="loader-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <circle class="loader-circle" cx="60" cy="60" r="50" fill="none"/>
+        </svg>
+    </div>
+
+    <header id="navbar-container" class="navbar"></header>
+
+    <main class="full-width-content">
+        <div class="card" style="padding: 2.5rem; margin-top: 1rem;">
+            <div id="announcement-detail-content">
+                <p style="color: var(--text-secondary-color);">正在讀取公告詳細內容...</p>
+            </div>
+            
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; margin-top: 2rem;">
+                <a href="index.html" class="sidebar-btn" style="width: auto; display: inline-flex;">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    <span>返回首頁</span>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/main.js"></script>
+    <script>
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                setTimeout(() => preloader.classList.add('hidden'), 200);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadNavbar();
+            await loadDetail();
+        });
+
+        async function loadDetail() {
+            const container = document.getElementById('announcement-detail-content');
+            const urlParams = new URLSearchParams(window.location.search);
+            const annId = urlParams.get('id');
+
+            if (!annId) {
+                container.innerHTML = '<h2>未指定公告 ID</h2><p>請返回首頁重試。</p>';
+                return;
+            }
+
+            try {
+                const result = await fetchDatabase();
+                const announcements = result.data.announcements || [];
+                const ann = announcements.find(item => item.id === annId);
+
+                if (!ann) {
+                    container.innerHTML = '<h2>找不到該公告內容</h2><p>該公告可能已被管理員移除。</p>';
+                    return;
+                }
+
+                // 成功尋獲，渲染標題、日期、詳細內容
+                container.innerHTML = `
+                    <div style="display: flex; gap: 1rem; align-items: center; color: var(--primary-color); margin-bottom: 0.5rem; font-size: 0.95rem;">
+                        <span class="material-symbols-outlined">calendar_month</span>
+                        <span>發布日期：${ann.date}</span>
+                    </div>
+                    <h1 style="color: var(--text-color); margin-bottom: 1.5rem; border-bottom: 2px solid var(--primary-color); padding-bottom: 1rem;">${ann.title}</h1>
+                    <div style="font-size: 1.1rem; line-height: 1.8; color: var(--text-color); white-space: pre-wrap;">${ann.content}</div>
+                `;
+
+                document.title = `${ann.title} | 系統公告`;
+
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = '<h2>讀取失敗</h2><p>與 GitHub 資料伺服器通訊時發生異常。</p>';
+            }
+        }
+    </script>
+</body>
+</html>
