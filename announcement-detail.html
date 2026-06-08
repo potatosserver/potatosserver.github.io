@@ -20,10 +20,10 @@
     <main class="full-width-content">
         <div class="card" style="padding: 2.5rem; margin-top: 1rem;">
             <div id="announcement-detail-content">
-                <p style="color: var(--text-secondary-color);">正在讀取公告詳細內容...</p>
+                <p style="color: var(--md-sys-color-text-muted);">正在讀取公告詳細內容...</p>
             </div>
             
-            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; margin-top: 2rem;">
+            <div style="border-top: 1px solid var(--md-sys-color-outline); padding-top: 1.5rem; margin-top: 2rem;">
                 <a href="index.html" class="sidebar-btn" style="width: auto; display: inline-flex;">
                     <span class="material-symbols-outlined">arrow_back</span>
                     <span>返回首頁</span>
@@ -66,14 +66,14 @@
                     return;
                 }
 
-                // 成功尋獲，渲染標題、日期、詳細內容
+                // 成功尋獲，修正 gap: 0.5rem 讓圖示與文字貼合
                 container.innerHTML = `
-                    <div style="display: flex; gap: 1rem; align-items: center; color: var(--primary-color); margin-bottom: 0.5rem; font-size: 0.95rem;">
-                        <span class="material-symbols-outlined">calendar_month</span>
+                    <div style="display: flex; gap: 0.5rem; align-items: center; color: var(--md-sys-color-primary); margin-bottom: 0.5rem; font-size: 0.95rem;">
+                        <span class="material-symbols-outlined" style="font-size: 1.25em;">calendar_month</span>
                         <span>發布日期：${ann.date}</span>
                     </div>
-                    <h1 style="color: var(--text-color); margin-bottom: 1.5rem; border-bottom: 2px solid var(--primary-color); padding-bottom: 1rem;">${ann.title}</h1>
-                    <div style="font-size: 1.1rem; line-height: 1.8; color: var(--text-color); white-space: pre-wrap;">${ann.content}</div>
+                    <h1 style="color: var(--md-sys-color-text-main); margin-bottom: 1.5rem; border-bottom: 2px solid var(--md-sys-color-primary); padding-bottom: 1rem;">${ann.title}</h1>
+                    <div style="font-size: 1.1rem; line-height: 1.8; color: var(--md-sys-color-text-main); white-space: pre-wrap;">${ann.content}</div>
                 `;
 
                 document.title = `${ann.title} | 系統公告`;

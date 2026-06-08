@@ -10,6 +10,7 @@
 </head>
 <body>
 
+    <!-- 預載入動畫 (Preloader) -->
     <div id="preloader">
         <svg class="loader-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
             <circle class="loader-circle" cx="60" cy="60" r="50" fill="none"/>
@@ -19,7 +20,9 @@
     <!-- 頂部共用導覽列 -->
     <header id="navbar-container" class="navbar"></header>
 
-    <!-- 1. 未登入狀態 -->
+    <!-- ===================================================
+         1. 未登入狀態：安全登入卡片
+         =================================================== -->
     <div id="login-view" class="full-width-content" style="display: none; max-width: 480px; text-align: center; margin-top: 15vh;">
         <div class="card" style="padding: 3rem 2rem;">
             <span class="material-symbols-outlined" style="font-size: 4rem; color: var(--md-sys-color-primary); margin-bottom: 1rem;">lock</span>
@@ -32,11 +35,15 @@
         </div>
     </div>
 
-    <!-- 2. 已登入狀態 -->
+    <!-- ===================================================
+         2. 已登入狀態：後台管理介面佈局
+         =================================================== -->
     <div id="admin-view" class="layout-container" style="display: none;">
         
+        <!-- 左側側邊欄容器 -->
         <div id="sidebar-container"></div>
 
+        <!-- 右側主要內容區域 -->
         <main class="main-content">
             
             <!-- 2.1 連線設定面板 -->
@@ -62,99 +69,136 @@
                 </div>
             </section>
 
-            <!-- 2.2 【新增】個人與首頁設定面板 -->
+            <!-- 2.2 個人設定面板 -->
             <section id="panel-profile" class="admin-panel-section" style="display: none;">
                 <div class="admin-panel-header">
                     <h2>
                         <span class="material-symbols-outlined" style="color: var(--md-sys-color-primary); margin-right: 8px;">person</span>
-                        <span>個人與品牌設定</span>
+                        <span>個人設定</span>
                     </h2>
+                    <button id="btn-edit-profile-trigger" class="sidebar-btn active" style="width: auto; padding: 0.6rem 1.25rem;">
+                        <span class="material-symbols-outlined">edit</span>
+                        <span>修改個人設定</span>
+                    </button>
+                </div>
+
+                <!-- 【視圖 A】唯讀檢視模式 -->
+                <div id="profile-view-mode" class="admin-view-fade">
+                    <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
+                        <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="material-symbols-outlined">palette</span>
+                            <span>主題視覺</span>
+                        </h3>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div id="preview-profile-color" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid white;"></div>
+                            <span id="preview-profile-color-text" style="font-family: monospace;">#7B9DFF</span>
+                        </div>
+                    </div>
+
+                    <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
+                        <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="material-symbols-outlined">home</span>
+                            <span>首頁文案</span>
+                        </h3>
+                        <h4 id="preview-home-title" style="margin-bottom: 0.5rem;"></h4>
+                        <p id="preview-home-subtitle" style="font-weight: 500; color: var(--md-sys-color-text-main); margin-bottom: 1rem;"></p>
+                        <p id="preview-home-desc" style="margin: 0;"></p>
+                    </div>
+
+                    <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
+                        <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="material-symbols-outlined">person</span>
+                            <span>關於我簡介</span>
+                        </h3>
+                        <p id="preview-about-bio" style="margin-bottom: 1.5rem;"></p>
+                        
+                        <h4 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="material-symbols-outlined" id="preview-skills-icon">psychology</span>
+                            <span id="preview-skills-title">我的技能</span>
+                        </h4>
+                        <div id="preview-skills-list" style="display: flex; flex-direction: column; gap: 0.5rem; color: var(--md-sys-color-text-muted);"></div>
+                    </div>
                 </div>
                 
-                <form id="form-profile">
-                    <!-- A. 主題視覺設定 -->
-                    <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
-                        <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1rem;">🎨 網頁主題視覺</h3>
-                        <div style="display: flex; align-items: center; gap: 1.5rem;">
-                            <input type="color" id="profile-color" class="m3-text-field" style="width: 80px; height: 50px; padding: 4px; cursor: pointer;">
-                            <div>
-                                <strong>網站主題高亮色</strong>
-                                <p style="margin: 0; font-size: 0.85rem; color: var(--md-sys-color-text-muted);">這會即時修改全站的按鈕、置頂標籤與強調文字外觀色調。</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- B. 首頁文案設定 -->
-                    <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
-                        <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1.25rem;">🏠 首頁文案控制</h3>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.2rem;">
-                            <div style="display: flex; flex-direction: column;">
-                                <label style="margin-bottom: 0.5rem; font-weight: bold;">主標題 (H1)</label>
-                                <input type="text" id="home-input-title" class="m3-text-field" required>
-                            </div>
-                            <div style="display: flex; flex-direction: column;">
-                                <label style="margin-bottom: 0.5rem; font-weight: bold;">副標題</label>
-                                <input type="text" id="home-input-subtitle" class="m3-text-field" required>
-                            </div>
-                        </div>
-                        <div style="display: flex; flex-direction: column;">
-                            <label style="margin-bottom: 0.5rem; font-weight: bold;">介紹內文 (支援高亮標記 {h}字詞{/h} )</label>
-                            <textarea id="home-input-desc" rows="4" class="m3-text-field" required></textarea>
-                        </div>
-                    </div>
-
-                    <!-- C. 關於我文案與技能 -->
-                    <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
-                        <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1.25rem;">👤 關於我文案控制</h3>
-                        <div style="display: flex; flex-direction: column; margin-bottom: 1.2rem;">
-                            <label style="margin-bottom: 0.5rem; font-weight: bold;">個人簡介</label>
-                            <textarea id="about-input-bio" rows="4" class="m3-text-field" required></textarea>
-                        </div>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
-                            <div style="display: flex; flex-direction: column;">
-                                <label style="margin-bottom: 0.5rem; font-weight: bold;">技能區塊標題</label>
-                                <input type="text" id="about-input-skills-title" class="m3-text-field" required>
-                            </div>
-                            <div style="display: flex; flex-direction: column;">
-                                <label style="margin-bottom: 0.5rem; font-weight: bold;">技能標題圖示</label>
-                                <select id="about-input-skills-icon" class="m3-text-field">
-                                    <option value="psychology">🧠 心理學/技能 (psychology)</option>
-                                    <option value="code">💻 程式開發 (code)</option>
-                                    <option value="school">🎓 學校/教育 (school)</option>
-                                    <option value="badge">🎖️ 徽章榮譽 (badge)</option>
-                                    <option value="person">👤 個人肖像 (person)</option>
-                                </select>
+                <!-- 【視圖 B】編輯表單模式 (預設隱藏) -->
+                <div id="profile-form-view" class="card admin-view-fade" style="padding: 2rem; margin-bottom: 2rem; display: none;">
+                    <form id="form-profile">
+                        <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem; background-color: rgba(255,255,255,0.01);">
+                            <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1rem;">主題配色</h3>
+                            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                                <input type="color" id="profile-color" class="m3-text-field" style="width: 80px; height: 50px; padding: 4px; cursor: pointer;">
+                                <div>
+                                    <strong>選擇網站高亮色</strong>
+                                    <p style="margin: 0; font-size: 0.85rem; color: var(--md-sys-color-text-muted);">這會即時修改全站所有導覽、按鈕與強調樣式。</p>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 三組預定義技能項目 (穩定性最高、最容易編輯) -->
-                        <div style="border-top: 1px solid var(--md-sys-color-outline); padding-top: 1.2rem;">
-                            <h4 style="margin-bottom: 1rem;">我的技能列表 (三組細項)</h4>
+                        <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem; background-color: rgba(255,255,255,0.01);">
+                            <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1.25rem;">首頁文字</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.2rem;">
+                                <div style="display: flex; flex-direction: column;">
+                                    <label style="margin-bottom: 0.5rem; font-weight: bold;">主標題 (H1)</label>
+                                    <input type="text" id="home-input-title" class="m3-text-field" required>
+                                </div>
+                                <div style="display: flex; flex-direction: column;">
+                                    <label style="margin-bottom: 0.5rem; font-weight: bold;">副標題</label>
+                                    <input type="text" id="home-input-subtitle" class="m3-text-field" required>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <label style="margin-bottom: 0.5rem; font-weight: bold;">介紹內文 (支援高亮標記 {h}字詞{/h} )</label>
+                                <textarea id="home-input-desc" rows="4" class="m3-text-field" required></textarea>
+                            </div>
+                        </div>
+
+                        <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem; background-color: rgba(255,255,255,0.01);">
+                            <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1.25rem;">關於我及技能</h3>
+                            <div style="display: flex; flex-direction: column; margin-bottom: 1.2rem;">
+                                <label style="margin-bottom: 0.5rem; font-weight: bold;">個人簡介</label>
+                                <textarea id="about-input-bio" rows="4" class="m3-text-field" required></textarea>
+                            </div>
                             
-                            <!-- 技能 1 -->
-                            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 0.75rem;">
-                                <input type="text" id="skill-lbl-0" class="m3-text-field" placeholder="標籤：例如 語言" required>
-                                <input type="text" id="skill-val-0" class="m3-text-field" placeholder="內容：例如 Python, C++" required>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                                <div style="display: flex; flex-direction: column;">
+                                    <label style="margin-bottom: 0.5rem; font-weight: bold;">技能區塊標題</label>
+                                    <input type="text" id="about-input-skills-title" class="m3-text-field" required>
+                                </div>
+                                <div style="display: flex; flex-direction: column;">
+                                    <label style="margin-bottom: 0.5rem; font-weight: bold;">技能標題圖示</label>
+                                    <select id="about-input-skills-icon" class="m3-text-field">
+                                        <option value="psychology">技能代碼 (psychology)</option>
+                                        <option value="code">程式開發 (code)</option>
+                                        <option value="school">學校教育 (school)</option>
+                                        <option value="badge">徽章榮譽 (badge)</option>
+                                        <option value="person">個人肖像 (person)</option>
+                                    </select>
+                                </div>
                             </div>
-                            <!-- 技能 2 -->
-                            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 0.75rem;">
-                                <input type="text" id="skill-lbl-1" class="m3-text-field" placeholder="標籤：例如 領域" required>
-                                <input type="text" id="skill-val-1" class="m3-text-field" placeholder="內容：例如 前端開發" required>
-                            </div>
-                            <!-- 技能 3 -->
-                            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 0.75rem;">
-                                <input type="text" id="skill-lbl-2" class="m3-text-field" placeholder="標籤：例如 興趣" required>
-                                <input type="text" id="skill-val-2" class="m3-text-field" placeholder="內容：自動化生活瑣事" required>
+
+                            <div style="border-top: 1px solid var(--md-sys-color-outline); padding-top: 1.2rem;">
+                                <h4 style="margin-bottom: 1rem;">技能清單管理</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 0.75rem;">
+                                    <input type="text" id="skill-lbl-0" class="m3-text-field" placeholder="標籤，例如：語言" required>
+                                    <input type="text" id="skill-val-0" class="m3-text-field" placeholder="內容，例如：Python, C++" required>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 0.75rem;">
+                                    <input type="text" id="skill-lbl-1" class="m3-text-field" placeholder="標籤，例如：領域" required>
+                                    <input type="text" id="skill-val-1" class="m3-text-field" placeholder="內容，例如：前端開發" required>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 0.75rem;">
+                                    <input type="text" id="skill-lbl-2" class="m3-text-field" placeholder="標籤，例如：興趣" required>
+                                    <input type="text" id="skill-val-2" class="m3-text-field" placeholder="內容，例如：探索小工具" required>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <button type="submit" class="sidebar-btn active" style="width: auto; padding: 0.9rem 2rem; margin-bottom: 3rem;">
-                        <span class="material-symbols-outlined">save</span>
-                        <span>儲存品牌與視覺設定</span>
-                    </button>
-                </form>
+                        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                            <button type="submit" class="sidebar-btn active" style="width: auto; padding: 0.75rem 1.5rem;">儲存個人設定</button>
+                            <button type="button" id="btn-profile-cancel" class="sidebar-btn" style="width: auto; padding: 0.75rem 1.5rem; background: #64748b;">取消修改</button>
+                        </div>
+                    </form>
+                </div>
             </section>
 
             <!-- 2.3 公告管理面板 -->
@@ -302,7 +346,7 @@
             bindFormEvents(); 
             bindProjectFormEvents(); 
             bindUIViewEvents(); 
-            bindProfileFormEvents(); // 綁定個人設定提交
+            bindProfileFormEvents(); 
         });
 
         async function checkAuth() {
@@ -390,7 +434,7 @@
                         document.getElementById('panel-settings').style.display = 'block';
                     } else if (btnId === 'btn-menu-profile') {
                         document.getElementById('panel-profile').style.display = 'block';
-                        refreshProfile(); // 下載個人檔案資料
+                        refreshProfile(); 
                     } else if (btnId === 'btn-menu-projects') {
                         document.getElementById('panel-projects').style.display = 'block';
                         refreshProjects(); 
@@ -422,48 +466,68 @@
         }
 
         function bindUIViewEvents() {
+            // 公告新增視圖切換
             document.getElementById('btn-add-ann-trigger').addEventListener('click', () => {
                 document.getElementById('ann-list-view').style.display = 'none';
                 document.getElementById('ann-form-view').style.display = 'block';
                 document.getElementById('btn-add-ann-trigger').style.display = 'none';
             });
 
+            // 作品新增視圖切換
             document.getElementById('btn-add-proj-trigger').addEventListener('click', () => {
                 document.getElementById('proj-list-view').style.display = 'none';
                 document.getElementById('proj-form-view').style.display = 'block';
                 document.getElementById('btn-add-proj-trigger').style.display = 'none';
             });
+
+            // 【新增】：個人設定「檢視/編輯」視圖切換
+            document.getElementById('btn-edit-profile-trigger').addEventListener('click', () => {
+                document.getElementById('profile-view-mode').style.display = 'none';
+                document.getElementById('profile-form-view').style.display = 'block';
+                document.getElementById('btn-edit-profile-trigger').style.display = 'none';
+            });
         }
 
+        // 將所有版面重置為預設唯讀/清單模式
         function resetAllViewsToDefault() {
+            // 公告
             document.getElementById('ann-list-view').style.display = 'block';
             document.getElementById('ann-form-view').style.display = 'none';
             const addAnnTrigger = document.getElementById('btn-add-ann-trigger');
             if (addAnnTrigger) addAnnTrigger.style.display = 'inline-flex';
             resetAnnForm();
 
+            // 作品
             document.getElementById('proj-list-view').style.display = 'block';
             document.getElementById('proj-form-view').style.display = 'none';
             const addProjTrigger = document.getElementById('btn-add-proj-trigger');
             if (addProjTrigger) addProjTrigger.style.display = 'inline-flex';
             resetProjForm();
+
+            // 個人設定
+            document.getElementById('profile-view-mode').style.display = 'block';
+            document.getElementById('profile-form-view').style.display = 'none';
+            const editProfileTrigger = document.getElementById('btn-edit-profile-trigger');
+            if (editProfileTrigger) editProfileTrigger.style.display = 'inline-flex';
         }
 
+
         // ===================================================
-        // 新增：個人設定控制邏輯
+        // 個人設定控制與自動讀取/寫入舊資料
         // ===================================================
         async function refreshProfile() {
             try {
+                // 自動從 GitHub 拉取最新檔案
                 const res = await fetchDatabase();
                 dbCache = res.data;
                 dbSha = res.sha;
 
-                // 填入表單
                 const profile = dbCache.profile || {};
                 const theme = profile.theme || {};
                 const home = profile.home || {};
                 const about = profile.about || {};
 
+                // 1. 自動導入至「編輯表單」
                 document.getElementById('profile-color').value = theme.highlight_color || '#7B9DFF';
                 document.getElementById('home-input-title').value = home.title || '';
                 document.getElementById('home-input-subtitle').value = home.subtitle || '';
@@ -479,9 +543,27 @@
                     document.getElementById(`skill-val-${i}`).value = skill.value;
                 }
 
+                // 2. 自動將舊資料渲染至「唯讀預覽區」
+                document.getElementById('preview-profile-color').style.backgroundColor = theme.highlight_color || '#7B9DFF';
+                document.getElementById('preview-profile-color-text').innerText = theme.highlight_color || '#7B9DFF';
+                document.getElementById('preview-home-title').innerText = home.title || '';
+                document.getElementById('preview-home-subtitle').innerText = home.subtitle || '';
+                document.getElementById('preview-home-desc').innerHTML = parseHighlights(home.description);
+                document.getElementById('preview-about-bio').innerText = about.bio || '';
+                document.getElementById('preview-skills-title').innerText = about.skills_title || '我的技能';
+                document.getElementById('preview-skills-icon').innerText = about.skills_icon || 'psychology';
+
+                const previewSkillsContainer = document.getElementById('preview-skills-list');
+                previewSkillsContainer.innerHTML = skills.map(sk => {
+                    if (sk.label && sk.value) {
+                        return `<div style="margin-bottom:4px;"><strong>${sk.label}：</strong><span>${sk.value}</span></div>`;
+                    }
+                    return '';
+                }).join('');
+
             } catch (err) {
-                console.error(err);
-                alert("載入設定檔失敗！");
+                console.error("載入個人設定失敗：", err);
+                alert("載入最新設定資料失敗，請確認與 GitHub 伺服器連線正常。");
             }
         }
 
@@ -507,16 +589,21 @@
                         });
                     }
 
-                    // 寫入快取
+                    // 寫入快取，分開進行儲存不干擾公告或作品
                     dbCache.profile = {
                         theme: { highlight_color },
                         home: { title: home_title, subtitle: home_subtitle, description: home_desc },
                         about: { bio: about_bio, skills_title, skills_icon, skills_list }
                     };
 
-                    await syncToGitHub('個人品牌設定更新');
+                    await syncToGitHub('個人品牌與視覺設定更新');
+                    resetAllViewsToDefault();
+                    await refreshProfile(); // 儲存完畢自動刷新唯讀畫面
                 });
             }
+
+            // 取消修改按鈕綁定
+            document.getElementById('btn-profile-cancel').addEventListener('click', resetAllViewsToDefault);
         }
 
         // ===================================================
