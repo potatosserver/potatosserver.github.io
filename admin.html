@@ -141,13 +141,15 @@
         // ==========================================
         // 核心 OAuth 驗證設定
         // ==========================================
-        const GITHUB_CLIENT_ID = 'Ov23limDuIK15ITZ4Tuo'; // 您的 Client ID
-        const WORKER_URL = 'https://github-oauth-handler.potatosserver.workers.dev/'; // 您的 Cloudflare Worker 網址
+        const GITHUB_CLIENT_ID = 'Ov23limDuIK15ITZ4Tuo'; 
+        const WORKER_URL = 'https://github-oauth-handler.potatosserver.workers.dev/'; 
         const REDIRECT_URI = window.location.origin + window.location.pathname;
 
         // 本地資料庫緩存與 SHA 值變數
         let dbCache = { announcements: [], projects: [] };
         let dbSha = '';
+
+        console.log("後台指令稿載入成功，準備初始化。");
 
         // 確保 Preloader 控制
         window.addEventListener('load', () => {
@@ -159,8 +161,10 @@
 
         // 頁面初始化
         document.addEventListener('DOMContentLoaded', async () => {
+            console.log("DOM 解析完畢，開始載入導覽列與進行登入檢查。");
             await loadNavbar();
-            checkAuth();
+            await checkAuth();
+            bindFormEvents(); // 將表單事件安全地在 DOM 完成後綁定
         });
 
         // 檢查驗證狀態
@@ -170,34 +174,37 @@
             const code = urlParams.get('code');
 
             if (token) {
-                // 已登入：隱藏登入卡片，顯示後台版面並下載側邊欄
+                console.log("驗證狀態：已登入。");
                 document.getElementById('admin-view').style.display = 'flex';
                 await loadSidebar();
             } else if (code) {
-                // 偵測到代碼：顯示 Preloader 表示正在換取正式 Token 中
+                console.log("驗證狀態：偵測到 OAuth 臨時 Code，開始交換 Token。");
                 const preloader = document.getElementById('preloader');
                 if (preloader) preloader.classList.remove('hidden');
-                
                 await exchangeCodeForToken(code);
             } else {
-                // 未登入：顯示登入介面
+                console.log("驗證狀態：未登入。顯示安全登入卡片。");
                 document.getElementById('login-view').style.display = 'block';
                 bindLoginEvent();
             }
         }
 
-        // 綁定登入按鈕
+        // 登入事件綁定
         function bindLoginEvent() {
-            document.getElementById('btn-github-login').addEventListener('click', () => {
-                // 請求寫入權限，用來讀寫您的 GitHub 數據庫 json
-                const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=repo`;
-                window.location.href = githubAuthUrl;
-            });
+            const btn = document.getElementById('btn-github-login');
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    console.log("重導向至 GitHub OAuth 授權頁面...");
+                    const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=repo`;
+                    window.location.href = githubAuthUrl;
+                });
+            }
         }
 
         // 與 Cloudflare Worker 連線交換 Token
         async function exchangeCodeForToken(code) {
             try {
+                console.log("向 Cloudflare Worker 發送交換請求...");
                 const response = await fetch(WORKER_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -207,12 +214,13 @@
                 const data = await response.json();
 
                 if (data.access_token) {
-                    // 交換成功：寫入本地，重置網址並重刷頁面完成登入
+                    console.log("Token 交換成功！安全寫入 localStorage。");
                     localStorage.setItem('gh_token', data.access_token);
                     window.history.replaceState({}, document.title, window.location.pathname);
                     location.reload();
                 } else {
-                    alert('登入失敗，無法交換金鑰。原因：' + (data.error_description || data.error || '未定義錯誤。'));
+                    console.error("交換 Token 失敗：", data);
+                    alert('登入失敗，無法交換安全金鑰。原因：' + (data.error_description || data.error || '未定義錯誤。'));
                     window.history.replaceState({}, document.title, window.location.pathname);
                     location.reload();
                 }
@@ -227,6 +235,7 @@
         // 載入側邊欄
         async function loadSidebar() {
             try {
+                console.log("開始動態載入側邊欄組件...");
                 const response = await fetch('components/sidebar.html');
                 if (response.ok) {
                     const html = await response.text();
@@ -242,17 +251,17 @@
         // 側邊欄切換面板與按鈕點擊控制
         function bindSidebarEvents() {
             const buttons = document.querySelectorAll('.sidebar-btn');
+            console.log("已成功獲取並綁定側邊欄按鈕事件。數量：", buttons.length);
             
             buttons.forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     
-                    // 1. 切換 active 按鈕效果
                     buttons.forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
 
-                    // 2. 依據按鈕 id 切換顯示右側特定的管理面板
                     const btnId = this.id;
+                    console.log(`切換管理面板：${btnId}`);
                     hideAllPanels();
 
                     if (btnId === 'btn-menu-settings') {
@@ -261,7 +270,7 @@
                         document.getElementById('panel-projects').style.display = 'block';
                     } else if (btnId === 'btn-menu-articles') {
                         document.getElementById('panel-announcements').style.display = 'block';
-                        refreshAnnouncements(); // 切換到公告版面時自動刷新清單
+                        refreshAnnouncements(); 
                     }
                 });
             });
@@ -277,17 +286,73 @@
 
         // 綁定登出按鈕
         function bindLogoutEvent() {
-            document.getElementById('btn-logout').addEventListener('click', () => {
-                if (confirm('確定要登出管理系統嗎？')) {
-                    localStorage.removeItem('gh_token');
-                    location.reload();
-                }
-            });
+            const btn = document.getElementById('btn-logout');
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    if (confirm('確定要登出管理系統嗎？')) {
+                        localStorage.removeItem('gh_token');
+                        location.reload();
+                    }
+                });
+            }
         }
 
         // ===================================================
-        // 雲端公告管理 (CRUD) API 對接控制邏輯
+        // 雲端公告管理 (CRUD) 安全綁定與偵錯日誌
         // ===================================================
+
+        // 綁定表單提交與取消 (防空防崩潰安全保護)
+        function bindFormEvents() {
+            const form = document.getElementById('form-announcement');
+            if (form) {
+                console.log("表單事件綁定成功：已準備好監聽 儲存公告 點擊事件。");
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    console.log("【偵錯】偵測到「儲存公告」提交事件觸發！");
+
+                    const annId = document.getElementById('ann-id').value;
+                    const title = document.getElementById('ann-input-title').value.trim();
+                    const date = document.getElementById('ann-input-date').value;
+                    const content = document.getElementById('ann-input-content').value;
+                    const pinned = document.getElementById('ann-input-pinned').checked;
+
+                    console.log("【偵錯】打包表單資料：", { id: annId, title, date, content, pinned });
+
+                    if (!dbCache.announcements) {
+                        console.log("本地快取無公告陣列，正在初始化新陣列。");
+                        dbCache.announcements = [];
+                    }
+
+                    const currentAnnData = {
+                        id: annId || 'ann-' + Date.now(),
+                        title,
+                        date,
+                        content,
+                        pinned
+                    };
+
+                    if (annId) {
+                        console.log("目前處於【編輯模式】，準備更新 ID：", annId);
+                        const idx = dbCache.announcements.findIndex(item => item.id === annId);
+                        if (idx > -1) dbCache.announcements[idx] = currentAnnData;
+                    } else {
+                        console.log("目前處於【新增模式】，產生新 ID：", currentAnnData.id);
+                        dbCache.announcements.push(currentAnnData);
+                    }
+
+                    console.log("【偵錯】呼叫 syncToGitHub 進入雲端同步程序...");
+                    await syncToGitHub('公告儲存');
+                    resetAnnForm();
+                });
+            } else {
+                console.error("【嚴重錯誤】未在 DOM 中尋獲 form-announcement 元素！");
+            }
+
+            const cancelBtn = document.getElementById('btn-ann-cancel');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', resetAnnForm);
+            }
+        }
 
         // 自雲端更新本地公告快取
         async function refreshAnnouncements() {
@@ -295,13 +360,15 @@
             listContainer.innerHTML = '<p style="color: var(--text-secondary-color);">讀取雲端最新資料中...</p>';
             
             try {
+                console.log("正在呼叫 fetchDatabase 下載雲端 JSON...");
                 const res = await fetchDatabase();
                 dbCache = res.data;
                 dbSha = res.sha;
+                console.log("JSON 資料下載成功，SHA 值為：", dbSha);
                 renderAdminAnnouncements();
             } catch (err) {
-                console.error(err);
-                listContainer.innerHTML = '<p style="color: #ef4444;">下載資料庫失敗，請確認 data/projects_articles.json 檔案是否存在。</p>';
+                console.error("下載雲端資料失敗：", err);
+                listContainer.innerHTML = '<p style="color: #ef4444;">下載資料庫失敗，請確認儲存庫內是否有 data/projects_articles.json 檔案。</p>';
             }
         }
 
@@ -333,42 +400,9 @@
             `).join('');
         }
 
-        // 綁定公告表單提交 (新增 & 修改)
-        document.getElementById('form-announcement').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const annId = document.getElementById('ann-id').value;
-            const title = document.getElementById('ann-input-title').value.trim();
-            const date = document.getElementById('ann-input-date').value;
-            const content = document.getElementById('ann-input-content').value;
-            const pinned = document.getElementById('ann-input-pinned').checked;
-
-            if (!dbCache.announcements) dbCache.announcements = [];
-
-            const currentAnnData = {
-                id: annId || 'ann-' + Date.now(),
-                title,
-                date,
-                content,
-                pinned
-            };
-
-            if (annId) {
-                // 編輯模式：取代原項目
-                const idx = dbCache.announcements.findIndex(item => item.id === annId);
-                if (idx > -1) dbCache.announcements[idx] = currentAnnData;
-            } else {
-                // 新增模式
-                dbCache.announcements.push(currentAnnData);
-            }
-
-            // 同步 Commit 回 GitHub
-            await syncToGitHub('公告儲存');
-            resetAnnForm();
-        });
-
         // 點擊編輯按鈕：將選定公告數據帶回表單
         function editAnnouncement(id) {
+            console.log("準備編輯項目 ID：", id);
             const ann = dbCache.announcements.find(item => item.id === id);
             if (ann) {
                 document.getElementById('ann-id').value = ann.id;
@@ -379,13 +413,9 @@
 
                 document.getElementById('form-ann-title').innerText = '📝 編輯系統公告';
                 document.getElementById('btn-ann-cancel').style.display = 'inline-flex';
-                // 平滑滾動至編輯表單
                 document.getElementById('form-announcement').scrollIntoView({ behavior: 'smooth' });
             }
         }
-
-        // 取消編輯按鈕綁定
-        document.getElementById('btn-ann-cancel').addEventListener('click', resetAnnForm);
 
         function resetAnnForm() {
             document.getElementById('form-announcement').reset();
@@ -406,15 +436,20 @@
         async function syncToGitHub(actionText) {
             const preloader = document.getElementById('preloader');
             if (preloader) preloader.classList.remove('hidden'); // 顯示動畫
+            console.log("【同步】開啟動畫，開始進行 GitHub API 上傳。");
 
             try {
-                // 1. 強制向 GitHub 讀取最新版本取得正確 SHA 值
+                // 1. 強制向 GitHub 讀取最新版本取得正確 SHA 值，防覆蓋衝突
+                console.log("【同步】正在重新獲取最新 SHA 值...");
                 const latest = await fetchDatabase();
                 dbSha = latest.sha;
+                console.log("【同步】最新 SHA 獲取成功：", dbSha);
 
                 // 2. 進行儲存
+                console.log("【同步】開始調用 saveDatabase 上傳資料...");
                 const res = await saveDatabase(dbCache, dbSha);
                 dbSha = res.content.sha; // 更新本地 SHA 變數
+                console.log("【同步】API 上傳成功！新 Commit SHA：", dbSha);
                 
                 // 先關閉預載動畫，讓瀏覽器收起黑屏
                 if (preloader) preloader.classList.add('hidden');
@@ -426,8 +461,7 @@
                 }, 50);
 
             } catch (err) {
-                console.error(err);
-                // 發生錯誤時同樣先收起黑屏
+                console.error("【同步失敗】過程發生異常：", err);
                 if (preloader) preloader.classList.add('hidden');
                 
                 setTimeout(() => {
