@@ -8,25 +8,79 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <!-- 預載入動畫 (Preloader) -->
+    <div id="preloader">
+        <svg class="loader-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <circle class="loader-circle" cx="60" cy="60" r="50" fill="none"/>
+        </svg>
+    </div>
+
+    <!-- 頂部共用導覽列 -->
     <header id="navbar-container" class="navbar"></header>
 
+    <!-- 滿版作品集主要內容區 -->
     <main class="full-width-content">
         <section>
             <h2><span class="material-symbols-outlined">category</span>作品集</h2>
-            <p style="margin-bottom: 1.5rem;">這裡是一些我利用課餘時間打造的開源專案，歡迎到我的 GitHub 探索更多細節。</p>
-            <div class="portfolio-grid">
-                <!-- 原有的卡片清單 (省略部分，保持結構與之前相同) -->
-                <div class="card">
-                    <h3>YouBike 2.0 即時查詢</h3>
-                    <p>串接 YouBike 官方 API，提供即時站點車輛與空位查詢的網頁應用。</p>
-                    <a href="https://github.com/potatosserver/YouBike" target="_blank">查看專案 <span class="material-symbols-outlined">open_in_new</span></a>
-                </div>
-                <!-- 您原本的其他卡片請依此類推放入 -->
+            <p style="margin-bottom: 2rem;">這裡是一些我利用課餘時間打造的開源專案，歡迎到我的 GitHub 探索更多細節。</p>
+            
+            <!-- 動態作品卡片載入網格容器 -->
+            <div class="portfolio-grid" id="dynamic-portfolio-grid">
+                <p style="color: var(--text-secondary-color);">正在自 GitHub 載入作品專案中...</p>
             </div>
         </section>
     </main>
 
+    <!-- 載入共用 JavaScript 邏輯 -->
     <script src="js/main.js"></script>
-    <script>document.addEventListener('DOMContentLoaded', loadNavbar);</script>
+    <script>
+        // 確保 Preloader 動態會在頁面載入後自動隱藏
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                setTimeout(() => {
+                    preloader.classList.add('hidden');
+                }, 200);
+            }
+        });
+
+        // 頁面初始化程序
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadNavbar();
+            await loadDynamicPortfolio();
+        });
+
+        // 動態獲取並渲染作品卡片
+        async function loadDynamicPortfolio() {
+            const grid = document.getElementById('dynamic-portfolio-grid');
+            try {
+                // 呼叫 js/main.js 封裝的 API 讀取 JSON
+                const result = await fetchDatabase();
+                const projects = result.data.projects || [];
+
+                if (projects.length === 0) {
+                    grid.innerHTML = '<p style="color: var(--text-secondary-color);">目前尚無作品專案。</p>';
+                    return;
+                }
+
+                // 將雲端專案渲染為精美的 HTML 卡片
+                grid.innerHTML = projects.map(proj => `
+                    <div class="card">
+                        <h3>${proj.title}</h3>
+                        <p style="margin-top: 0.5rem; line-height: 1.6; color: var(--text-secondary-color); flex-grow: 1;">${proj.description}</p>
+                        <a href="${proj.github_url}" target="_blank">
+                            <span>查看專案</span>
+                            <span class="material-symbols-outlined">open_in_new</span>
+                        </a>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('動態載入作品專案失敗：', error);
+                grid.innerHTML = '<p style="color: #ef4444;">無法連線至 GitHub 載入作品清單，請確認網路與資料庫設定。</p>';
+            }
+        }
+    </script>
 </body>
 </html>
