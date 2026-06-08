@@ -40,8 +40,10 @@
          =================================================== -->
     <div id="admin-view" class="layout-container" style="display: none;">
         
+        <!-- 左側側邊欄容器 -->
         <div id="sidebar-container"></div>
 
+        <!-- 右側主要內容區域 -->
         <main class="main-content">
             
             <!-- 2.1 連線設定面板 -->
@@ -85,12 +87,10 @@
                         </h3>
                         <button id="btn-edit-theme" class="sidebar-btn" style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; border: 1px solid var(--md-sys-color-outline);">修改</button>
                     </div>
-                    <!-- 唯讀檢視 -->
                     <div id="theme-view-mode" style="display: flex; align-items: center; gap: 1rem;">
                         <div id="preview-profile-color" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid white;"></div>
                         <span id="preview-profile-color-text" style="font-family: monospace;">#7B9DFF</span>
                     </div>
-                    <!-- 編輯表單 -->
                     <div id="theme-form-mode" style="display: none;" class="admin-view-fade">
                         <form id="form-theme">
                             <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1rem;">
@@ -114,13 +114,11 @@
                         </h3>
                         <button id="btn-edit-home" class="sidebar-btn" style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; border: 1px solid var(--md-sys-color-outline);">修改</button>
                     </div>
-                    <!-- 唯讀檢視 -->
                     <div id="home-view-mode">
                         <h4 id="preview-home-title" style="margin-bottom: 0.5rem;"></h4>
                         <p id="preview-home-subtitle" style="font-weight: 500; color: var(--md-sys-color-text-main); margin-bottom: 1rem;"></p>
                         <p id="preview-home-desc" style="margin: 0;"></p>
                     </div>
-                    <!-- 編輯表單 -->
                     <div id="home-form-mode" style="display: none;" class="admin-view-fade">
                         <form id="form-home">
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.2rem;">
@@ -154,7 +152,6 @@
                         </h3>
                         <button id="btn-edit-about" class="sidebar-btn" style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; border: 1px solid var(--md-sys-color-outline);">修改</button>
                     </div>
-                    <!-- 唯讀檢視 -->
                     <div id="about-view-mode">
                         <p id="preview-about-bio" style="margin-bottom: 1.5rem;"></p>
                         <h4 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
@@ -163,7 +160,6 @@
                         </h4>
                         <div id="preview-skills-list" style="display: flex; flex-direction: column; gap: 0.5rem; color: var(--md-sys-color-text-muted);"></div>
                     </div>
-                    <!-- 編輯表單 -->
                     <div id="about-form-mode" style="display: none;" class="admin-view-fade">
                         <form id="form-about">
                             <div style="display: flex; flex-direction: column; margin-bottom: 1.2rem;">
@@ -211,7 +207,7 @@
                     </div>
                 </div>
 
-                <!-- 2.2.4 【新功能】卡片 D：聯絡管道管理卡片 -->
+                <!-- 2.2.4 卡片 D：聯絡管道管理卡片 -->
                 <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <h3 style="color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.5rem; margin:0;">
@@ -221,14 +217,10 @@
                         <button id="btn-add-contact-trigger" class="sidebar-btn active" style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem;">新增聯絡方式</button>
                     </div>
 
-                    <!-- 【檢視/列表視圖】 -->
                     <div id="contact-list-view">
-                        <div id="admin-contact-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                            <!-- 動態載入聯絡人 -->
-                        </div>
+                        <div id="admin-contact-list" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
                     </div>
 
-                    <!-- 【新增/編輯表單視圖】 -->
                     <div id="contact-form-view" style="display: none;" class="admin-view-fade">
                         <form id="form-contact">
                             <input type="hidden" id="contact-id">
@@ -392,9 +384,8 @@
     <!-- 載入共用 JavaScript 邏輯 -->
     <script src="js/main.js"></script>
     <script>
-        const GITHUB_CLIENT_ID = 'Ov23limDuIK15ITZ4Tuo'; 
-        const WORKER_URL = 'https://github-oauth-handler.potatosserver.workers.dev/'; 
-        const REDIRECT_URI = window.location.origin + window.location.pathname;
+        // 設定由 data/config.json 讀取，不再硬編碼於此
+        let REDIRECT_URI = window.location.origin + window.location.pathname;
 
         let dbCache = { profile: { theme: {}, home: {}, about: {} }, announcements: [], projects: [], contacts: [] };
         let dbSha = '';
@@ -408,11 +399,12 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             await loadNavbar();
+            await loadConfig(); // 確保全域 GITHUB_CLIENT_ID 與 CLOUDFLARE_WORKER_URL 載入完畢！
             await checkAuth();
             bindFormEvents(); 
             bindProjectFormEvents(); 
             bindUIViewEvents(); 
-            bindProfileFormEvents(); // 綁定分拆式個人設定
+            bindProfileFormEvents(); 
         });
 
         async function checkAuth() {
@@ -437,6 +429,7 @@
             const btn = document.getElementById('btn-github-login');
             if (btn) {
                 btn.addEventListener('click', () => {
+                    // 動態使用來自 config.json 的 GITHUB_CLIENT_ID
                     const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=repo`;
                     window.location.href = githubAuthUrl;
                 });
@@ -445,7 +438,8 @@
 
         async function exchangeCodeForToken(code) {
             try {
-                const response = await fetch(WORKER_URL, {
+                // 動態使用來自 config.json 的 CLOUDFLARE_WORKER_URL
+                const response = await fetch(CLOUDFLARE_WORKER_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ code })
@@ -464,7 +458,7 @@
                 }
             } catch (error) {
                 console.error(error);
-                alert('伺服器連線異常。');
+                alert('與驗證端連線超時。');
             }
         }
 
@@ -531,46 +525,37 @@
             }
         }
 
-        // ===================================================
-        // 新增與調整：M3 視圖切換邏輯 ( 包含拆分設定 )
-        // ===================================================
         function bindUIViewEvents() {
-            // 公告新增視圖切換
             document.getElementById('btn-add-ann-trigger').addEventListener('click', () => {
                 document.getElementById('ann-list-view').style.display = 'none';
                 document.getElementById('ann-form-view').style.display = 'block';
                 document.getElementById('btn-add-ann-trigger').style.display = 'none';
             });
 
-            // 作品新增視圖切換
             document.getElementById('btn-add-proj-trigger').addEventListener('click', () => {
                 document.getElementById('proj-list-view').style.display = 'none';
                 document.getElementById('proj-form-view').style.display = 'block';
                 document.getElementById('btn-add-proj-trigger').style.display = 'none';
             });
 
-            // A. 主題視覺一小區切換
             document.getElementById('btn-edit-theme').addEventListener('click', () => {
                 document.getElementById('theme-view-mode').style.display = 'none';
                 document.getElementById('theme-form-mode').style.display = 'block';
                 document.getElementById('btn-edit-theme').style.display = 'none';
             });
 
-            // B. 首頁文案一小區切換
             document.getElementById('btn-edit-home').addEventListener('click', () => {
                 document.getElementById('home-view-mode').style.display = 'none';
                 document.getElementById('home-form-mode').style.display = 'block';
                 document.getElementById('btn-edit-home').style.display = 'none';
             });
 
-            // C. 關於我一小區切換
             document.getElementById('btn-edit-about').addEventListener('click', () => {
                 document.getElementById('about-view-mode').style.display = 'none';
                 document.getElementById('about-form-mode').style.display = 'block';
                 document.getElementById('btn-edit-about').style.display = 'none';
             });
 
-            // D. 聯絡人新增視圖切換
             document.getElementById('btn-add-contact-trigger').addEventListener('click', () => {
                 document.getElementById('contact-list-view').style.display = 'none';
                 document.getElementById('contact-form-view').style.display = 'block';
@@ -578,23 +563,19 @@
             });
         }
 
-        // 將所有版面與表單重置為預設唯讀檢視與清單狀態
         function resetAllViewsToDefault() {
-            // 公告
             document.getElementById('ann-list-view').style.display = 'block';
             document.getElementById('ann-form-view').style.display = 'none';
             const addAnnTrigger = document.getElementById('btn-add-ann-trigger');
             if (addAnnTrigger) addAnnTrigger.style.display = 'inline-flex';
             resetAnnForm();
 
-            // 作品
             document.getElementById('proj-list-view').style.display = 'block';
             document.getElementById('proj-form-view').style.display = 'none';
             const addProjTrigger = document.getElementById('btn-add-proj-trigger');
             if (addProjTrigger) addProjTrigger.style.display = 'inline-flex';
             resetProjForm();
 
-            // 個人視覺設定 (重置為檢視狀態)
             document.getElementById('theme-view-mode').style.display = 'flex';
             document.getElementById('theme-form-mode').style.display = 'none';
             document.getElementById('btn-edit-theme').style.display = 'inline-flex';
@@ -607,10 +588,10 @@
             document.getElementById('about-form-mode').style.display = 'none';
             document.getElementById('btn-edit-about').style.display = 'inline-flex';
 
-            // 聯絡人
             document.getElementById('contact-list-view').style.display = 'block';
             document.getElementById('contact-form-view').style.display = 'none';
-            document.getElementById('btn-add-contact-trigger').style.display = 'inline-flex';
+            const addContactTrigger = document.getElementById('btn-add-contact-trigger');
+            if (addContactTrigger) addContactTrigger.style.display = 'inline-flex';
             resetContactForm();
         }
 
@@ -618,8 +599,6 @@
         // ===================================================
         // 模組化：分拆式個人設定、自動載入與獨立分開儲存
         // ===================================================
-
-        // 自雲端同步下載設定，渲染唯讀區與載入表單
         async function refreshProfile() {
             try {
                 const res = await fetchDatabase();
@@ -677,7 +656,6 @@
             }
         }
 
-        // 綁定獨立小卡片各自儲存
         function bindProfileFormEvents() {
             // A. 主題儲存
             document.getElementById('form-theme').addEventListener('submit', async function(e) {

@@ -1,5 +1,7 @@
 {
   "repo_owner": "potatosserver",
   "repo_name": "potatosserver.github.io",
-  "database_path": "data/projects_articles.json"
+  "database_path": "data/projects_articles.json",
+  "github_client_id": "Ov23limDuIK15ITZ4Tuo",
+  "cloudflare_worker_url": "https://github-oauth-handler.potatosserver.workers.dev/"
 }

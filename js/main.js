@@ -1,26 +1,31 @@
 // js/main.js
 
 // ==========================================
-// 動態儲存庫配置變數 (將從 data/config.json 自動載入)
+// 動態儲存庫與驗證配置變數 (將從 data/config.json 自動載入)
 // ==========================================
 let REPO_OWNER = '';
 let REPO_NAME = '';
 let DATABASE_PATH = '';
+let GITHUB_CLIENT_ID = '';
+let CLOUDFLARE_WORKER_URL = '';
 
-// 新增：安全讀取本地設定檔的函式
+// 安全讀取本地設定檔的函式
 async function loadConfig() {
-    // 如果已經載入過，直接跳過以提升效能
-    if (REPO_OWNER && REPO_NAME) return;
+    if (REPO_OWNER && REPO_NAME && GITHUB_CLIENT_ID && CLOUDFLARE_WORKER_URL) return;
 
     try {
-        // 使用相對路徑讀取本地 config.json (不論誰 Fork，皆能讀到自己儲存庫下的設定)
         const response = await fetch('data/config.json?nocache=' + new Date().getTime());
         if (response.ok) {
             const config = await response.json();
             REPO_OWNER = config.repo_owner;
             REPO_NAME = config.repo_name;
             DATABASE_PATH = config.database_path || 'data/projects_articles.json';
-            console.log(`儲存庫設定自動載入成功：目標為 ${REPO_OWNER}/${REPO_NAME}`);
+            
+            // 【自動註冊驗證金鑰與後端網址】
+            GITHUB_CLIENT_ID = config.github_client_id;
+            CLOUDFLARE_WORKER_URL = config.cloudflare_worker_url;
+            
+            console.log(`設定檔自動載入成功：目標為 ${REPO_OWNER}/${REPO_NAME}`);
         } else {
             throw new Error("無法讀取本地 data/config.json 設定檔。");
         }
@@ -84,7 +89,6 @@ function highlightCurrentPage() {
 
 // 2. [讀取] 獲取 GitHub 最新資料庫內容與 SHA 值
 async function fetchDatabase() {
-    // 確保在發送 API 前，設定檔已載入完畢
     await loadConfig();
 
     const token = localStorage.getItem('gh_token');
@@ -104,7 +108,6 @@ async function fetchDatabase() {
     const decodedContent = b64_to_utf8(fileInfo.content);
     const database = JSON.parse(decodedContent);
 
-    // 【自動套用變色】
     if (database.profile && database.profile.theme && database.profile.theme.highlight_color) {
         applyDynamicTheme(database.profile.theme.highlight_color);
     }
@@ -117,7 +120,6 @@ async function fetchDatabase() {
 
 // 3. [寫入] 將資料更新並 Commit 回 GitHub
 async function saveDatabase(jsonData, sha) {
-    // 確保在發送 API 前，設定檔已載入完畢
     await loadConfig();
 
     const token = localStorage.getItem('gh_token');
