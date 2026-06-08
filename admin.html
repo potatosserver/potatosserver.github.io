@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理後台 - 作品與文章系統</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 頂部導覽列容器 -->
+  <div id="navbar-container"></div>
+
+  <!-- 後台主要版面 (包含側邊欄與主要內容) -->
+  <div class="layout-container">
+    
+    <!-- 左側側邊欄容器 -->
+    <div id="sidebar-container"></div>
+
+    <!-- 右側主要內容區域 -->
+    <main class="main-content">
+      
+      <!-- 暫時的靜態內容，代表後台的主畫面 -->
+      <section id="admin-panel">
+        <h2 style="margin-bottom: 0.5rem;">管理員後台</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">請點選左側按鈕切換管理項目。</p>
+        
+        <div style="background: white; padding: 2rem; border-radius: 8px; border: 1px solid var(--border-color);">
+          <h3>歡迎回來！</h3>
+          <p style="margin-top: 0.5rem; color: var(--text-muted);">這是您的作品集與文章管理後台。在完成 GitHub 驗證設定後，您將可以透過左側選單新增或更新您首頁的展示內容。</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // 載入組件的輔助函式
+    async function loadComponent(targetId, filePath) {
+      try {
+        const response = await fetch(filePath);
+        if (response.ok) {
+          const htmlContent = await response.text();
+          document.getElementById(targetId).innerHTML = htmlContent;
+          
+          // 如果載入的是側邊欄，在載入後綁定按鈕點擊事件
+          if (targetId === 'sidebar-container') {
+            bindSidebarEvents();
+          }
+        }
+      } catch (error) {
+        console.error(`無法載入組件: ${filePath}`, error);
+      }
+    }
+
+    // 處理側邊欄按鈕點擊切換選取狀態
+    function bindSidebarEvents() {
+      const buttons = document.querySelectorAll('.sidebar-btn');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          // 移除所有按鈕的 active 樣式
+          buttons.forEach(b => b.classList.remove('active'));
+          // 為當前點擊的按鈕加上 active 樣式
+          btn.classList.add('active');
+        });
+      });
+    }
+
+    // 頁面就緒後載入導覽列與側邊欄
+    window.addEventListener('DOMContentLoaded', () => {
+      loadComponent('navbar-container', 'components/navbar.html');
+      loadComponent('sidebar-container', 'components/sidebar.html');
+    });
+  </script>
+</body>
+</html>
