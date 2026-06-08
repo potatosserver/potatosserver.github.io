@@ -97,18 +97,14 @@
                     return;
                 }
 
-                // 成功尋獲，渲染標題、日期、詳細內容 (已開通標題與內文高亮)
+                // 【核心修正】：將 <div> 與內文變數緊密排在同一行，防止 pre-wrap 抓到縮排空格
                 container.innerHTML = `
                     <div style="display: flex; gap: 0.5rem; align-items: center; color: var(--md-sys-color-primary); margin-bottom: 0.5rem; font-size: 0.95rem;">
                         <span class="material-symbols-outlined" style="font-size: 1.25em;">calendar_month</span>
                         <span>發布日期：${ann.date}</span>
                     </div>
-                    <h1 style="color: var(--md-sys-color-text-main); margin-bottom: 1.25rem; border-bottom: 2px solid var(--md-sys-color-primary); padding-bottom: 0.75rem; line-height: 1.4; font-size: 2rem; letter-spacing: -0.02em;">
-                        ${parseHighlights(ann.title)}
-                    </h1>
-                    <div style="font-size: 1.05rem; line-height: 1.8; color: var(--md-sys-color-text-main); white-space: pre-wrap; letter-spacing: 0.02em;">
-                        ${parseHighlights(ann.content)}
-                    </div>
+                    <h1 style="color: var(--md-sys-color-text-main); margin-bottom: 1.25rem; border-bottom: 2px solid var(--md-sys-color-primary); padding-bottom: 0.75rem; line-height: 1.4; font-size: 2rem; letter-spacing: -0.02em;">${parseHighlights(ann.title)}</h1>
+                    <div style="font-size: 1.05rem; line-height: 1.8; color: var(--md-sys-color-text-main); white-space: pre-wrap; letter-spacing: 0.02em;">${parseHighlights(ann.content)}</div>
                 `;
 
                 document.title = `${ann.title} | 系統公告`;
