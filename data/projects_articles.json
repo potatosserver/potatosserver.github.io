@@ -6,6 +6,13 @@
       "title": "網站系統成功升級！",
       "content": "目前已將所有分頁進行實體檔案拆分，並部署至 GitHub Pages，支援雲端管理！",
       "pinned": true
+    },
+    {
+      "id": "ann-1780915500271",
+      "title": "1",
+      "date": "2026-06-08",
+      "content": "2",
+      "pinned": false
     }
   ],
   "projects": [
