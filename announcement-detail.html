@@ -22,12 +22,12 @@
 
     <!-- 主要內容區 -->
     <main class="full-width-content">
-        <!-- 採用 M3 規範高圓角卡片，並加入過渡動畫 -->
-        <div class="card admin-view-fade" style="padding: 2.5rem; margin-top: 1rem;">
+        <!-- 卡片內邊距調整為 1.75rem，使其更精緻緊湊 -->
+        <div class="card admin-view-fade" style="padding: 1.75rem; margin-top: 1rem;">
             
-            <!-- 【重置於頂部】：返回首頁導航按鈕 (M3 膠囊型) -->
-            <div style="margin-bottom: 2rem; border-bottom: 1px solid var(--md-sys-color-outline); padding-bottom: 1.5rem;">
-                <a href="index.html" class="sidebar-btn" style="width: auto; display: inline-flex; align-items: center;">
+            <!-- 【緊湊排版】：大幅收緊返回按鈕的上下留白 -->
+            <div style="margin-bottom: 1rem; border-bottom: 1px solid var(--md-sys-color-outline); padding-bottom: 0.75rem;">
+                <a href="index.html" class="sidebar-btn" style="width: auto; display: inline-flex; align-items: center; padding: 0.5rem 1rem;">
                     <span class="material-symbols-outlined">arrow_back</span>
                     <span>返回首頁</span>
                 </a>
@@ -86,14 +86,14 @@
                     return;
                 }
 
-                // 成功尋獲，渲染標題、日期、詳細內容 (修正 gap: 0.5rem 以精準貼合圖示)
+                // 成功尋獲，渲染標題、日期、詳細內容
                 container.innerHTML = `
-                    <div style="display: flex; gap: 0.5rem; align-items: center; color: var(--md-sys-color-primary); margin-bottom: 0.75rem; font-size: 0.95rem;">
+                    <div style="display: flex; gap: 0.5rem; align-items: center; color: var(--md-sys-color-primary); margin-bottom: 0.5rem; font-size: 0.95rem;">
                         <span class="material-symbols-outlined" style="font-size: 1.25em;">calendar_month</span>
                         <span>發布日期：${ann.date}</span>
                     </div>
-                    <h1 style="color: var(--md-sys-color-text-main); margin-bottom: 1.5rem; border-bottom: 2px solid var(--md-sys-color-primary); padding-bottom: 1rem; line-height: 1.4; font-size: 2.2rem; letter-spacing: -0.02em;">${ann.title}</h1>
-                    <div style="font-size: 1.05rem; line-height: 1.9; color: var(--md-sys-color-text-main); white-space: pre-wrap; letter-spacing: 0.02em;">${ann.content}</div>
+                    <h1 style="color: var(--md-sys-color-text-main); margin-bottom: 1.25rem; border-bottom: 2px solid var(--md-sys-color-primary); padding-bottom: 0.75rem; line-height: 1.4; font-size: 2rem; letter-spacing: -0.02em;">${ann.title}</h1>
+                    <div style="font-size: 1.05rem; line-height: 1.8; color: var(--md-sys-color-text-main); white-space: pre-wrap; letter-spacing: 0.02em;">${ann.content}</div>
                 `;
 
                 // 動態同步更新瀏覽器的分頁標題
