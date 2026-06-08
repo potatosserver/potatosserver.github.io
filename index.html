@@ -4,72 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>卓稟鈞 (Andrew) | 個人網站</title>
-    <!-- 引入 Google Material Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- 預載入動畫 (Preloader) -->
     <div id="preloader">
         <svg class="loader-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
             <circle class="loader-circle" cx="60" cy="60" r="50" fill="none"/>
         </svg>
     </div>
 
-    <!-- 頂部導覽列容器 (首頁無側邊欄) -->
     <header id="navbar-container" class="navbar"></header>
 
-    <!-- 滿版無側邊欄主要內容區 -->
     <main class="full-width-content">
-        <!-- 1. 個人簡介 -->
         <section id="home-section">
             <h1>Hello, 我是卓稟鈞 (Andrew)！</h1>
-            <p style="font-size: 1.2rem; color: var(--text-color);">一個對寫程式充滿無限好奇心的高中生。</p>
+            <p style="font-size: 1.2rem; color: var(--md-sys-color-text-main);">一個對寫程式充滿無限好奇心的高中生。</p>
             <p>
                 我熱衷於用 <span class="highlight">Python、C++</span> 和<span class="highlight">前端技術</span>，將腦中的奇思妙想打造成真正能解決問題的工具。從 Discord Bot 到交通查詢 App，我的目標始終是——<strong class="highlight">讓科技更貼近生活</strong>。
             </p>
         </section>
 
-        <!-- 2. 最新動態公告區塊 -->
         <section class="announcement-section" style="padding: 1.5rem 1rem;">
             <div class="announcement-header" style="padding-left: 0.5rem; margin-bottom: 0.5rem;">
-                <span class="material-symbols-outlined" style="color: var(--primary-color);">campaign</span>
+                <span class="material-symbols-outlined" style="color: var(--md-sys-color-primary);">campaign</span>
                 <span>最新公告</span>
             </div>
-            <!-- 動態公告載入容器 -->
             <ul class="announcement-list" id="dynamic-announcements">
-                <li style="color: var(--text-secondary-color); padding: 0.5rem;">正在自 GitHub 載入雲端公告項目...</li>
+                <li style="color: var(--md-sys-color-text-muted); padding: 0.5rem;">正在自 GitHub 載入雲端公告項目...</li>
             </ul>
         </section>
     </main>
 
-    <!-- 載入共用 JavaScript 邏輯 -->
     <script src="js/main.js"></script>
     <script>
-        // 確保 Preloader 動態會在頁面載入後自動隱藏
         window.addEventListener('load', () => {
             const preloader = document.getElementById('preloader');
             if (preloader) {
-                setTimeout(() => {
-                    preloader.classList.add('hidden');
-                }, 200);
+                setTimeout(() => preloader.classList.add('hidden'), 200);
             }
         });
 
-        // 網頁初始程序
         document.addEventListener('DOMContentLoaded', async () => {
-            // 載入共用導覽列
             await loadNavbar();
-            // 讀取並動態顯示 GitHub 雲端資料庫中的公告
             await loadDynamicAnnouncements();
         });
 
-        // 自 GitHub API 下載並渲染公告
         async function loadDynamicAnnouncements() {
             const container = document.getElementById('dynamic-announcements');
             try {
-                // 呼叫 js/main.js 中封裝的讀取 API
                 const result = await fetchDatabase();
                 const announcements = result.data.announcements || [];
 
@@ -78,20 +62,18 @@
                     return;
                 }
 
-                // 排序邏輯：優先排列置頂公告 (pinned: true)，再依日期從新到舊排序
                 announcements.sort((a, b) => {
                     if (a.pinned && !b.pinned) return -1;
                     if (!a.pinned && b.pinned) return 1;
                     return new Date(b.date) - new Date(a.date);
                 });
 
-                // 輸出 HTML 至容器中 (整條公告滿版可點擊)
                 container.innerHTML = announcements.map(ann => `
-                    <li class="announcement-item" style="padding: 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                        <a href="announcement-detail.html?id=${ann.id}" style="display: flex; align-items: flex-start; gap: 1rem; width: 100%; padding: 0.95rem 0.75rem; text-decoration: none; color: inherit; transition: background-color 0.2s; border-radius: var(--border-radius-md);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.03)'" onmouseout="this.style.backgroundColor='transparent'">
-                            <span class="announcement-date" style="color: var(--primary-color); font-weight: 500; font-size: 0.85rem; white-space: nowrap; padding-top: 0.15rem; margin: 0;">${ann.date}</span>
-                            <span class="announcement-content" style="color: var(--text-color); font-size: 0.95rem; line-height: 1.5;">
-                                ${ann.pinned ? '<span style="color:var(--primary-color); font-weight:bold; margin-right:5px;">[置頂]</span>' : ''}
+                    <li class="announcement-item" style="padding: 0; border-bottom: 1px solid var(--md-sys-color-outline);">
+                        <a href="announcement-detail.html?id=${ann.id}" style="display: flex; align-items: flex-start; gap: 1rem; width: 100%; padding: 0.95rem 0.75rem; text-decoration: none; color: inherit; transition: background-color 0.2s; border-radius: var(--md-shape-corner-large);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.03)'" onmouseout="this.style.backgroundColor='transparent'">
+                            <span class="announcement-date" style="color: var(--md-sys-color-primary); font-weight: 600; font-size: 0.85rem; white-space: nowrap; padding-top: 0.15rem; margin: 0;">${ann.date}</span>
+                            <span class="announcement-content" style="color: var(--md-sys-color-text-main); font-size: 0.95rem; line-height: 1.5;">
+                                ${ann.pinned ? '<span style="color:var(--md-sys-color-primary); font-weight:bold; margin-right:5px;">[置頂]</span>' : ''}
                                 ${ann.title}
                             </span>
                         </a>
@@ -99,7 +81,7 @@
                 `).join('');
 
             } catch (error) {
-                console.error('動態載入公告失敗：', error);
+                console.error(error);
                 container.innerHTML = '<li class="announcement-item" style="padding: 0.75rem 0.5rem; color: #ef4444;"><span class="announcement-content">無法與 GitHub 連線以載入最新公告。</span></li>';
             }
         }
