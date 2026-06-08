@@ -1,76 +1,83 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>管理後台 - 作品與文章系統</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理後台 | Andrew</title>
+    <!-- 引入 Icon 樣式表，解決圖示載入不出來的問題 -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- 頂部導覽列容器 -->
-  <div id="navbar-container"></div>
+    <div id="preloader">
+        <svg class="loader-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <circle class="loader-circle" cx="60" cy="60" r="50" fill="none"/>
+        </svg>
+    </div>
 
-  <!-- 後台主要版面 (包含側邊欄與主要內容) -->
-  <div class="layout-container">
-    
-    <!-- 左側側邊欄容器 -->
+    <!-- 頂部共用導覽列 -->
+    <header id="navbar-container" class="navbar"></header>
+
+    <!-- 側邊欄容器 -->
     <div id="sidebar-container"></div>
 
     <!-- 右側主要內容區域 -->
     <main class="main-content">
-      
-      <!-- 暫時的靜態內容，代表後台的主畫面 -->
-      <section id="admin-panel">
-        <h2 style="margin-bottom: 0.5rem;">管理員後台</h2>
-        <p style="color: var(--text-muted); margin-bottom: 2rem;">請點選左側按鈕切換管理項目。</p>
-        
-        <div style="background: white; padding: 2rem; border-radius: 8px; border: 1px solid var(--border-color);">
-          <h3>歡迎回來！</h3>
-          <p style="margin-top: 0.5rem; color: var(--text-muted);">這是您的作品集與文章管理後台。在完成 GitHub 驗證設定後，您將可以透過左側選單新增或更新您首頁的展示內容。</p>
-        </div>
-      </section>
-
+        <section id="admin-panel">
+            <h2 style="margin-top: 0; border-bottom: none; padding-bottom: 0;">
+                <span class="material-symbols-outlined" style="font-size: 1.5em; color: var(--primary-color);">admin_panel_settings</span>
+                <span>系統管理後台</span>
+            </h2>
+            <p style="color: var(--text-secondary-color); margin-bottom: 2rem;">請使用左側選單切換設定與內容管理項目。</p>
+            
+            <div class="card" style="padding: 2rem;">
+                <h3 style="color: var(--primary-color); margin-bottom: 1rem;">歡迎使用管理系統</h3>
+                <p>在這裡，您將能夠透過 GitHub API 進行雲端資料更新。目前系統外觀已調整完畢，下一個階段我們將開始實作與 GitHub 儲存庫的連線設定。</p>
+            </div>
+        </section>
     </main>
-  </div>
 
-  <script>
-    // 載入組件的輔助函式
-    async function loadComponent(targetId, filePath) {
-      try {
-        const response = await fetch(filePath);
-        if (response.ok) {
-          const htmlContent = await response.text();
-          document.getElementById(targetId).innerHTML = htmlContent;
-          
-          // 如果載入的是側邊欄，在載入後綁定按鈕點擊事件
-          if (targetId === 'sidebar-container') {
-            bindSidebarEvents();
-          }
-        }
-      } catch (error) {
-        console.error(`無法載入組件: ${filePath}`, error);
-      }
-    }
-
-    // 處理側邊欄按鈕點擊切換選取狀態
-    function bindSidebarEvents() {
-      const buttons = document.querySelectorAll('.sidebar-btn');
-      buttons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          // 移除所有按鈕的 active 樣式
-          buttons.forEach(b => b.classList.remove('active'));
-          // 為當前點擊的按鈕加上 active 樣式
-          btn.classList.add('active');
+    <script src="js/main.js"></script>
+    <script>
+        // Preloader 控制
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                setTimeout(() => preloader.classList.add('hidden'), 200);
+            }
         });
-      });
-    }
 
-    // 頁面就緒後載入導覽列與側邊欄
-    window.addEventListener('DOMContentLoaded', () => {
-      loadComponent('navbar-container', 'components/navbar.html');
-      loadComponent('sidebar-container', 'components/sidebar.html');
-    });
-  </script>
+        // 載入導覽列與側邊欄
+        async function loadAdminLayout() {
+            // 載入頂部導覽列 (使用 js/main.js 內定義的 loadNavbar)
+            await loadNavbar();
+            
+            // 載入左側側邊欄
+            try {
+                const response = await fetch('components/sidebar.html');
+                if (response.ok) {
+                    const html = await response.text();
+                    document.getElementById('sidebar-container').innerHTML = html;
+                    bindSidebarEvents();
+                }
+            } catch (error) {
+                console.error('側邊欄組件載入失敗:', error);
+            }
+        }
+
+        // 綁定側邊欄按鈕的選取切換效果
+        function bindSidebarEvents() {
+            const buttons = document.querySelectorAll('.sidebar-btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    buttons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAdminLayout);
+    </script>
 </body>
 </html>

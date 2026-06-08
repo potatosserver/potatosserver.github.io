@@ -34,7 +34,9 @@ html, body {
     font-size: 1.2em;
 }
 
-/* 載入動畫 (Preloader) */
+/* ==========================================
+   1. 載入動畫 (Preloader)
+   ========================================== */
 #preloader {
     position: fixed;
     top: 0;
@@ -83,7 +85,9 @@ html, body {
     100% { stroke-dasharray: 1 314; stroke-dashoffset: -314; }
 }
 
-/* 模組化導覽列樣式 */
+/* ==========================================
+   2. 模組化頂部導覽列 (Navbar)
+   ========================================== */
 .navbar {
     background-color: var(--surface-color);
     padding: 0 calc(var(--spacing-unit) * 2);
@@ -95,7 +99,7 @@ html, body {
     left: 0;
     width: 100%;
     height: var(--nav-height);
-    z-index: 1000;
+    z-index: 1000; /* 確保導覽列置於最上層 */
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -137,23 +141,24 @@ html, body {
     border: 1px solid var(--primary-color);
 }
 
-/* 主版面配置 (有側邊欄時使用) */
-.layout-container {
-    display: flex;
-    margin-top: var(--nav-height);
-    min-height: calc(100vh - var(--nav-height));
+.nav-link-admin.active {
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
 }
 
-/* 側邊欄樣式 (左側完整一列按鈕) */
+/* ==========================================
+   3. 模組化側邊欄 (Sidebar)
+   ========================================== */
 .sidebar {
     width: var(--sidebar-width);
     background-color: var(--surface-color);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     padding: 1.5rem 1rem;
     position: fixed;
-    top: var(--nav-height);
+    top: var(--nav-height); /* 精確定位在導覽列下方 */
     bottom: 0;
     left: 0;
+    z-index: 900; /* 層級低於導覽列 */
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -169,7 +174,7 @@ html, body {
     margin-bottom: 0.75rem;
 }
 
-/* 側邊欄連結改為完整寬度的按鈕樣式 */
+/* 側邊欄完整寬度按鈕樣式 */
 .sidebar-btn {
     display: flex;
     align-items: center;
@@ -201,37 +206,38 @@ html, body {
     font-weight: 600;
 }
 
-/* 主要內容區域 (首頁滿版無側邊欄樣式) */
+/* ==========================================
+   4. 版面容器佈局 (Layout Containers)
+   ========================================== */
+
+/* 【前台頁面】主要內容區域：滿版無側邊欄 */
 .full-width-content {
-    padding: calc(var(--spacing-unit) * 6) calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 2);
+    margin-top: var(--nav-height); /* 預留上方導覽列高度，防遮擋 */
+    padding: calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 2);
     max-width: 960px;
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-/* 主要內容區域 (後台有側邊欄樣式) */
+/* 【後台頁面】最外層容器 */
+.layout-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* 【後台頁面】主要內容區域：預留左側與上方空間 */
 .main-content {
     flex: 1;
-    margin-left: var(--sidebar-width);
+    margin-left: var(--sidebar-width); /* 預留側邊欄寬度，防重疊 */
+    margin-top: var(--nav-height);    /* 預留導覽列高度，防重疊 */
     padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 3);
     background-color: var(--bg-color);
+    min-height: calc(100vh - var(--nav-height));
 }
 
-/* 舊有的分頁展示動畫 */
-.page-content {
-    display: none;
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-.page-content.active {
-    display: block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* 標題與內文樣式 */
+/* ==========================================
+   5. 內容排版、卡片、列表與其他組件
+   ========================================== */
 h1 {
     font-size: 2.5rem;
     color: var(--primary-color);
@@ -261,13 +267,14 @@ p {
     font-weight: 500;
 }
 
-/* 作品集網格 */
+/* 作品集網格系統 */
 .portfolio-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
 }
 
+/* 卡片組件 */
 .card {
     background-color: var(--surface-color);
     border-radius: var(--border-radius-lg);
@@ -329,28 +336,12 @@ p {
     background-color: rgba(255, 255, 255, 0.05);
 }
 
-/* RWD 回應式設計 */
-@media (max-width: 768px) {
-    .navbar {
-        flex-direction: column;
-        padding: var(--spacing-unit);
-        height: auto;
-    }
-    .nav-links {
-        margin-top: var(--spacing-unit);
-        width: 100%;
-        justify-content: center;
-    }
-    .full-width-content {
-        padding-top: calc(var(--spacing-unit) * 9);
-    }
-}
-/* style.css - 新增公告區塊樣式 */
+/* 公告區塊樣式 */
 .announcement-section {
     background-color: var(--surface-color);
     border-radius: var(--border-radius-lg);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-left: 5px solid var(--primary-color); /* 左側極光藍邊框 */
+    border-left: 5px solid var(--primary-color); /* 左側極光藍直條 border */
     padding: 1.5rem;
     margin-top: 1.5rem;
     margin-bottom: 2rem;
@@ -379,7 +370,7 @@ p {
 }
 
 .announcement-item:last-child {
-    border-bottom: none; /* 最後一項移除底線 */
+    border-bottom: none;
 }
 
 .announcement-date {
@@ -393,4 +384,44 @@ p {
 .announcement-content {
     color: var(--text-secondary-color);
     font-size: 0.95rem;
+}
+
+/* ==========================================
+   6. 響應式網頁設計 (RWD)
+   ========================================== */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        padding: var(--spacing-unit);
+        height: auto;
+        position: relative; /* 手機端取消固定，避免與內容卡住 */
+    }
+    
+    .nav-links {
+        margin-top: var(--spacing-unit);
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    /* 手機端取消固定定位的高度預留，改為自動排列 */
+    .full-width-content {
+        margin-top: 0;
+        padding: calc(var(--spacing-unit) * 2);
+    }
+
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        top: 0;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .main-content {
+        margin-left: 0;
+        margin-top: 0;
+        padding: calc(var(--spacing-unit) * 2);
+    }
 }
