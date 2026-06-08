@@ -10,14 +10,14 @@
 </head>
 <body>
 
-    <!-- 預載入動畫 (Preloader) 防大黑圓版本 -->
+    <!-- 預載入動畫 (Preloader) -->
     <div id="preloader">
         <svg class="loader-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
             <circle class="loader-circle" cx="60" cy="60" r="50" fill="none"/>
         </svg>
     </div>
 
-    <!-- 導覽列容器 -->
+    <!-- 頂部導覽列容器 (首頁無側邊欄) -->
     <header id="navbar-container" class="navbar"></header>
 
     <!-- 滿版無側邊欄主要內容區 -->
@@ -32,14 +32,14 @@
         </section>
 
         <!-- 2. 最新動態公告區塊 -->
-        <section class="announcement-section">
-            <div class="announcement-header">
+        <section class="announcement-section" style="padding: 1.5rem 1rem;">
+            <div class="announcement-header" style="padding-left: 0.5rem; margin-bottom: 0.5rem;">
                 <span class="material-symbols-outlined" style="color: var(--primary-color);">campaign</span>
                 <span>最新公告</span>
             </div>
             <!-- 動態公告載入容器 -->
             <ul class="announcement-list" id="dynamic-announcements">
-                <li style="color: var(--text-secondary-color);">正在自 GitHub 載入雲端公告項目...</li>
+                <li style="color: var(--text-secondary-color); padding: 0.5rem;">正在自 GitHub 載入雲端公告項目...</li>
             </ul>
         </section>
     </main>
@@ -74,7 +74,7 @@
                 const announcements = result.data.announcements || [];
 
                 if (announcements.length === 0) {
-                    container.innerHTML = '<li class="announcement-item"><span class="announcement-content">目前尚無公告。</span></li>';
+                    container.innerHTML = '<li class="announcement-item" style="padding:0.75rem 0.5rem;"><span class="announcement-content">目前尚無公告。</span></li>';
                     return;
                 }
 
@@ -85,22 +85,22 @@
                     return new Date(b.date) - new Date(a.date);
                 });
 
-                // 輸出 HTML 至容器中
+                // 輸出 HTML 至容器中 (整條公告滿版可點擊)
                 container.innerHTML = announcements.map(ann => `
-                    <li class="announcement-item">
-                        <span class="announcement-date">${ann.date}</span>
-                        <span class="announcement-content">
-                            <a href="announcement-detail.html?id=${ann.id}" style="color: var(--text-color); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='var(--text-color)'">
+                    <li class="announcement-item" style="padding: 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                        <a href="announcement-detail.html?id=${ann.id}" style="display: flex; align-items: flex-start; gap: 1rem; width: 100%; padding: 0.95rem 0.75rem; text-decoration: none; color: inherit; transition: background-color 0.2s; border-radius: var(--border-radius-md);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.03)'" onmouseout="this.style.backgroundColor='transparent'">
+                            <span class="announcement-date" style="color: var(--primary-color); font-weight: 500; font-size: 0.85rem; white-space: nowrap; padding-top: 0.15rem; margin: 0;">${ann.date}</span>
+                            <span class="announcement-content" style="color: var(--text-color); font-size: 0.95rem; line-height: 1.5;">
                                 ${ann.pinned ? '<span style="color:var(--primary-color); font-weight:bold; margin-right:5px;">[置頂]</span>' : ''}
                                 ${ann.title}
-                            </a>
-                        </span>
+                            </span>
+                        </a>
                     </li>
                 `).join('');
 
             } catch (error) {
                 console.error('動態載入公告失敗：', error);
-                container.innerHTML = '<li class="announcement-item" style="color: #ef4444;"><span class="announcement-content">無法與 GitHub 連線以載入最新公告。</span></li>';
+                container.innerHTML = '<li class="announcement-item" style="padding: 0.75rem 0.5rem; color: #ef4444;"><span class="announcement-content">無法與 GitHub 連線以載入最新公告。</span></li>';
             }
         }
     </script>
