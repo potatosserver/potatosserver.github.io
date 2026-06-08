@@ -16,7 +16,7 @@
 1. 前往 GitHub 個人設定 (Settings) -> 左側選單最下方 **Developer settings** -> **OAuth Apps**。
 2. 點擊 **Register a new application**（註冊新應用程式）。
 3. 填入以下設定：
-   * **Application name**：自訂名稱（例如：`Andrew Portfolio Admin`）
+   * **Application name**：自訂名稱（例如：`Portfolio Admin`）
    * **Homepage URL**：填入您的網頁首頁網址（例如：`https://your-username.github.io/`）
    * **Authorization callback URL**：填入您的後台實體網址（例如：`https://your-username.github.io/admin.html`）
 4. 點擊 **Register application**。
