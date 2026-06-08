@@ -4,26 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>卓稟鈞 (Andrew) | 個人網站</title>
-    <!-- Google Icon Font 連結 -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- 保留原本的 Preloader 載入動畫 -->
+    <!-- SVG 加入 fill="none"，防止 CSS 未載入時顯示大黑圓 -->
     <div id="preloader">
         <svg class="loader-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-            <circle class="loader-circle" cx="60" cy="60" r="50"/>
+            <circle class="loader-circle" cx="60" cy="60" r="50" fill="none"/>
         </svg>
     </div>
 
-    <!-- 動態載入導覽列 -->
-    <header id="navbar-container"></header>
+    <!-- 導覽列容器 -->
+    <header id="navbar-container" class="navbar"></header>
 
-    <!-- 主展示內容區 -->
     <main class="full-width-content">
         <!-- 首頁 -->
-        <section id="home" class="page-content active">
+        <section id="home" class="page-content">
             <h1>Hello, 我是卓稟鈞 (Andrew)！</h1>
             <p style="font-size: 1.2rem; color: var(--text-color);">一個對寫程式充滿無限好奇心的高中生。</p>
             <p>
@@ -111,55 +109,66 @@
     </main>
 
     <script>
-        // Preloader 載入動畫控制
-        window.onload = function() {
+        // 獨立 Preloader 邏輯：確保無論如何都會隱藏動畫，避免畫面被卡死
+        window.addEventListener('load', () => {
             const preloader = document.getElementById('preloader');
             if (preloader) {
                 setTimeout(() => {
                     preloader.classList.add('hidden');
                 }, 200); 
             }
-        };
+        });
 
-        // 載入導覽列組件的通用函式
+        // 載入導覽列
         async function loadNavbar() {
             try {
                 const response = await fetch('components/navbar.html');
                 if (response.ok) {
                     const html = await response.text();
                     document.getElementById('navbar-container').innerHTML = html;
-                    initNavigation(); // 載入後初始化選單切換功能
+                    
+                    // 標註當前頁面在導覽列的 active 狀態
+                    const activeLink = document.getElementById('nav-link-home');
+                    if (activeLink) activeLink.classList.add('active');
+                    
+                    handleRouting(); // 初始化路由切換
                 }
             } catch (error) {
-                console.error('導覽列載入失敗:', error);
+                console.error('導覽列組件載入失敗，請確認是否使用本地伺服器(Live Server)開啟。', error);
             }
         }
 
-        // 頁面動態切換邏輯
-        function initNavigation() {
-            const navLinks = document.querySelectorAll('.nav-link:not(.nav-link-admin)');
+        // 核心：基於 Hash (#) 的路由切換機制
+        function handleRouting() {
+            const hash = window.location.hash || '#home';
+            const pageId = hash.replace('#', '');
+            const targetPage = document.getElementById(pageId);
             const pages = document.querySelectorAll('.page-content');
-            
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(event) {
-                    event.preventDefault(); 
-                    const targetId = this.getAttribute('data-page');
-                    const targetPage = document.getElementById(targetId);
-                    
-                    // 切換連結的選取樣式
-                    navLinks.forEach(nav => nav.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // 切換頁面內容顯示
-                    pages.forEach(page => page.classList.remove('active'));
-                    if (targetPage) {
-                        targetPage.classList.add('active');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            if (targetPage) {
+                // 1. 切換顯示內容
+                pages.forEach(p => p.classList.remove('active'));
+                targetPage.classList.add('active');
+
+                // 2. 切換導覽列按鈕 active 樣式
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    const hrefAttr = link.getAttribute('href');
+                    if (hrefAttr && hrefAttr.endsWith(hash)) {
+                        link.classList.add('active');
                     }
                 });
-            });
+            }
         }
 
-        document.addEventListener('DOMContentLoaded', loadNavbar);
+        // 監聽網址的 Hash 變化 (例如從 admin.html 跳回來時)
+        window.addEventListener('hashchange', handleRouting);
+        
+        // 頁面初次載入
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNavbar();
+        });
     </script>
 </body>
 </html>
