@@ -1,9 +1,35 @@
 // js/main.js
 
-const REPO_OWNER = 'potatosserver';
-const REPO_NAME = 'potatosserver.github.io'; 
-const DATABASE_PATH = 'data/projects_articles.json';
+// ==========================================
+// 動態儲存庫配置變數 (將從 data/config.json 自動載入)
+// ==========================================
+let REPO_OWNER = '';
+let REPO_NAME = '';
+let DATABASE_PATH = '';
 
+// 新增：安全讀取本地設定檔的函式
+async function loadConfig() {
+    // 如果已經載入過，直接跳過以提升效能
+    if (REPO_OWNER && REPO_NAME) return;
+
+    try {
+        // 使用相對路徑讀取本地 config.json (不論誰 Fork，皆能讀到自己儲存庫下的設定)
+        const response = await fetch('data/config.json?nocache=' + new Date().getTime());
+        if (response.ok) {
+            const config = await response.json();
+            REPO_OWNER = config.repo_owner;
+            REPO_NAME = config.repo_name;
+            DATABASE_PATH = config.database_path || 'data/projects_articles.json';
+            console.log(`儲存庫設定自動載入成功：目標為 ${REPO_OWNER}/${REPO_NAME}`);
+        } else {
+            throw new Error("無法讀取本地 data/config.json 設定檔。");
+        }
+    } catch (error) {
+        console.error("載入本地設定檔失敗，請確認檔案路徑與 JSON 格式：", error);
+    }
+}
+
+// 輔助函式：支援 UTF-8 中文的 Base64 編解碼 (防亂碼)
 function utf8_to_b64(str) {
     return window.btoa(unescape(encodeURIComponent(str)));
 }
@@ -25,6 +51,7 @@ function parseHighlights(text) {
     return text.replace(/{h}/g, '<span class="highlight">').replace(/{\/h}/g, '</span>');
 }
 
+// 1. 載入共用導覽列
 async function loadNavbar() {
     try {
         const response = await fetch('components/navbar.html');
@@ -55,8 +82,11 @@ function highlightCurrentPage() {
     });
 }
 
-// 獲取最新資料庫 (獲取後會自動執行一次配色檢查)
+// 2. [讀取] 獲取 GitHub 最新資料庫內容與 SHA 值
 async function fetchDatabase() {
+    // 確保在發送 API 前，設定檔已載入完畢
+    await loadConfig();
+
     const token = localStorage.getItem('gh_token');
     const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${DATABASE_PATH}?nocache=${new Date().getTime()}`;
     
@@ -74,7 +104,7 @@ async function fetchDatabase() {
     const decodedContent = b64_to_utf8(fileInfo.content);
     const database = JSON.parse(decodedContent);
 
-    // 【自動套用變色】只要頁面載入資料庫，就會自動讀取配置更新主題色
+    // 【自動套用變色】
     if (database.profile && database.profile.theme && database.profile.theme.highlight_color) {
         applyDynamicTheme(database.profile.theme.highlight_color);
     }
@@ -85,7 +115,11 @@ async function fetchDatabase() {
     };
 }
 
+// 3. [寫入] 將資料更新並 Commit 回 GitHub
 async function saveDatabase(jsonData, sha) {
+    // 確保在發送 API 前，設定檔已載入完畢
+    await loadConfig();
+
     const token = localStorage.getItem('gh_token');
     if (!token) {
         throw new Error('未偵測到管理員驗證權杖，請重新登入。');
