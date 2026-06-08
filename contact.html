@@ -8,30 +8,70 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <div id="preloader">
+        <svg class="loader-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <circle class="loader-circle" cx="60" cy="60" r="50" fill="none"/>
+        </svg>
+    </div>
+
+    <!-- 頂部共用導覽列 -->
     <header id="navbar-container" class="navbar"></header>
 
     <main class="full-width-content">
         <section>
             <h2><span class="material-symbols-outlined">connect_without_contact</span>聯絡方式</h2>
-            <p>很高興能與您交流，您可以透過以下方式找到我：</p>
-            <ul class="contact-list">
-                <li>
-                    <a href="mailto:potatosserver@gmail.com">
-                        <span class="material-symbols-outlined">email</span>
-                        <span>potatosserver@gmail.com</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="https://github.com/potatosserver" target="_blank">
-                        <span class="material-symbols-outlined">code</span>
-                        <span>GitHub: @potatosserver</span>
-                    </a>
-                </li>
+            <p style="margin-bottom: 2rem;">很高興能與您交流，您可以透過以下方式找到我：</p>
+            
+            <!-- 動態聯絡管道容器 -->
+            <ul class="contact-list" id="dynamic-contact-list">
+                <li style="color: var(--md-sys-color-text-muted);">正在自 GitHub 載入聯絡資訊...</li>
             </ul>
         </section>
     </main>
 
+    <!-- 載入共用 JavaScript 邏輯 -->
     <script src="js/main.js"></script>
-    <script>document.addEventListener('DOMContentLoaded', loadNavbar);</script>
+    <script>
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                setTimeout(() => preloader.classList.add('hidden'), 200);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadNavbar();
+            await loadDynamicContacts();
+        });
+
+        // 自 GitHub API 讀取並渲染聯絡資訊
+        async function loadDynamicContacts() {
+            const container = document.getElementById('dynamic-contact-list');
+            try {
+                const result = await fetchDatabase();
+                const contacts = result.data.contacts || [];
+
+                if (contacts.length === 0) {
+                    container.innerHTML = '<li style="color: var(--md-sys-color-text-muted); padding: 0.5rem;">目前尚無聯絡管道。</li>';
+                    return;
+                }
+
+                // 渲染聯絡清單
+                container.innerHTML = contacts.map(c => `
+                    <li>
+                        <a href="${c.url}" target="_blank" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                            <span class="material-symbols-outlined" style="font-size: 1.25em;">${c.icon}</span>
+                            <span>${c.value}</span>
+                        </a>
+                    </li>
+                `).join('');
+
+            } catch (error) {
+                console.error('動態載入聯絡管道失敗：', error);
+                container.innerHTML = '<li style="color: #ef4444; padding: 0.5rem;">無法與 GitHub 連線以載入聯絡管道。</li>';
+            }
+        }
+    </script>
 </body>
 </html>

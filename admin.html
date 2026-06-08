@@ -21,7 +21,7 @@
     <header id="navbar-container" class="navbar"></header>
 
     <!-- ===================================================
-         1. 未登入狀態：安全登入卡片
+         1. 未登入狀態
          =================================================== -->
     <div id="login-view" class="full-width-content" style="display: none; max-width: 480px; text-align: center; margin-top: 15vh;">
         <div class="card" style="padding: 3rem 2rem;">
@@ -36,14 +36,12 @@
     </div>
 
     <!-- ===================================================
-         2. 已登入狀態：後台管理介面佈局
+         2. 已登入狀態
          =================================================== -->
     <div id="admin-view" class="layout-container" style="display: none;">
         
-        <!-- 左側側邊欄容器 -->
         <div id="sidebar-container"></div>
 
-        <!-- 右側主要內容區域 -->
         <main class="main-content">
             
             <!-- 2.1 連線設定面板 -->
@@ -69,73 +67,62 @@
                 </div>
             </section>
 
-            <!-- 2.2 個人設定面板 -->
+            <!-- 2.2 個人設定與聯絡管道面板 -->
             <section id="panel-profile" class="admin-panel-section" style="display: none;">
                 <div class="admin-panel-header">
                     <h2>
                         <span class="material-symbols-outlined" style="color: var(--md-sys-color-primary); margin-right: 8px;">person</span>
-                        <span>個人設定</span>
+                        <span>個人與聯絡設定</span>
                     </h2>
-                    <button id="btn-edit-profile-trigger" class="sidebar-btn active" style="width: auto; padding: 0.6rem 1.25rem;">
-                        <span class="material-symbols-outlined">edit</span>
-                        <span>修改個人設定</span>
-                    </button>
                 </div>
 
-                <!-- 【視圖 A】唯讀檢視模式 -->
-                <div id="profile-view-mode" class="admin-view-fade">
-                    <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
-                        <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                <!-- 2.2.1 卡片 A：主題配色區區塊 -->
+                <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 style="color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.5rem; margin:0;">
                             <span class="material-symbols-outlined">palette</span>
                             <span>主題視覺</span>
                         </h3>
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div id="preview-profile-color" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid white;"></div>
-                            <span id="preview-profile-color-text" style="font-family: monospace;">#7B9DFF</span>
-                        </div>
+                        <button id="btn-edit-theme" class="sidebar-btn" style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; border: 1px solid var(--md-sys-color-outline);">修改</button>
                     </div>
+                    <!-- 唯讀檢視 -->
+                    <div id="theme-view-mode" style="display: flex; align-items: center; gap: 1rem;">
+                        <div id="preview-profile-color" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid white;"></div>
+                        <span id="preview-profile-color-text" style="font-family: monospace;">#7B9DFF</span>
+                    </div>
+                    <!-- 編輯表單 -->
+                    <div id="theme-form-mode" style="display: none;" class="admin-view-fade">
+                        <form id="form-theme">
+                            <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1rem;">
+                                <input type="color" id="profile-color" class="m3-text-field" style="width: 80px; height: 50px; padding: 4px; cursor: pointer;">
+                                <span>選擇網站高亮色（這會即時修改全站所有強調視覺）</span>
+                            </div>
+                            <div style="display: flex; gap: 1rem;">
+                                <button type="submit" class="sidebar-btn active" style="width: auto; padding: 0.5rem 1rem;">儲存</button>
+                                <button type="button" id="btn-cancel-theme" class="sidebar-btn" style="width: auto; padding: 0.5rem 1rem; background: #64748b;">取消</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
-                    <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
-                        <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                <!-- 2.2.2 卡片 B：首頁文案區區塊 -->
+                <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 style="color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.5rem; margin:0;">
                             <span class="material-symbols-outlined">home</span>
                             <span>首頁文案</span>
                         </h3>
+                        <button id="btn-edit-home" class="sidebar-btn" style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; border: 1px solid var(--md-sys-color-outline);">修改</button>
+                    </div>
+                    <!-- 唯讀檢視 -->
+                    <div id="home-view-mode">
                         <h4 id="preview-home-title" style="margin-bottom: 0.5rem;"></h4>
                         <p id="preview-home-subtitle" style="font-weight: 500; color: var(--md-sys-color-text-main); margin-bottom: 1rem;"></p>
                         <p id="preview-home-desc" style="margin: 0;"></p>
                     </div>
-
-                    <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
-                        <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <span class="material-symbols-outlined">person</span>
-                            <span>關於我簡介</span>
-                        </h3>
-                        <p id="preview-about-bio" style="margin-bottom: 1.5rem;"></p>
-                        
-                        <h4 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <span class="material-symbols-outlined" id="preview-skills-icon">psychology</span>
-                            <span id="preview-skills-title">我的技能</span>
-                        </h4>
-                        <div id="preview-skills-list" style="display: flex; flex-direction: column; gap: 0.5rem; color: var(--md-sys-color-text-muted);"></div>
-                    </div>
-                </div>
-                
-                <!-- 【視圖 B】編輯表單模式 (預設隱藏) -->
-                <div id="profile-form-view" class="card admin-view-fade" style="padding: 2rem; margin-bottom: 2rem; display: none;">
-                    <form id="form-profile">
-                        <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem; background-color: rgba(255,255,255,0.01);">
-                            <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1rem;">主題配色</h3>
-                            <div style="display: flex; align-items: center; gap: 1.5rem;">
-                                <input type="color" id="profile-color" class="m3-text-field" style="width: 80px; height: 50px; padding: 4px; cursor: pointer;">
-                                <div>
-                                    <strong>選擇網站高亮色</strong>
-                                    <p style="margin: 0; font-size: 0.85rem; color: var(--md-sys-color-text-muted);">這會即時修改全站所有導覽、按鈕與強調樣式。</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem; background-color: rgba(255,255,255,0.01);">
-                            <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1.25rem;">首頁文字</h3>
+                    <!-- 編輯表單 -->
+                    <div id="home-form-mode" style="display: none;" class="admin-view-fade">
+                        <form id="form-home">
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.2rem;">
                                 <div style="display: flex; flex-direction: column;">
                                     <label style="margin-bottom: 0.5rem; font-weight: bold;">主標題 (H1)</label>
@@ -146,14 +133,39 @@
                                     <input type="text" id="home-input-subtitle" class="m3-text-field" required>
                                 </div>
                             </div>
-                            <div style="display: flex; flex-direction: column;">
+                            <div style="display: flex; flex-direction: column; margin-bottom: 1.2rem;">
                                 <label style="margin-bottom: 0.5rem; font-weight: bold;">介紹內文 (支援高亮標記 {h}字詞{/h} )</label>
                                 <textarea id="home-input-desc" rows="4" class="m3-text-field" required></textarea>
                             </div>
-                        </div>
+                            <div style="display: flex; gap: 1rem;">
+                                <button type="submit" class="sidebar-btn active" style="width: auto; padding: 0.5rem 1rem;">儲存</button>
+                                <button type="button" id="btn-cancel-home" class="sidebar-btn" style="width: auto; padding: 0.5rem 1rem; background: #64748b;">取消</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
-                        <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem; background-color: rgba(255,255,255,0.01);">
-                            <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1.25rem;">關於我及技能</h3>
+                <!-- 2.2.3 卡片 C：關於我與技能區區塊 -->
+                <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 style="color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.5rem; margin:0;">
+                            <span class="material-symbols-outlined">person</span>
+                            <span>關於我與技能</span>
+                        </h3>
+                        <button id="btn-edit-about" class="sidebar-btn" style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; border: 1px solid var(--md-sys-color-outline);">修改</button>
+                    </div>
+                    <!-- 唯讀檢視 -->
+                    <div id="about-view-mode">
+                        <p id="preview-about-bio" style="margin-bottom: 1.5rem;"></p>
+                        <h4 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="material-symbols-outlined" id="preview-skills-icon">psychology</span>
+                            <span id="preview-skills-title">我的技能</span>
+                        </h4>
+                        <div id="preview-skills-list" style="display: flex; flex-direction: column; gap: 0.5rem; color: var(--md-sys-color-text-muted);"></div>
+                    </div>
+                    <!-- 編輯表單 -->
+                    <div id="about-form-mode" style="display: none;" class="admin-view-fade">
+                        <form id="form-about">
                             <div style="display: flex; flex-direction: column; margin-bottom: 1.2rem;">
                                 <label style="margin-bottom: 0.5rem; font-weight: bold;">個人簡介</label>
                                 <textarea id="about-input-bio" rows="4" class="m3-text-field" required></textarea>
@@ -176,7 +188,7 @@
                                 </div>
                             </div>
 
-                            <div style="border-top: 1px solid var(--md-sys-color-outline); padding-top: 1.2rem;">
+                            <div style="border-top: 1px solid var(--md-sys-color-outline); padding-top: 1.2rem; margin-bottom: 1.5rem;">
                                 <h4 style="margin-bottom: 1rem;">技能清單管理</h4>
                                 <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 0.75rem;">
                                     <input type="text" id="skill-lbl-0" class="m3-text-field" placeholder="標籤，例如：語言" required>
@@ -191,13 +203,67 @@
                                     <input type="text" id="skill-val-2" class="m3-text-field" placeholder="內容，例如：探索小工具" required>
                                 </div>
                             </div>
-                        </div>
+                            <div style="display: flex; gap: 1rem;">
+                                <button type="submit" class="sidebar-btn active" style="width: auto; padding: 0.5rem 1rem;">儲存</button>
+                                <button type="button" id="btn-cancel-about" class="sidebar-btn" style="width: auto; padding: 0.5rem 1rem; background: #64748b;">取消</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
-                        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-                            <button type="submit" class="sidebar-btn active" style="width: auto; padding: 0.75rem 1.5rem;">儲存個人設定</button>
-                            <button type="button" id="btn-profile-cancel" class="sidebar-btn" style="width: auto; padding: 0.75rem 1.5rem; background: #64748b;">取消修改</button>
+                <!-- 2.2.4 【新功能】卡片 D：聯絡管道管理卡片 -->
+                <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 style="color: var(--md-sys-color-primary); display: flex; align-items: center; gap: 0.5rem; margin:0;">
+                            <span class="material-symbols-outlined">connect_without_contact</span>
+                            <span>聯絡管道設定</span>
+                        </h3>
+                        <button id="btn-add-contact-trigger" class="sidebar-btn active" style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem;">新增聯絡方式</button>
+                    </div>
+
+                    <!-- 【檢視/列表視圖】 -->
+                    <div id="contact-list-view">
+                        <div id="admin-contact-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <!-- 動態載入聯絡人 -->
                         </div>
-                    </form>
+                    </div>
+
+                    <!-- 【新增/編輯表單視圖】 -->
+                    <div id="contact-form-view" style="display: none;" class="admin-view-fade">
+                        <form id="form-contact">
+                            <input type="hidden" id="contact-id">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.2rem;">
+                                <div style="display: flex; flex-direction: column;">
+                                    <label style="margin-bottom: 0.5rem; font-weight: bold;">平台/分類名稱</label>
+                                    <input type="text" id="contact-input-platform" class="m3-text-field" placeholder="例如：Email、GitHub" required>
+                                </div>
+                                <div style="display: flex; flex-direction: column;">
+                                    <label style="margin-bottom: 0.5rem; font-weight: bold;">圖示類型</label>
+                                    <select id="contact-input-icon" class="m3-text-field">
+                                        <option value="email">電子信箱 (email)</option>
+                                        <option value="code">原始碼/程式開發 (code)</option>
+                                        <option value="photo_camera">相機/社群媒體 (photo_camera)</option>
+                                        <option value="link">外部連結 (link)</option>
+                                        <option value="language">網頁/網域 (language)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                                <div style="display: flex; flex-direction: column;">
+                                    <label style="margin-bottom: 0.5rem; font-weight: bold;">展示文字</label>
+                                    <input type="text" id="contact-input-value" class="m3-text-field" placeholder="例如：potatosserver@gmail.com" required>
+                                </div>
+                                <div style="display: flex; flex-direction: column;">
+                                    <label style="margin-bottom: 0.5rem; font-weight: bold;">實體跳轉連結 (URL)</label>
+                                    <input type="text" id="contact-input-url" class="m3-text-field" placeholder="例如：mailto:... 或 https://..." required>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 1rem;">
+                                <button type="submit" class="sidebar-btn active" style="width: auto; padding: 0.5rem 1rem;">儲存管道</button>
+                                <button type="button" id="btn-cancel-contact" class="sidebar-btn" style="width: auto; padding: 0.5rem 1rem; background: #64748b;">取消</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </section>
 
@@ -330,7 +396,7 @@
         const WORKER_URL = 'https://github-oauth-handler.potatosserver.workers.dev/'; 
         const REDIRECT_URI = window.location.origin + window.location.pathname;
 
-        let dbCache = { profile: { theme: {}, home: {}, about: {} }, announcements: [], projects: [] };
+        let dbCache = { profile: { theme: {}, home: {}, about: {} }, announcements: [], projects: [], contacts: [] };
         let dbSha = '';
 
         window.addEventListener('load', () => {
@@ -346,7 +412,7 @@
             bindFormEvents(); 
             bindProjectFormEvents(); 
             bindUIViewEvents(); 
-            bindProfileFormEvents(); 
+            bindProfileFormEvents(); // 綁定分拆式個人設定
         });
 
         async function checkAuth() {
@@ -465,6 +531,9 @@
             }
         }
 
+        // ===================================================
+        // 新增與調整：M3 視圖切換邏輯 ( 包含拆分設定 )
+        // ===================================================
         function bindUIViewEvents() {
             // 公告新增視圖切換
             document.getElementById('btn-add-ann-trigger').addEventListener('click', () => {
@@ -480,15 +549,36 @@
                 document.getElementById('btn-add-proj-trigger').style.display = 'none';
             });
 
-            // 【新增】：個人設定「檢視/編輯」視圖切換
-            document.getElementById('btn-edit-profile-trigger').addEventListener('click', () => {
-                document.getElementById('profile-view-mode').style.display = 'none';
-                document.getElementById('profile-form-view').style.display = 'block';
-                document.getElementById('btn-edit-profile-trigger').style.display = 'none';
+            // A. 主題視覺一小區切換
+            document.getElementById('btn-edit-theme').addEventListener('click', () => {
+                document.getElementById('theme-view-mode').style.display = 'none';
+                document.getElementById('theme-form-mode').style.display = 'block';
+                document.getElementById('btn-edit-theme').style.display = 'none';
+            });
+
+            // B. 首頁文案一小區切換
+            document.getElementById('btn-edit-home').addEventListener('click', () => {
+                document.getElementById('home-view-mode').style.display = 'none';
+                document.getElementById('home-form-mode').style.display = 'block';
+                document.getElementById('btn-edit-home').style.display = 'none';
+            });
+
+            // C. 關於我一小區切換
+            document.getElementById('btn-edit-about').addEventListener('click', () => {
+                document.getElementById('about-view-mode').style.display = 'none';
+                document.getElementById('about-form-mode').style.display = 'block';
+                document.getElementById('btn-edit-about').style.display = 'none';
+            });
+
+            // D. 聯絡人新增視圖切換
+            document.getElementById('btn-add-contact-trigger').addEventListener('click', () => {
+                document.getElementById('contact-list-view').style.display = 'none';
+                document.getElementById('contact-form-view').style.display = 'block';
+                document.getElementById('btn-add-contact-trigger').style.display = 'none';
             });
         }
 
-        // 將所有版面重置為預設唯讀/清單模式
+        // 將所有版面與表單重置為預設唯讀檢視與清單狀態
         function resetAllViewsToDefault() {
             // 公告
             document.getElementById('ann-list-view').style.display = 'block';
@@ -504,20 +594,34 @@
             if (addProjTrigger) addProjTrigger.style.display = 'inline-flex';
             resetProjForm();
 
-            // 個人設定
-            document.getElementById('profile-view-mode').style.display = 'block';
-            document.getElementById('profile-form-view').style.display = 'none';
-            const editProfileTrigger = document.getElementById('btn-edit-profile-trigger');
-            if (editProfileTrigger) editProfileTrigger.style.display = 'inline-flex';
+            // 個人視覺設定 (重置為檢視狀態)
+            document.getElementById('theme-view-mode').style.display = 'flex';
+            document.getElementById('theme-form-mode').style.display = 'none';
+            document.getElementById('btn-edit-theme').style.display = 'inline-flex';
+
+            document.getElementById('home-view-mode').style.display = 'block';
+            document.getElementById('home-form-mode').style.display = 'none';
+            document.getElementById('btn-edit-home').style.display = 'inline-flex';
+
+            document.getElementById('about-view-mode').style.display = 'block';
+            document.getElementById('about-form-mode').style.display = 'none';
+            document.getElementById('btn-edit-about').style.display = 'inline-flex';
+
+            // 聯絡人
+            document.getElementById('contact-list-view').style.display = 'block';
+            document.getElementById('contact-form-view').style.display = 'none';
+            document.getElementById('btn-add-contact-trigger').style.display = 'inline-flex';
+            resetContactForm();
         }
 
 
         // ===================================================
-        // 個人設定控制與自動讀取/寫入舊資料
+        // 模組化：分拆式個人設定、自動載入與獨立分開儲存
         // ===================================================
+
+        // 自雲端同步下載設定，渲染唯讀區與載入表單
         async function refreshProfile() {
             try {
-                // 自動從 GitHub 拉取最新檔案
                 const res = await fetchDatabase();
                 dbCache = res.data;
                 dbSha = res.sha;
@@ -527,14 +631,28 @@
                 const home = profile.home || {};
                 const about = profile.about || {};
 
-                // 1. 自動導入至「編輯表單」
+                // -- 1. 主題配色設定 --
                 document.getElementById('profile-color').value = theme.highlight_color || '#7B9DFF';
+                document.getElementById('preview-profile-color').style.backgroundColor = theme.highlight_color || '#7B9DFF';
+                document.getElementById('preview-profile-color-text').innerText = theme.highlight_color || '#7B9DFF';
+
+                // -- 2. 首頁文案設定 --
                 document.getElementById('home-input-title').value = home.title || '';
                 document.getElementById('home-input-subtitle').value = home.subtitle || '';
                 document.getElementById('home-input-desc').value = home.description || '';
+                
+                document.getElementById('preview-home-title').innerText = home.title || '';
+                document.getElementById('preview-home-subtitle').innerText = home.subtitle || '';
+                document.getElementById('preview-home-desc').innerHTML = parseHighlights(home.description);
+
+                // -- 3. 關於我與技能設定 --
                 document.getElementById('about-input-bio').value = about.bio || '';
                 document.getElementById('about-input-skills-title').value = about.skills_title || '我的技能';
                 document.getElementById('about-input-skills-icon').value = about.skills_icon || 'psychology';
+                
+                document.getElementById('preview-about-bio').innerText = about.bio || '';
+                document.getElementById('preview-skills-title').innerText = about.skills_title || '我的技能';
+                document.getElementById('preview-skills-icon').innerText = about.skills_icon || 'psychology';
 
                 const skills = about.skills_list || [];
                 for (let i = 0; i < 3; i++) {
@@ -542,16 +660,6 @@
                     document.getElementById(`skill-lbl-${i}`).value = skill.label;
                     document.getElementById(`skill-val-${i}`).value = skill.value;
                 }
-
-                // 2. 自動將舊資料渲染至「唯讀預覽區」
-                document.getElementById('preview-profile-color').style.backgroundColor = theme.highlight_color || '#7B9DFF';
-                document.getElementById('preview-profile-color-text').innerText = theme.highlight_color || '#7B9DFF';
-                document.getElementById('preview-home-title').innerText = home.title || '';
-                document.getElementById('preview-home-subtitle').innerText = home.subtitle || '';
-                document.getElementById('preview-home-desc').innerHTML = parseHighlights(home.description);
-                document.getElementById('preview-about-bio').innerText = about.bio || '';
-                document.getElementById('preview-skills-title').innerText = about.skills_title || '我的技能';
-                document.getElementById('preview-skills-icon').innerText = about.skills_icon || 'psychology';
 
                 const previewSkillsContainer = document.getElementById('preview-skills-list');
                 previewSkillsContainer.innerHTML = skills.map(sk => {
@@ -561,49 +669,155 @@
                     return '';
                 }).join('');
 
+                // -- 4. 聯絡人列表渲染 --
+                renderAdminContacts();
+
             } catch (err) {
-                console.error("載入個人設定失敗：", err);
-                alert("載入最新設定資料失敗，請確認與 GitHub 伺服器連線正常。");
+                console.error("載入個人資料失敗：", err);
             }
         }
 
+        // 綁定獨立小卡片各自儲存
         function bindProfileFormEvents() {
-            const form = document.getElementById('form-profile');
-            if (form) {
-                form.addEventListener('submit', async function(e) {
-                    e.preventDefault();
+            // A. 主題儲存
+            document.getElementById('form-theme').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const color = document.getElementById('profile-color').value;
+                if(!dbCache.profile) dbCache.profile = {};
+                dbCache.profile.theme = { highlight_color: color };
 
-                    const highlight_color = document.getElementById('profile-color').value;
-                    const home_title = document.getElementById('home-input-title').value.trim();
-                    const home_subtitle = document.getElementById('home-input-subtitle').value.trim();
-                    const home_desc = document.getElementById('home-input-desc').value;
-                    const about_bio = document.getElementById('about-input-bio').value;
-                    const skills_title = document.getElementById('about-input-skills-title').value.trim();
-                    const skills_icon = document.getElementById('about-input-skills-icon').value;
+                await syncToGitHub('主題高亮配色更新');
+                resetAllViewsToDefault();
+                await refreshProfile();
+            });
+            document.getElementById('btn-cancel-theme').addEventListener('click', resetAllViewsToDefault);
 
-                    const skills_list = [];
-                    for (let i = 0; i < 3; i++) {
-                        skills_list.push({
-                            label: document.getElementById(`skill-lbl-${i}`).value.trim(),
-                            value: document.getElementById(`skill-val-${i}`).value.trim()
-                        });
-                    }
+            // B. 首頁儲存
+            document.getElementById('form-home').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const title = document.getElementById('home-input-title').value.trim();
+                const subtitle = document.getElementById('home-input-subtitle').value.trim();
+                const description = document.getElementById('home-input-desc').value;
 
-                    // 寫入快取，分開進行儲存不干擾公告或作品
-                    dbCache.profile = {
-                        theme: { highlight_color },
-                        home: { title: home_title, subtitle: home_subtitle, description: home_desc },
-                        about: { bio: about_bio, skills_title, skills_icon, skills_list }
-                    };
+                if(!dbCache.profile) dbCache.profile = {};
+                dbCache.profile.home = { title, subtitle, description };
 
-                    await syncToGitHub('個人品牌與視覺設定更新');
-                    resetAllViewsToDefault();
-                    await refreshProfile(); // 儲存完畢自動刷新唯讀畫面
-                });
+                await syncToGitHub('首頁文案更新');
+                resetAllViewsToDefault();
+                await refreshProfile();
+            });
+            document.getElementById('btn-cancel-home').addEventListener('click', resetAllViewsToDefault);
+
+            // C. 關於我儲存
+            document.getElementById('form-about').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const bio = document.getElementById('about-input-bio').value;
+                const skills_title = document.getElementById('about-input-skills-title').value.trim();
+                const skills_icon = document.getElementById('about-input-skills-icon').value;
+
+                const skills_list = [];
+                for (let i = 0; i < 3; i++) {
+                    skills_list.push({
+                        label: document.getElementById(`skill-lbl-${i}`).value.trim(),
+                        value: document.getElementById(`skill-val-${i}`).value.trim()
+                    });
+                }
+
+                if(!dbCache.profile) dbCache.profile = {};
+                dbCache.profile.about = { bio, skills_title, skills_icon, skills_list };
+
+                await syncToGitHub('關於我與技能設定更新');
+                resetAllViewsToDefault();
+                await refreshProfile();
+            });
+            document.getElementById('btn-cancel-about').addEventListener('click', resetAllViewsToDefault);
+
+            // D. 聯絡人管道儲存 (新增/修改)
+            document.getElementById('form-contact').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const contactId = document.getElementById('contact-id').value;
+                const platform = document.getElementById('contact-input-platform').value.trim();
+                const icon = document.getElementById('contact-input-icon').value;
+                const value = document.getElementById('contact-input-value').value.trim();
+                const url = document.getElementById('contact-input-url').value.trim();
+
+                if (!dbCache.contacts) dbCache.contacts = [];
+
+                const currentContact = {
+                    id: contactId || 'c-' + Date.now(),
+                    platform,
+                    icon,
+                    value,
+                    url
+                };
+
+                if (contactId) {
+                    const idx = dbCache.contacts.findIndex(item => item.id === contactId);
+                    if (idx > -1) dbCache.contacts[idx] = currentContact;
+                } else {
+                    dbCache.contacts.push(currentContact);
+                }
+
+                await syncToGitHub('聯絡管道儲存');
+                resetAllViewsToDefault();
+                await refreshProfile();
+            });
+            document.getElementById('btn-cancel-contact').addEventListener('click', resetAllViewsToDefault);
+        }
+
+        // ===================================================
+        // 聯絡管道管理子模組 (CRUD)
+        // ===================================================
+        function renderAdminContacts() {
+            const listContainer = document.getElementById('admin-contact-list');
+            const items = dbCache.contacts || [];
+
+            if (items.length === 0) {
+                listContainer.innerHTML = '<p style="color: var(--md-sys-color-text-muted);">目前沒有設定任何聯絡管道。</p>';
+                return;
             }
 
-            // 取消修改按鈕綁定
-            document.getElementById('btn-profile-cancel').addEventListener('click', resetAllViewsToDefault);
+            listContainer.innerHTML = items.map(c => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 1.15rem; background: var(--md-sys-color-background); border: 1px solid var(--md-sys-color-outline); border-radius: var(--md-shape-corner-medium);">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="color: var(--md-sys-color-primary);">${c.icon}</span>
+                        <strong>${c.platform}：</strong>
+                        <span style="color: var(--md-sys-color-text-muted); font-size: 0.95rem;">${c.value}</span>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button onclick="editContact('${c.id}')" class="sidebar-btn" style="width: auto; padding: 0.3rem 0.6rem; font-size: 0.8rem; background:#eab308; color:#000;">編輯</button>
+                        <button onclick="deleteContact('${c.id}')" class="sidebar-btn" style="width: auto; padding: 0.3rem 0.6rem; font-size: 0.8rem; background:#ef4444; color:#fff;">刪除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function editContact(id) {
+            const c = dbCache.contacts.find(item => item.id === id);
+            if (c) {
+                document.getElementById('contact-id').value = c.id;
+                document.getElementById('contact-input-platform').value = c.platform;
+                document.getElementById('contact-input-icon').value = c.icon;
+                document.getElementById('contact-input-value').value = c.value;
+                document.getElementById('contact-input-url').value = c.url;
+
+                document.getElementById('contact-list-view').style.display = 'none';
+                document.getElementById('contact-form-view').style.display = 'block';
+                document.getElementById('btn-add-contact-trigger').style.display = 'none';
+            }
+        }
+
+        function resetContactForm() {
+            document.getElementById('form-contact').reset();
+            document.getElementById('contact-id').value = '';
+        }
+
+        async function deleteContact(id) {
+            if (confirm('確定要永久刪除此聯絡方式嗎？將會即時同步至 GitHub。')) {
+                dbCache.contacts = dbCache.contacts.filter(item => item.id !== id);
+                await syncToGitHub('聯絡人刪除');
+                await refreshProfile();
+            }
         }
 
         // ===================================================
@@ -839,6 +1053,7 @@
         async function syncToGitHub(actionText) {
             const preloader = document.getElementById('preloader');
             if (preloader) preloader.classList.remove('hidden'); 
+            console.log("【同步】開啟動畫，開始進行 GitHub API 上傳。");
 
             try {
                 const latest = await fetchDatabase();

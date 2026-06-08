@@ -1,4 +1,33 @@
 {
+  "profile": {
+    "theme": {
+      "highlight_color": "#7B9DFF"
+    },
+    "home": {
+      "title": "Hello, 我是卓稟鈞 (Andrew)！",
+      "subtitle": "一個對寫程式充滿無限好奇心的高中生。",
+      "description": "我熱衷於用 {h}Python、C++{/h} 和 {h}前端技術{/h}，將腦中的奇思妙想打造成真正能解決問題的工具。從 Discord Bot 到交通查詢 App，我的目標始終是——{h}讓科技更貼近生活{/h}。"
+    },
+    "about": {
+      "bio": "目前就讀於高雄新莊高中三年級。雙子座的個性驅使我對許多領域都抱持著強烈的好奇心，尤其是在軟體開發的世界裡，總有挖掘不完的新鮮事。",
+      "skills_title": "我的技能",
+      "skills_icon": "psychology",
+      "skills_list": [
+        {
+          "label": "語言",
+          "value": "Python, C++, JavaScript"
+        },
+        {
+          "label": "領域",
+          "value": "前端開發, Discord Bot 製作, 資料串接"
+        },
+        {
+          "label": "興趣",
+          "value": "探索新的 API、打造實用的小工具、自動化處理生活中的瑣事"
+        }
+      ]
+    }
+  },
   "announcements": [
     {
       "id": "ann-1",
@@ -8,10 +37,10 @@
       "pinned": true
     },
     {
-      "id": "ann-1780915500271",
-      "title": "1",
-      "date": "2026-06-08",
-      "content": "3",
+      "id": "ann-2",
+      "date": "2026-06-05",
+      "title": "YouBike 2.0 查詢工具與個人網站深度整合測試中",
+      "content": "正在開發將 YouBike 2.0 站點即時車輛與空位查詢功能直接整合至個人首頁的小工具，提供最直覺的使用體驗。",
       "pinned": false
     }
   ],
@@ -29,10 +58,51 @@
       "github_url": "https://github.com/potatosserver/kaohsiung_live_bus"
     },
     {
-      "id": "proj-1780916496434",
-      "title": "1",
-      "description": "2",
-      "github_url": "https://potatosserver.github.io"
+      "id": "proj-3",
+      "title": "YouBike 站點嵌入工具產生器",
+      "description": "為網頁開發者設計的工具，可以快速產生一個美觀、可嵌入的 YouBike 站點搜尋器，方便整合到任何網站中。",
+      "github_url": "https://github.com/potatosserver/YouBike_Station_Widget"
+    },
+    {
+      "id": "proj-4",
+      "title": "YouBike (Python 版)",
+      "description": "使用 Python 腳本實現的 YouBike 資料查詢工具。",
+      "github_url": "https://github.com/potatosserver/YouBike_Python"
+    },
+    {
+      "id": "proj-5",
+      "title": "高雄捷運路線圖",
+      "description": "提供高雄捷運路線查詢與站點資訊的工具。",
+      "github_url": "https://github.com/potatosserver/KRTC"
+    },
+    {
+      "id": "proj-6",
+      "title": "網頁記事本",
+      "description": "一個簡單美觀的網頁記事本應用，支援文字與數字記錄，並內建方便的備份與匯入功能，幫助你隨時捕捉靈感。",
+      "github_url": "https://github.com/potatosserver/Notepad"
+    }
+  ],
+  "contacts": [
+    {
+      "id": "c-1",
+      "platform": "電子信箱",
+      "icon": "email",
+      "value": "potatosserver@gmail.com",
+      "url": "mailto:potatosserver@gmail.com"
+    },
+    {
+      "id": "c-2",
+      "platform": "GitHub",
+      "icon": "code",
+      "value": "GitHub: @potatosserver",
+      "url": "https://github.com/potatosserver"
+    },
+    {
+      "id": "c-3",
+      "platform": "Instagram",
+      "icon": "photo_camera",
+      "value": "Instagram: @andrewcho365",
+      "url": "https://www.instagram.com/andrewcho365/"
     }
   ]
 }
