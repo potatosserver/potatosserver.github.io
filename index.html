@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>個人作品集與文章展示</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 用來載入導覽列組件的容器 -->
+  <div id="navbar-container"></div>
+
+  <!-- 首頁採用滿版無側邊欄設計 -->
+  <main class="full-width-content">
+    
+    <!-- 1. 作品集區塊 -->
+    <section id="projects" style="margin-bottom: 3rem;">
+      <h2 style="border-left: 5px solid var(--primary-color); padding-left: 0.75rem; margin-bottom: 1.5rem;">個人精選作品</h2>
+      
+      <div class="grid">
+        <!-- 靜態測試卡片 1 -->
+        <div class="card">
+          <img src="https://picsum.photos/400/250?random=1" alt="作品預覽" class="card-img">
+          <div class="card-body">
+            <h3 class="card-title">React 購物網站</h3>
+            <p class="card-text">這是一個使用 React 與 Tailwind CSS 建立的響應式購物車專案，支援商品篩選與模擬結帳流程。</p>
+            <div class="card-tags">
+              <span class="tag">React</span>
+              <span class="tag">TailwindCSS</span>
+              <span class="tag">JavaScript</span>
+            </div>
+            <a href="#" style="color: var(--primary-color); text-decoration: none; font-weight: bold; font-size: 0.9rem;">查看專案 →</a>
+          </div>
+        </div>
+
+        <!-- 靜態測試卡片 2 -->
+        <div class="card">
+          <img src="https://picsum.photos/400/250?random=2" alt="作品預覽" class="card-img">
+          <div class="card-body">
+            <h3 class="card-title">個人部落格系統</h3>
+            <p class="card-text">基於 HTML/CSS/JS 建立的靜態部落格，透過前端 API 連接無伺服器後端，完成資料存取。</p>
+            <div class="card-tags">
+              <span class="tag">HTML</span>
+              <span class="tag">CSS</span>
+              <span class="tag">Vanilla JS</span>
+            </div>
+            <a href="#" style="color: var(--primary-color); text-decoration: none; font-weight: bold; font-size: 0.9rem;">查看專案 →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 文章列表區塊 -->
+    <section id="articles">
+      <h2 style="border-left: 5px solid var(--primary-color); padding-left: 0.75rem; margin-bottom: 1.5rem;">最新技術文章</h2>
+      
+      <div class="grid">
+        <!-- 靜態測試文章卡片 1 -->
+        <div class="card">
+          <div class="card-body">
+            <small style="color: var(--text-muted);">2026-06-08 | 技術分享</small>
+            <h3 class="card-title" style="margin-top: 0.5rem;">學習 GitHub OAuth 的實務心得</h3>
+            <p class="card-text">探討在沒有專屬後端伺服器的情況下，如何利用 Serverless Proxy 來安全地交換 Access Token...</p>
+            <div class="card-tags">
+              <span class="tag">OAuth</span>
+              <span class="tag">Security</span>
+            </div>
+            <a href="#" style="color: var(--primary-color); text-decoration: none; font-weight: bold; font-size: 0.9rem;">閱讀全文 →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 模組化載入組件的 JavaScript -->
+  <script>
+    // 建立一個通用的載入 HTML 片段函式
+    async function loadComponent(targetId, filePath) {
+      try {
+        const response = await fetch(filePath);
+        if (response.ok) {
+          const htmlContent = await response.text();
+          document.getElementById(targetId).innerHTML = htmlContent;
+        } else {
+          console.error(`無法載入組件: ${filePath}`);
+        }
+      } catch (error) {
+        console.error(`載入組件時發生錯誤:`, error);
+      }
+    }
+
+    // 當頁面準備就緒，載入導覽列
+    window.addEventListener('DOMContentLoaded', () => {
+      loadComponent('navbar-container', 'components/navbar.html');
+    });
+  </script>
+</body>
+</html>
