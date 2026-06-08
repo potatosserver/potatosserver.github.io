@@ -21,7 +21,7 @@
     <header id="navbar-container" class="navbar"></header>
 
     <!-- ===================================================
-         1. 未登入狀態：安全登入卡片
+         1. 未登入狀態
          =================================================== -->
     <div id="login-view" class="full-width-content" style="display: none; max-width: 480px; text-align: center; margin-top: 15vh;">
         <div class="card" style="padding: 3rem 2rem;">
@@ -36,7 +36,7 @@
     </div>
 
     <!-- ===================================================
-         2. 已登入狀態：後台管理介面佈局
+         2. 已登入狀態
          =================================================== -->
     <div id="admin-view" class="layout-container" style="display: none;">
         
@@ -525,74 +525,104 @@
             }
         }
 
+        // ===================================================
+        // 核心：M3 視圖切換與防禦性全重置 (防止複數編輯框開啟)
+        // ===================================================
         function bindUIViewEvents() {
+            // 公告新增按鈕 ( 關閉現有編輯 )
             document.getElementById('btn-add-ann-trigger').addEventListener('click', () => {
+                resetAnnForm(); 
                 document.getElementById('ann-list-view').style.display = 'none';
                 document.getElementById('ann-form-view').style.display = 'block';
                 document.getElementById('btn-add-ann-trigger').style.display = 'none';
             });
 
+            // 作品新增按鈕 ( 關閉現有編輯 )
             document.getElementById('btn-add-proj-trigger').addEventListener('click', () => {
+                resetProjForm();
                 document.getElementById('proj-list-view').style.display = 'none';
                 document.getElementById('proj-form-view').style.display = 'block';
                 document.getElementById('btn-add-proj-trigger').style.display = 'none';
             });
 
+            // 主題修改按鈕 ( 關閉其他個人編輯框 )
             document.getElementById('btn-edit-theme').addEventListener('click', () => {
+                closeAllProfileEditModes(); 
                 document.getElementById('theme-view-mode').style.display = 'none';
                 document.getElementById('theme-form-mode').style.display = 'block';
                 document.getElementById('btn-edit-theme').style.display = 'none';
             });
 
+            // 首頁修改按鈕 ( 關閉其他個人編輯框 )
             document.getElementById('btn-edit-home').addEventListener('click', () => {
+                closeAllProfileEditModes();
                 document.getElementById('home-view-mode').style.display = 'none';
                 document.getElementById('home-form-mode').style.display = 'block';
                 document.getElementById('btn-edit-home').style.display = 'none';
             });
 
+            // 關於我修改按鈕 ( 關閉其他個人編輯框 )
             document.getElementById('btn-edit-about').addEventListener('click', () => {
+                closeAllProfileEditModes();
                 document.getElementById('about-view-mode').style.display = 'none';
                 document.getElementById('about-form-mode').style.display = 'block';
                 document.getElementById('btn-edit-about').style.display = 'none';
             });
 
+            // 聯絡方式新增按鈕 ( 關閉其他個人編輯框 )
             document.getElementById('btn-add-contact-trigger').addEventListener('click', () => {
+                closeAllProfileEditModes();
                 document.getElementById('contact-list-view').style.display = 'none';
                 document.getElementById('contact-form-view').style.display = 'block';
                 document.getElementById('btn-add-contact-trigger').style.display = 'none';
             });
         }
 
+        // 核心安全防禦：強制關閉個人資料下所有卡片的編輯狀態
+        function closeAllProfileEditModes() {
+            // 還原主題視覺
+            document.getElementById('theme-view-mode').style.display = 'flex';
+            document.getElementById('theme-form-mode').style.display = 'none';
+            document.getElementById('btn-edit-theme').style.display = 'inline-flex';
+            document.getElementById('form-theme').reset();
+
+            // 還原首頁文案
+            document.getElementById('home-view-mode').style.display = 'block';
+            document.getElementById('home-form-mode').style.display = 'none';
+            document.getElementById('btn-edit-home').style.display = 'inline-flex';
+            document.getElementById('form-home').reset();
+
+            // 還原關於我
+            document.getElementById('about-view-mode').style.display = 'block';
+            document.getElementById('about-form-mode').style.display = 'none';
+            document.getElementById('btn-edit-about').style.display = 'inline-flex';
+            document.getElementById('form-about').reset();
+
+            // 還原聯絡方式
+            document.getElementById('contact-list-view').style.display = 'block';
+            document.getElementById('contact-form-view').style.display = 'none';
+            document.getElementById('btn-add-contact-trigger').style.display = 'inline-flex';
+            resetContactForm();
+        }
+
+        // 將所有版面與表單重置為預設唯讀檢視與清單狀態
         function resetAllViewsToDefault() {
+            // 公告
             document.getElementById('ann-list-view').style.display = 'block';
             document.getElementById('ann-form-view').style.display = 'none';
             const addAnnTrigger = document.getElementById('btn-add-ann-trigger');
             if (addAnnTrigger) addAnnTrigger.style.display = 'inline-flex';
             resetAnnForm();
 
+            // 作品
             document.getElementById('proj-list-view').style.display = 'block';
             document.getElementById('proj-form-view').style.display = 'none';
             const addProjTrigger = document.getElementById('btn-add-proj-trigger');
             if (addProjTrigger) addProjTrigger.style.display = 'inline-flex';
             resetProjForm();
 
-            document.getElementById('theme-view-mode').style.display = 'flex';
-            document.getElementById('theme-form-mode').style.display = 'none';
-            document.getElementById('btn-edit-theme').style.display = 'inline-flex';
-
-            document.getElementById('home-view-mode').style.display = 'block';
-            document.getElementById('home-form-mode').style.display = 'none';
-            document.getElementById('btn-edit-home').style.display = 'inline-flex';
-
-            document.getElementById('about-view-mode').style.display = 'block';
-            document.getElementById('about-form-mode').style.display = 'none';
-            document.getElementById('btn-edit-about').style.display = 'inline-flex';
-
-            document.getElementById('contact-list-view').style.display = 'block';
-            document.getElementById('contact-form-view').style.display = 'none';
-            const addContactTrigger = document.getElementById('btn-add-contact-trigger');
-            if (addContactTrigger) addContactTrigger.style.display = 'inline-flex';
-            resetContactForm();
+            // 關閉所有個人設定分拆卡片的編輯
+            closeAllProfileEditModes();
         }
 
 
@@ -770,7 +800,9 @@
             `).join('');
         }
 
+        // 點擊修改聯絡管道：安全重置其餘編輯器並開啟
         function editContact(id) {
+            closeAllProfileEditModes(); 
             const c = dbCache.contacts.find(item => item.id === id);
             if (c) {
                 document.getElementById('contact-id').value = c.id;
@@ -876,7 +908,6 @@
                                 <span>置頂</span>
                             </span>
                         ` : ''}
-                        <!-- 【已開通】：後台列表標題高亮 -->
                         <strong style="color: var(--md-sys-color-text-main);">${parseHighlights(ann.title)}</strong>
                     </div>
                     <div style="display: flex; gap: 0.5rem;">
@@ -887,7 +918,9 @@
             `).join('');
         }
 
+        // 點擊編輯公告：強制自動取消前一個編輯狀態後開啟
         function editAnnouncement(id) {
+            resetAnnForm(); // 安全防禦：先取消重置現有編輯狀態
             const ann = dbCache.announcements.find(item => item.id === id);
             if (ann) {
                 document.getElementById('ann-id').value = ann.id;
@@ -909,6 +942,13 @@
             document.getElementById('form-announcement').reset();
             document.getElementById('ann-id').value = '';
             document.getElementById('form-ann-title').innerHTML = '<span class="material-symbols-outlined">add_box</span><span>新增系統公告</span>';
+        }
+
+        async function deleteAnnouncement(id) {
+            if (confirm('確定要永久刪除此公告嗎？這個動作將會自動同步提交至 GitHub。')) {
+                dbCache.announcements = dbCache.announcements.filter(item => item.id !== id);
+                await syncToGitHub('刪除公告');
+            }
         }
 
         // ===================================================
@@ -989,7 +1029,9 @@
             `).join('');
         }
 
+        // 點擊編輯作品：安全防禦，先取消重置現有作品編輯狀態後開啟
         function editProject(id) {
+            resetProjForm(); // 安全防禦
             const proj = dbCache.projects.find(item => item.id === id);
             if (proj) {
                 document.getElementById('proj-id').value = proj.id;
