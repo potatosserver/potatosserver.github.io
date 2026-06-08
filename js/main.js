@@ -1,10 +1,10 @@
 // js/main.js
 
 // ==========================================
-// 核心儲存庫設定
+// 核心儲存庫設定 (已更新為您的實際主頁儲存庫)
 // ==========================================
 const REPO_OWNER = 'potatosserver';
-const REPO_NAME = 'my-portfolio'; // 您的專案倉庫名稱
+const REPO_NAME = 'potatosserver.github.io'; // 已修正為您的個人主頁儲存庫
 const DATABASE_PATH = 'data/projects_articles.json';
 
 // 輔助函式：支援 UTF-8 中文的 Base64 編解碼 (防亂碼)
