@@ -345,3 +345,52 @@ p {
         padding-top: calc(var(--spacing-unit) * 9);
     }
 }
+/* style.css - 新增公告區塊樣式 */
+.announcement-section {
+    background-color: var(--surface-color);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 5px solid var(--primary-color); /* 左側極光藍邊框 */
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.announcement-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.announcement-list {
+    list-style: none;
+}
+
+.announcement-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.announcement-item:last-child {
+    border-bottom: none; /* 最後一項移除底線 */
+}
+
+.announcement-date {
+    font-size: 0.85rem;
+    color: var(--primary-color);
+    font-weight: 500;
+    white-space: nowrap;
+    padding-top: 0.15rem;
+}
+
+.announcement-content {
+    color: var(--text-secondary-color);
+    font-size: 0.95rem;
+}
