@@ -35,13 +35,6 @@
       "title": "網站系統成功升級！",
       "content": "目前已將所有分頁進行實體檔案拆分，並部署至 GitHub Pages，支援雲端管理！",
       "pinned": true
-    },
-    {
-      "id": "ann-2",
-      "date": "2026-06-05",
-      "title": "YouBike 2.0 查詢工具與個人網站深度整合測試中",
-      "content": "正在開發將 YouBike 2.0 站點即時車輛與空位查詢功能直接整合至個人首頁的小工具，提供最直覺的使用體驗。",
-      "pinned": false
     }
   ],
   "projects": [
