@@ -27,6 +27,12 @@
       "title": "高雄即時公車",
       "description": "一個能夠查詢高雄地區公車即時動態的應用程式。",
       "github_url": "https://github.com/potatosserver/kaohsiung_live_bus"
+    },
+    {
+      "id": "proj-1780916496434",
+      "title": "1",
+      "description": "2",
+      "github_url": "https://potatosserver.github.io"
     }
   ]
 }
