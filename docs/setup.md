@@ -62,6 +62,7 @@
   "github_client_id": "您的_GITHUB_CLIENT_ID",
   "cloudflare_worker_url": "您的_CLOUDFLARE_WORKER_網址"
 }
+```
 
 ---
 
