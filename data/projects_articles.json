@@ -35,6 +35,13 @@
       "date": "2026-06-08",
       "content": "目前已將所有分頁進行實體檔案拆分，並部署至 {h}GitHub Pages{/h}，支援雲端管理！\n歡迎大家fork使用",
       "pinned": false
+    },
+    {
+      "id": "ann-1781094483864",
+      "title": "Walk Go封閉測試加入說明",
+      "date": "2026-06-10",
+      "content": "我開發了一個App叫Walk Go\n當您進行的運動不易被手機偵測，或單純忘記攜帶手機時，WalkGo 可以幫助您補登這些遺漏的步數。它提供了一個強大且易於使用的解決方案，讓您的健康數據更完整。\n\n而現在它準備上架到Google Play商店\n在那之前將進行封閉測試\n我將廣邀各位進行測試人員的加入\n詳情點擊這裡查看更多\nhttps://github.com/potatosserver/WalkGo/blob/main/WalkGo_CBT_Guide.md",
+      "pinned": true
     }
   ],
   "projects": [
