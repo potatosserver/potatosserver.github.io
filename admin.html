@@ -21,7 +21,7 @@
     <header id="navbar-container" class="navbar"></header>
 
     <!-- ===================================================
-         1. 未登入狀態
+         1. 未登入狀態：安全登入卡片
          =================================================== -->
     <div id="login-view" class="full-width-content" style="display: none; max-width: 480px; text-align: center; margin-top: 15vh;">
         <div class="card" style="padding: 3rem 2rem;">
@@ -36,7 +36,7 @@
     </div>
 
     <!-- ===================================================
-         2. 已登入狀態
+         2. 已登入狀態：後台管理介面佈局
          =================================================== -->
     <div id="admin-view" class="layout-container" style="display: none;">
         
@@ -53,10 +53,9 @@
                     <span>系統狀態與設定</span>
                 </h2>
                 
-                <!-- 移除了 align-items: start，使其預設為 stretch 進行左右等高對齊 -->
                 <div class="portfolio-grid">
                     
-                    <!-- A. 左欄：GitHub 管理員個人名片卡 (移除了個人自介) -->
+                    <!-- A. 左欄：GitHub 管理員個人名片卡 -->
                     <div class="card" style="padding: 2.5rem 2rem; align-items: center; text-align: center; justify-content: center; height: 100%;">
                         <!-- 使用者大頭貼 -->
                         <img id="profile-avatar" src="" alt="頭像" style="width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--md-sys-color-primary); margin-bottom: 1.25rem; background-color: rgba(255,255,255,0.05); object-fit: cover;">
@@ -75,10 +74,10 @@
                         </span>
                     </div>
 
-                    <!-- B. 右欄：儲存庫連線資訊與操作 (設定 height: 100% 以完美對齊左欄) -->
+                    <!-- B. 右欄：儲存庫連線資訊與操作 -->
                     <div style="display: flex; flex-direction: column; gap: 1.5rem; height: 100%;">
                         
-                        <!-- 雲端設定詳情卡片 ( flex-grow: 1 彈性膨脹撐滿空間 ) -->
+                        <!-- 雲端設定詳情卡片 -->
                         <div class="card" style="padding: 1.75rem 2rem; flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
                             <h3 style="color: var(--md-sys-color-primary); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
                                 <span class="material-symbols-outlined">database</span>
@@ -170,7 +169,7 @@
                     </div>
                     <div id="home-form-mode" style="display: none;" class="admin-view-fade">
                         <form id="form-home">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.2rem;">
+                            <div class="m3-grid-2" style="margin-bottom: 1.2rem;">
                                 <div style="display: flex; flex-direction: column;">
                                     <label style="margin-bottom: 0.5rem; font-weight: bold;">主標題 (H1)</label>
                                     <input type="text" id="home-input-title" class="m3-text-field" required>
@@ -216,7 +215,7 @@
                                 <textarea id="about-input-bio" rows="4" class="m3-text-field" required></textarea>
                             </div>
                             
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                            <div class="m3-grid-2" style="margin-bottom: 1.5rem;">
                                 <div style="display: flex; flex-direction: column;">
                                     <label style="margin-bottom: 0.5rem; font-weight: bold;">技能區塊標題</label>
                                     <input type="text" id="about-input-skills-title" class="m3-text-field" required>
@@ -235,15 +234,15 @@
 
                             <div style="border-top: 1px solid var(--md-sys-color-outline); padding-top: 1.2rem; margin-bottom: 1.5rem;">
                                 <h4 style="margin-bottom: 1rem;">技能清單管理</h4>
-                                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 0.75rem;">
+                                <div class="m3-grid-skills" style="margin-bottom: 0.75rem;">
                                     <input type="text" id="skill-lbl-0" class="m3-text-field" placeholder="標籤，例如：語言" required>
                                     <input type="text" id="skill-val-0" class="m3-text-field" placeholder="內容，例如：Python, C++" required>
                                 </div>
-                                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 0.75rem;">
+                                <div class="m3-grid-skills" style="margin-bottom: 0.75rem;">
                                     <input type="text" id="skill-lbl-1" class="m3-text-field" placeholder="標籤，例如：領域" required>
                                     <input type="text" id="skill-val-1" class="m3-text-field" placeholder="內容，例如：前端開發" required>
                                 </div>
-                                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 0.75rem;">
+                                <div class="m3-grid-skills" style="margin-bottom: 0.75rem;">
                                     <input type="text" id="skill-lbl-2" class="m3-text-field" placeholder="標籤，例如：興趣" required>
                                     <input type="text" id="skill-val-2" class="m3-text-field" placeholder="內容，例如：探索小工具" required>
                                 </div>
@@ -273,7 +272,7 @@
                     <div id="contact-form-view" style="display: none;" class="admin-view-fade">
                         <form id="form-contact">
                             <input type="hidden" id="contact-id">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.2rem;">
+                            <div class="m3-grid-2" style="margin-bottom: 1.2rem;">
                                 <div style="display: flex; flex-direction: column;">
                                     <label style="margin-bottom: 0.5rem; font-weight: bold;">平台/分類名稱</label>
                                     <input type="text" id="contact-input-platform" class="m3-text-field" placeholder="例如：Email、GitHub" required>
@@ -289,7 +288,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                            <div class="m3-grid-2" style="margin-bottom: 1.5rem;">
                                 <div style="display: flex; flex-direction: column;">
                                     <label style="margin-bottom: 0.5rem; font-weight: bold;">展示文字</label>
                                     <input type="text" id="contact-input-value" class="m3-text-field" placeholder="例如：potatosserver@gmail.com" required>
@@ -330,7 +329,7 @@
                     <form id="form-announcement">
                         <input type="hidden" id="ann-id">
                         
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.2rem;">
+                        <div class="m3-grid-2" style="margin-bottom: 1.2rem;">
                             <div style="display: flex; flex-direction: column;">
                                 <label style="margin-bottom: 0.5rem; font-weight: bold;">公告標題</label>
                                 <input type="text" id="ann-input-title" class="m3-text-field">
@@ -393,7 +392,7 @@
                     <form id="form-project">
                         <input type="hidden" id="proj-id">
                         
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.2rem;">
+                        <div class="m3-grid-2" style="margin-bottom: 1.2rem;">
                             <div style="display: flex; flex-direction: column;">
                                 <label style="margin-bottom: 0.5rem; font-weight: bold;">專案名稱 (作品名稱)</label>
                                 <input type="text" id="proj-input-title" class="m3-text-field">
