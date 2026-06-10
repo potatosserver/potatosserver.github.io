@@ -37,7 +37,7 @@ html, body {
     line-height: 1.6;
     scroll-behavior: smooth;
     
-    /* 【行動端修正】：全域強制鎖定，禁止網頁產生多餘的左右滑動與溢出 */
+    /* 【行動端修正 1】：全域強制鎖定，禁止網頁產生多餘的左右滑動與溢出 */
     overflow-x: hidden;
     width: 100%;
 }
@@ -47,14 +47,14 @@ html, body {
     font-size: 1.3em;
 }
 
-/* 確保全站所有文字與超連結在遇到長網址時自動安全折行 */
+/* 【行動端修正 2】：確保長網址或文字遇到邊界時自動安全換行，絕不撐破卡片 */
 p, span, a, div, h1, h2, h3, h4, strong, small {
     overflow-wrap: break-word;
     word-wrap: break-word;
     word-break: break-word;
 }
 
-/* 極長純網址特定強制斷行 */
+/* 極長純網址強制斷行 */
 a {
     word-break: break-all;
 }
@@ -109,7 +109,7 @@ a {
 }
 
 /* ==========================================
-   2. M3 頂部導覽列 (Navbar)
+   2. M3 頂部導覽列 (Navbar) & 漢堡按鈕架構
    ========================================== */
 .navbar {
     background-color: var(--md-sys-color-surface);
@@ -125,6 +125,30 @@ a {
     z-index: 1000;
     border-bottom: 1px solid var(--md-sys-color-outline);
     box-sizing: border-box;
+}
+
+/* 導覽列左側標頭封裝 ( 包含名字與漢堡按鈕 ) */
+.navbar-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* 手機端漢堡按鈕：預設在電腦端隱藏 */
+#btn-hamburger {
+    background: transparent;
+    border: none;
+    color: var(--md-sys-color-text-main);
+    cursor: pointer;
+    font-size: 1.8rem;
+    padding: 4px;
+    border-radius: 50%;
+    display: none; /* 電腦版隱藏 */
+    transition: background-color 0.2s;
+}
+
+#btn-hamburger:hover {
+    background-color: rgba(255, 255, 255, 0.08);
 }
 
 .nav-brand {
@@ -184,10 +208,11 @@ a {
     top: var(--nav-height); /* 避開頂部導覽列 */
     bottom: 0;
     left: 0;
-    z-index: 900;
+    z-index: 1200; /* 行動端抽屜層級 */
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* M3 標準動畫過渡 */
 }
 
 .sidebar-menu {
@@ -227,6 +252,25 @@ a {
     background-color: var(--md-sys-color-secondary-container);
     color: var(--md-sys-color-primary);
     font-weight: 600;
+}
+
+/* 【新增】：後台抽屜選單專用半透明遮罩背景 */
+#sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1100; /* 低於側邊欄，高於主內容 */
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#sidebar-backdrop.show {
+    display: block;
+    opacity: 1;
 }
 
 /* ==========================================
@@ -411,8 +455,27 @@ p {
     color: var(--md-sys-color-text-main);
 }
 
+/* 【核心新增 3】：統一後台管理列表項目與動作按鈕容器，徹底解決手機端溢出推擠 */
+.admin-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.15rem;
+    background: var(--md-sys-color-background);
+    border: 1px solid var(--md-sys-color-outline);
+    border-radius: var(--md-shape-corner-medium);
+    transition: border-color 0.2s;
+    width: 100%;
+}
+
+.admin-list-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0; /* 鎖定大小不允許被擠壓變形 */
+}
+
 /* ==========================================
-   6. 新增：M3 進階自訂控制項 & 置頂標籤
+   6. M3 進階自訂控制項 & 置頂標籤
    ========================================== */
 
 /* 自製紅底白字置頂標籤 */
@@ -526,50 +589,49 @@ p {
 }
 
 /* ==========================================
-   9. 新增：M3 響應式雙欄/三欄自適應網格 (RWD 防跑版關鍵)
-   ========================================== */
-
-/* 雙欄表單自適應摺疊 */
-.m3-grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-}
-
-/* 三欄/技能列表自適應摺疊 */
-.m3-grid-skills {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 1rem;
-}
-
-/* ==========================================
-   10. 響應式佈局 (RWD 安全自適應優化)
+   10. 響應式佈局 (RWD 安全自適應與極致體驗優化)
    ========================================== */
 @media (max-width: 768px) {
+    /* 【頂部導覽列雙行結構優化】：第一行品牌與漢堡，第二行橫向滾動按鈕 */
     .navbar {
         flex-direction: column;
-        padding: var(--spacing-unit);
+        align-items: stretch; /* 撐滿寬度 */
+        padding: 0.75rem 1rem;
         height: auto;
-        position: relative; /* 手機端取消固定定位，避免與內容重疊 */
+        position: relative; /* 手機端取消固定定位，防卡死 */
         width: 100%;
         box-sizing: border-box;
     }
     
+    /* 啟動手機端漢堡選單按鈕 */
+    #btn-hamburger {
+        display: block;
+    }
+
+    /* 手機端專屬：網航按鈕「不換行、可橫向滑動」M3 頂級導覽列體驗 */
     .nav-links {
-        margin-top: var(--spacing-unit);
+        margin-top: 0.75rem;
         width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
+        display: flex;
+        overflow-x: auto; /* 允許橫向滑動滾動 */
+        white-space: nowrap; /* 強制不換行 */
         gap: 0.5rem;
+        padding-bottom: 4px; /* 預留滑動時的觸覺空間 */
+        -webkit-overflow-scrolling: touch; /* 啟用 iOS 流暢慣性滾動 */
+    }
+
+    /* 隱藏手機端導覽滾動條，保持極致乾淨視覺 */
+    .nav-links::-webkit-scrollbar {
+        display: none;
     }
     
     .nav-link {
-        padding: 0.5rem 0.85rem; /* 手機端縮小導覽按鈕，防擁擠溢出 */
+        flex-shrink: 0; /* 鎖定按鈕不允許在滾動時被擠壓縮小 */
+        padding: 0.5rem 0.95rem; 
         font-size: 0.85rem;
     }
-
-    /* 縮小手機端卡片與容器的左右邊距，釋放空間並防止溢出 */
+    
+    /* 縮小手機端前台卡片與容器的左右邊距，釋放螢幕空間並防溢出 */
     .full-width-content {
         margin-top: 0;
         padding: calc(var(--spacing-unit) * 2) var(--spacing-unit);
@@ -577,15 +639,26 @@ p {
         box-sizing: border-box;
     }
 
+    /* 【手機端抽屜式側邊欄 (Navigation Drawer)】：預設隱藏於螢幕左外側 */
     .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
+        position: fixed;
+        width: var(--sidebar-width);
+        height: 100vh;
         top: 0;
-        border-right: none;
-        border-bottom: 1px solid var(--md-sys-color-outline);
-        padding: 1rem;
+        bottom: 0;
+        left: 0;
+        z-index: 1500; /* 高於所有層級，蓋在 Navbar 上 */
+        border-right: 1px solid var(--md-sys-color-outline);
+        border-bottom: none;
+        padding: 2rem 1.25rem;
         box-sizing: border-box;
+        transform: translateX(-100%); /* 藏到左邊外側 */
+        box-shadow: 16px 0 24px rgba(0, 0, 0, 0.4); /* M3 抽屜陰影 */
+    }
+
+    /* 抽屜啟動滑出樣式 */
+    .sidebar.open {
+        transform: translateX(0); /* 滑入畫面 */
     }
 
     .main-content {
@@ -597,28 +670,28 @@ p {
     }
 
     /* --------------------------------------
-       【後台 RWD 核心覆蓋】：解決後台手機端嚴重擠壓問題
+       【後台 RWD 核心堆疊】：解決手機端表格、表單與列表擠壓
        -------------------------------------- */
     .m3-grid-2 {
-        grid-template-columns: 1fr; /* 手機端：雙欄欄位全自動堆疊為單欄，防擠壓 */
+        grid-template-columns: 1fr; /* 雙欄欄位全自動堆疊為單欄，防擠壓 */
         gap: 1rem;
     }
 
     .m3-grid-skills {
-        grid-template-columns: 1fr; /* 手機端：技能管理清單全自動堆疊 */
+        grid-template-columns: 1fr; /* 技能管理清單全自動堆疊 */
         gap: 0.75rem;
     }
 
     .portfolio-grid {
-        grid-template-columns: 1fr !important; /* 手機端：Settings 連線卡片雙欄強制改為單欄堆疊 */
+        grid-template-columns: 1fr !important; /* Settings 連線卡片雙欄強制改為單欄堆疊 */
         gap: 1.5rem;
     }
 
     .layout-container {
-        flex-direction: column; /* 手機端：側邊欄與主要內容區改為上下排列 */
+        flex-direction: column; 
     }
 
-    /* 手機端：連線設定卡片組高度自動自適應，取消 stretching 100% 高度限制 */
+    /* 解決連線面板高度被 100% 拉伸過長問題 */
     .admin-panel-section .portfolio-grid > div {
         height: auto !important;
     }
@@ -633,5 +706,18 @@ p {
     .admin-panel-header button {
         width: 100% !important; /* 按鈕寬度撐滿手機螢幕，極易點擊 */
         justify-content: center;
+    }
+
+    /* 【安全優化】：公告與作品的管理清單，在手機端由左右並排自動轉為「上下堆疊」，防按鈕溢出 */
+    .admin-list-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .admin-list-actions {
+        width: 100%;
+        justify-content: flex-end; /* 在手機端將編輯、刪除按鈕靠右排列 */
     }
 }
