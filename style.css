@@ -36,11 +36,27 @@ html, body {
     color: var(--md-sys-color-text-main);
     line-height: 1.6;
     scroll-behavior: smooth;
+    
+    /* 【行動端修正 1】：全域強制鎖定，禁止網頁產生多餘的左右滑動與溢出 */
+    overflow-x: hidden;
+    width: 100%;
 }
 
 .material-symbols-outlined {
     vertical-align: middle;
     font-size: 1.3em;
+}
+
+/* 【行動端修正 2】：確保全站所有文字與超連結在遇到長網址時自動折行，絕不撐破卡片外框 */
+p, span, a, div, h1, h2, h3, h4, strong, small {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+/* 極長純網址特定強制斷行 */
+a {
+    word-break: break-all;
 }
 
 /* ==========================================
@@ -108,6 +124,7 @@ html, body {
     height: var(--nav-height);
     z-index: 1000; /* 置於所有內容最上層 */
     border-bottom: 1px solid var(--md-sys-color-outline);
+    box-sizing: border-box;
 }
 
 .nav-brand {
@@ -213,7 +230,7 @@ html, body {
 }
 
 /* ==========================================
-   4. 主要內容排版定位區
+   4. 主要內容排版定位區 ( 採用安全 box-sizing )
    ========================================== */
 
 /* 【前台展示頁】滿版無側邊欄樣式 */
@@ -223,6 +240,7 @@ html, body {
     max-width: 960px;
     margin-left: auto;
     margin-right: auto;
+    box-sizing: border-box;
 }
 
 /* 【後台管理頁】左右並排佈局容器 */
@@ -239,6 +257,7 @@ html, body {
     padding: calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 4);
     background-color: var(--md-sys-color-background);
     min-height: calc(100vh - var(--nav-height));
+    box-sizing: border-box;
 }
 
 /* ==========================================
@@ -507,7 +526,7 @@ p {
 }
 
 /* ==========================================
-   8. 響應式佈局 (RWD)
+   8. 響應式佈局 (RWD 安全自適應優化)
    ========================================== */
 @media (max-width: 768px) {
     .navbar {
@@ -515,6 +534,8 @@ p {
         padding: var(--spacing-unit);
         height: auto;
         position: relative; /* 手機端取消固定定位，避免與內容重疊 */
+        width: 100%;
+        box-sizing: border-box;
     }
     
     .nav-links {
@@ -522,11 +543,20 @@ p {
         width: 100%;
         justify-content: center;
         flex-wrap: wrap;
+        gap: 0.5rem;
     }
     
+    .nav-link {
+        padding: 0.5rem 0.85rem; /* 手機端縮小導覽按鈕，防擁擠溢出 */
+        font-size: 0.85rem;
+    }
+
+    /* 縮小手機端卡片與容器的左右邊距，釋放空間並防止溢出 */
     .full-width-content {
         margin-top: 0;
-        padding: calc(var(--spacing-unit) * 2);
+        padding: calc(var(--spacing-unit) * 2) var(--spacing-unit);
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .sidebar {
@@ -536,11 +566,15 @@ p {
         top: 0;
         border-right: none;
         border-bottom: 1px solid var(--md-sys-color-outline);
+        padding: 1rem;
+        box-sizing: border-box;
     }
 
     .main-content {
         margin-left: 0;
         margin-top: 0;
-        padding: calc(var(--spacing-unit) * 2);
+        padding: calc(var(--spacing-unit) * 2) var(--spacing-unit);
+        width: 100%;
+        box-sizing: border-box;
     }
 }
