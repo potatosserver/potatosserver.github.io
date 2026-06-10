@@ -37,7 +37,7 @@ html, body {
     line-height: 1.6;
     scroll-behavior: smooth;
     
-    /* 【行動端修正 1】：全域強制鎖定，禁止網頁產生多餘的左右滑動與溢出 */
+    /* 【行動端修正】：全域強制鎖定，禁止網頁產生多餘的左右滑動與溢出 */
     overflow-x: hidden;
     width: 100%;
 }
@@ -47,7 +47,7 @@ html, body {
     font-size: 1.3em;
 }
 
-/* 【行動端修正 2】：確保全站所有文字與超連結在遇到長網址時自動折行，絕不撐破卡片外框 */
+/* 確保全站所有文字與超連結在遇到長網址時自動安全折行 */
 p, span, a, div, h1, h2, h3, h4, strong, small {
     overflow-wrap: break-word;
     word-wrap: break-word;
@@ -122,7 +122,7 @@ a {
     left: 0;
     width: 100%;
     height: var(--nav-height);
-    z-index: 1000; /* 置於所有內容最上層 */
+    z-index: 1000;
     border-bottom: 1px solid var(--md-sys-color-outline);
     box-sizing: border-box;
 }
@@ -526,7 +526,25 @@ p {
 }
 
 /* ==========================================
-   8. 響應式佈局 (RWD 安全自適應優化)
+   9. 新增：M3 響應式雙欄/三欄自適應網格 (RWD 防跑版關鍵)
+   ========================================== */
+
+/* 雙欄表單自適應摺疊 */
+.m3-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+/* 三欄/技能列表自適應摺疊 */
+.m3-grid-skills {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1rem;
+}
+
+/* ==========================================
+   10. 響應式佈局 (RWD 安全自適應優化)
    ========================================== */
 @media (max-width: 768px) {
     .navbar {
@@ -576,5 +594,44 @@ p {
         padding: calc(var(--spacing-unit) * 2) var(--spacing-unit);
         width: 100%;
         box-sizing: border-box;
+    }
+
+    /* --------------------------------------
+       【後台 RWD 核心覆蓋】：解決後台手機端嚴重擠壓問題
+       -------------------------------------- */
+    .m3-grid-2 {
+        grid-template-columns: 1fr; /* 手機端：雙欄欄位全自動堆疊為單欄，防擠壓 */
+        gap: 1rem;
+    }
+
+    .m3-grid-skills {
+        grid-template-columns: 1fr; /* 手機端：技能管理清單全自動堆疊 */
+        gap: 0.75rem;
+    }
+
+    .portfolio-grid {
+        grid-template-columns: 1fr !important; /* 手機端：Settings 連線卡片雙欄強制改為單欄堆疊 */
+        gap: 1.5rem;
+    }
+
+    .layout-container {
+        flex-direction: column; /* 手機端：側邊欄與主要內容區改為上下排列 */
+    }
+
+    /* 手機端：連線設定卡片組高度自動自適應，取消 stretching 100% 高度限制 */
+    .admin-panel-section .portfolio-grid > div {
+        height: auto !important;
+    }
+
+    /* 後台標題在手機端自適應垂直排列，防新增按鈕被擠壓 */
+    .admin-panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .admin-panel-header button {
+        width: 100% !important; /* 按鈕寬度撐滿手機螢幕，極易點擊 */
+        justify-content: center;
     }
 }
