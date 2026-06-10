@@ -43,7 +43,7 @@
         <!-- 左側側邊欄容器 -->
         <div id="sidebar-container"></div>
 
-        <!-- 【新增】：M3 抽屜式選單半透明遮罩背景容器 -->
+        <!-- M3 抽屜式選單半透明遮罩背景容器 -->
         <div id="sidebar-backdrop"></div>
 
         <!-- 右側主要內容區域 -->
@@ -58,7 +58,7 @@
                 
                 <div class="portfolio-grid">
                     
-                    <!-- A. 左欄：GitHub 管理員個人名片卡 -->
+                    <!-- A. 左欄：GitHub 管理員個人名片卡 ( 移除個人簡介 ) -->
                     <div class="card" style="padding: 2.5rem 2rem; align-items: center; text-align: center; justify-content: center; height: 100%;">
                         <!-- 使用者大頭貼 -->
                         <img id="profile-avatar" src="" alt="頭像" style="width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--md-sys-color-primary); margin-bottom: 1.25rem; background-color: rgba(255,255,255,0.05); object-fit: cover;">
@@ -247,7 +247,7 @@
                                 </div>
                                 <div class="m3-grid-skills" style="margin-bottom: 0.75rem;">
                                     <input type="text" id="skill-lbl-2" class="m3-text-field" placeholder="標籤，例如：興趣" required>
-                                    <input type="text" id="skill-val-2" class="m3-text-field" placeholder="內容，例如：探索小工具" required>
+                                    <input type="text" id="skill-val-2" class="m3-text-field" placeholder="內容，例如：探索生活中的瑣事" required>
                                 </div>
                             </div>
                             <div style="display: flex; gap: 1rem;">
@@ -581,6 +581,16 @@
             panels.forEach(panel => {
                 panel.style.display = 'none';
             });
+        }
+
+        // 預留黑背景 Backdrop 的隱藏
+        function hideBackdrop() {
+            const backdrop = document.getElementById('sidebar-backdrop');
+            const sidebar = document.querySelector('.sidebar');
+            if (backdrop && sidebar) {
+                sidebar.classList.remove('open');
+                backdrop.classList.remove('show');
+            }
         }
 
         function bindLogoutEvent() {
