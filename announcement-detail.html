@@ -70,6 +70,17 @@
             await loadDetail();
         });
 
+        // 新增：網址自動轉換超連結函數 ( 採用安全正則表達式 )
+        function convertURLsToLinks(text) {
+            if (!text) return "";
+            // 匹配 http:// 或 https:// 開頭，直到遇到空白或特定字元為止的網址
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return text.replace(urlRegex, function(url) {
+                // 將網址包裝成 M3 高亮色、點擊自動開啟新分頁的超連結
+                return `<a href="${url}" target="_blank" style="color: var(--md-sys-color-primary); text-decoration: underline; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">${url}</a>`;
+            });
+        }
+
         // 動態載入並渲染公告詳細內容
         async function loadDetail() {
             const container = document.getElementById('announcement-detail-content');
@@ -97,14 +108,22 @@
                     return;
                 }
 
-                // 【核心修正】：將 <div> 與內文變數緊密排在同一行，防止 pre-wrap 抓到縮排空格
+                // 核心改動：先進行網址轉超連結 (convertURLsToLinks)，再進行高亮轉換 (parseHighlights)
+                const formattedTitle = parseHighlights(convertURLsToLinks(ann.title));
+                const formattedContent = parseHighlights(convertURLsToLinks(ann.content));
+
+                // 成功尋獲，渲染標題、日期、詳細內容
                 container.innerHTML = `
                     <div style="display: flex; gap: 0.5rem; align-items: center; color: var(--md-sys-color-primary); margin-bottom: 0.5rem; font-size: 0.95rem;">
                         <span class="material-symbols-outlined" style="font-size: 1.25em;">calendar_month</span>
                         <span>發布日期：${ann.date}</span>
                     </div>
-                    <h1 style="color: var(--md-sys-color-text-main); margin-bottom: 1.25rem; border-bottom: 2px solid var(--md-sys-color-primary); padding-bottom: 0.75rem; line-height: 1.4; font-size: 2rem; letter-spacing: -0.02em;">${parseHighlights(ann.title)}</h1>
-                    <div style="font-size: 1.05rem; line-height: 1.8; color: var(--md-sys-color-text-main); white-space: pre-wrap; letter-spacing: 0.02em;">${parseHighlights(ann.content)}</div>
+                    <h1 style="color: var(--md-sys-color-text-main); margin-bottom: 1.25rem; border-bottom: 2px solid var(--md-sys-color-primary); padding-bottom: 0.75rem; line-height: 1.4; font-size: 2rem; letter-spacing: -0.02em;">
+                        ${formattedTitle}
+                    </h1>
+                    <div style="font-size: 1.05rem; line-height: 1.8; color: var(--md-sys-color-text-main); white-space: pre-wrap; letter-spacing: 0.02em;">
+                        ${formattedContent}
+                    </div>
                 `;
 
                 document.title = `${ann.title} | 系統公告`;
