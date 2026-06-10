@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="style.css">
 </head>
-<!-- 加上 admin-page 類別，使導覽列能精確辨識手機端的漢堡選單啟用 -->
 <body class="admin-page">
 
     <!-- 預載入動畫 (Preloader) -->
@@ -43,6 +42,9 @@
         
         <!-- 左側側邊欄容器 -->
         <div id="sidebar-container"></div>
+
+        <!-- 【新增】：M3 抽屜式選單半透明遮罩背景容器 -->
+        <div id="sidebar-backdrop"></div>
 
         <!-- 右側主要內容區域 -->
         <main class="main-content">
@@ -579,16 +581,6 @@
             panels.forEach(panel => {
                 panel.style.display = 'none';
             });
-        }
-
-        // 預留黑背景 Backdrop 的隱藏
-        function hideBackdrop() {
-            const backdrop = document.getElementById('sidebar-backdrop');
-            const sidebar = document.querySelector('.sidebar');
-            if (backdrop && sidebar) {
-                sidebar.classList.remove('open');
-                backdrop.classList.remove('show');
-            }
         }
 
         function bindLogoutEvent() {
